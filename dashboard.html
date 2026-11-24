@@ -8,6 +8,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Librería SheetJS para generar archivos Excel (.xlsx) reales -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- SDK oficial de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -44,6 +46,20 @@
 
       <form onsubmit="handleLogin(event)" class="space-y-4">
         <div>
+          <label for="loginEmail" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+            Correo de acceso
+          </label>
+          <input
+            type="email"
+            id="loginEmail"
+            required
+            autocomplete="username"
+            placeholder="correo@ejemplo.com"
+            class="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 bg-slate-50 text-slate-900 font-bold text-sm focus:outline-none focus:border-[#14532d] focus:bg-white transition"
+          />
+        </div>
+
+        <div>
           <label for="loginPass" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
             Clave de acceso
           </label>
@@ -58,11 +74,12 @@
         </div>
 
         <p id="loginError" class="hidden text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-2xl px-3.5 py-2.5">
-          Credencial no válida. Verifique e intente de nuevo.
+          Credencial no válida. Verifique correo y contraseña e intente de nuevo.
         </p>
 
         <button
           type="submit"
+          id="loginBtn"
           class="w-full py-3.5 rounded-2xl bg-[#14532d] hover:bg-[#0f3f22] text-white font-extrabold text-sm tracking-wide shadow-lg shadow-emerald-950/20 transition cursor-pointer active:scale-[0.99]"
         >
           Entrar a Control Total
@@ -83,7 +100,7 @@
             </span>
             <h1 class="text-base sm:text-lg font-extrabold tracking-tight">Control Total de Operación</h1>
           </div>
-          <p class="text-xs text-emerald-100/80 mt-0.5">Soyapango, San Salvador • Sincronizado en tiempo real con la tienda</p>
+          <p class="text-xs text-emerald-100/80 mt-0.5">Soyapango, San Salvador • Sincronizado con la nube y la tienda</p>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
@@ -317,7 +334,7 @@
 
       <!-- 7. RESPALDO Y EXPORTACIÓN -->
       <footer class="bg-white rounded-3xl border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
-        <span class="font-medium">Almacenamiento local sincronizado con index.html.</span>
+        <span class="font-medium">Sincronizado con Supabase y respaldo local en el navegador.</span>
         <div class="flex items-center gap-2 flex-wrap">
           <button
             type="button"
@@ -666,9 +683,18 @@
   </div>
 
   <script>
-    const ADMIN_KEY = "FYVM2026";
+    const SUPABASE_URL = "https://vdfjjcimdwxrtrtyped.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_oFWXcjT-7MBWW2VHWDl7Aw_RcmzLQKX";
+    const CLOUD_ROW_ID = "frutas_y_verduras_mancia_v1";
     const STORAGE_KEY = "biz_control_total_v6";
     const DEFAULT_BOSS_WHATSAPP = "50379698478";
+
+    const supabaseClient =
+      typeof window.supabase !== "undefined" &&
+      SUPABASE_URL &&
+      !SUPABASE_PUBLISHABLE_KEY.startsWith("PEGA_AQUI")
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+        : null;
 
     // Fecha local exacta de El Salvador (UTC-6)
     const todayISO = () => {
@@ -779,11 +805,53 @@
       const n = Number(v || 0);
       return Number.isInteger(n) ? String(n) : n.toFixed(1);
     };
+
+    async function syncToCloud() {
+      if (!supabaseClient) return;
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+        const { error } = await supabaseClient
+          .from("store_control")
+          .upsert({
+            id: CLOUD_ROW_ID,
+            data: db,
+            updated_at: new Date().toISOString()
+          });
+        if (error) {
+          showToast("Guardado local; revisa la conexión con Supabase.", "danger");
+        }
+      } catch {
+        // Conserva copia local si no hay conexión
+      }
+    }
+
     const saveDB = () => {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
       } catch {}
+      syncToCloud();
     };
+
+    async function loadFromCloudAndRender() {
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from("store_control")
+            .select("data")
+            .eq("id", CLOUD_ROW_ID)
+            .maybeSingle();
+
+          if (!error && data && data.data) {
+            db = normalizeDB(data.data);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+          }
+        } catch {
+          // Usa datos locales si no hay red
+        }
+      }
+      render();
+    }
 
     window.addEventListener("storage", (e) => {
       if (e.key === STORAGE_KEY && e.newValue) {
@@ -813,22 +881,45 @@
       if (el) el.classList.add("hidden");
     }
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
-      const pass = document.getElementById("loginPass").value.trim();
-      if (pass === ADMIN_KEY) {
-        document.getElementById("loginError").classList.add("hidden");
-        document.getElementById("authScreen").classList.add("hidden");
-        document.getElementById("appScreen").classList.remove("hidden");
-        document.getElementById("saleDate").value = todayISO();
-        document.getElementById("expDt").value = todayISO();
-        render();
-      } else {
-        document.getElementById("loginError").classList.remove("hidden");
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPass").value;
+      const errorEl = document.getElementById("loginError");
+      const btnEl = document.getElementById("loginBtn");
+
+      if (!supabaseClient) {
+        errorEl.textContent = "Configura SUPABASE_PUBLISHABLE_KEY en dashboard.html antes de iniciar sesión.";
+        errorEl.classList.remove("hidden");
+        return;
       }
+
+      btnEl.disabled = true;
+      btnEl.textContent = "Verificando...";
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+      btnEl.disabled = false;
+      btnEl.textContent = "Entrar a Control Total";
+
+      if (error || !data.session) {
+        errorEl.textContent = "Credencial no válida. Verifique correo y contraseña e intente de nuevo.";
+        errorEl.classList.remove("hidden");
+        return;
+      }
+
+      errorEl.classList.add("hidden");
+      document.getElementById("authScreen").classList.add("hidden");
+      document.getElementById("appScreen").classList.remove("hidden");
+      document.getElementById("saleDate").value = todayISO();
+      document.getElementById("expDt").value = todayISO();
+      await loadFromCloudAndRender();
     }
 
-    function logout() {
+    async function logout() {
+      if (supabaseClient) {
+        await supabaseClient.auth.signOut();
+      }
       document.getElementById("loginPass").value = "";
       document.getElementById("appScreen").classList.add("hidden");
       document.getElementById("authScreen").classList.remove("hidden");
