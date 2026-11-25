@@ -98,7 +98,7 @@
             <h1 class="text-base sm:text-lg font-extrabold tracking-tight">Control Total de Operación</h1>
             <span id="todayBadgeHeader" class="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[11px] font-extrabold"></span>
           </div>
-          <p class="text-xs text-emerald-100/80 mt-0.5">Soyapango, San Salvador • Sincronizado con la nube y la tienda</p>
+          <p class="text-xs text-emerald-100/80 mt-0.5">Soyapango, San Salvador • Reinicio diario a las 12:00 a. m. • Sincronizado</p>
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
@@ -253,7 +253,7 @@
         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3.5">
           <div>
             <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Evolución diaria desde el Día 1</h2>
-            <p class="text-xs text-slate-500">Cada fecha única es una jornada. Seleccione un día o pulse Ver Hoy.</p>
+            <p class="text-xs text-slate-500">Cada fecha única es una jornada. La tienda local inicia en $0.00 cada día a las 12:00 a. m.</p>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
             <button
@@ -789,6 +789,19 @@
           method: s.method || "Efectivo"
         }));
 
+      // Asegura que la venta de 2026-11-24 ($31.25) esté presente si el historial aún no la incluye
+      const hasNov24Sale = cleanSales.some(s => s.date === "2026-11-24" && Math.abs(Number(s.amount) - 31.25) < 0.001);
+      if (!hasNov24Sale) {
+        cleanSales.push({
+          id: 2401,
+          date: "2026-11-24",
+          product: "Ventas del día (libreta)",
+          amount: 31.25,
+          category: "Verduras",
+          method: "Efectivo"
+        });
+      }
+
       const cleanExpenses = (Array.isArray(raw.expenses) ? raw.expenses : base.expenses)
         .filter(g => g && typeof g.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(g.date.trim()))
         .map(g => ({
@@ -823,6 +836,7 @@
     let selectedDay = "ALL";
     let sortDesc = true;
     let toastTimer = null;
+    let activeDayTracker = todayISO();
 
     const fmt = v => `$${Number(v || 0).toFixed(2)}`;
 
@@ -861,8 +875,13 @@
             .maybeSingle();
 
           if (!error && data && data.data) {
-            db = normalizeDB(data.data);
+            const normalized = normalizeDB(data.data);
+            const hadNov24 = Array.isArray(data.data.sales) && data.data.sales.some(s => s.date === "2026-11-24" && Math.abs(Number(s.amount) - 31.25) < 0.001);
+            db = normalized;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+            if (!hadNov24) {
+              await syncToCloud();
+            }
           } else if (!error && !data) {
             await syncToCloud();
           }
@@ -872,6 +891,21 @@
       }
       render();
     }
+
+    function checkMidnightRollover() {
+      const nowDay = todayISO();
+      if (nowDay !== activeDayTracker) {
+        activeDayTracker = nowDay;
+        const saleDateEl = document.getElementById("saleDate");
+        const expDateEl = document.getElementById("expDt");
+        if (saleDateEl) saleDateEl.value = nowDay;
+        if (expDateEl) expDateEl.value = nowDay;
+        render();
+        showToast(`Nuevo día (${nowDay}): contador diario de caja local reiniciado en $0.00.`);
+      }
+    }
+
+    setInterval(checkMidnightRollover, 30000);
 
     window.addEventListener("storage", (e) => {
       if (e.key === STORAGE_KEY && e.newValue) {
@@ -1415,6 +1449,7 @@
 
     function render() {
       const t = todayISO();
+      activeDayTracker = t;
       const headerTodayBadge = document.getElementById("todayBadgeHeader");
       if (headerTodayBadge) headerTodayBadge.textContent = `Hoy: ${t}`;
 
