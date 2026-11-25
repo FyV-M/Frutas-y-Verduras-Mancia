@@ -1,648 +1,1126 @@
 <!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#075e43">
-  <meta name="description" content="Frutas y verduras frescas en Soyapango. Haz tu pedido por WhatsApp y recógelo en el local.">
-  <title>Frutas y Verduras Mancía | Pedidos y mayoreo en Soyapango</title>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#065f46" />
+  <title>Frutas y Verduras Mancía | Retiro Rápido y Mayoreo en Soyapango</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <style>
-    :root {
-      --green-950: #06452f;
-      --green-900: #075e43;
-      --green-700: #13865a;
-      --green-100: #e4f3e9;
-      --cream: #f7f6f1;
-      --ink: #292d2a;
-      --gold: #f5b936;
-    }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
     body {
-      font-family: "Plus Jakarta Sans", sans-serif;
-      font-weight: 400;
-      color: var(--ink);
-      background: var(--cream);
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f4f6f3;
+      color: #1c1917;
+      -webkit-tap-highlight-color: transparent;
     }
-    h1,h2,h3,h4 { letter-spacing: -.035em; line-height: 1.2; }
-    button,a { -webkit-tap-highlight-color: transparent; }
-    button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {
-      outline: 3px solid #f5b936;
-      outline-offset: 3px;
-    }
-    img { display:block; max-width:100%; }
-    .no-scrollbar::-webkit-scrollbar { display:none; }
-    .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
-    .product-image { width:100%; aspect-ratio:4/3; object-fit:cover; object-position:center; }
-    .hero-pattern {
-      background-image: radial-gradient(rgba(255,255,255,.09) 1px, transparent 1px);
-      background-size: 18px 18px;
-    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .product-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
     .drawer-scroll { overscroll-behavior: contain; }
-    @media (prefers-reduced-motion: reduce) {
-      *,*::before,*::after { scroll-behavior:auto !important; transition-duration:.01ms !important; animation-duration:.01ms !important; }
-    }
   </style>
 </head>
+<body class="antialiased pb-28">
 
-<body class="pb-28">
-  <header class="sticky top-0 z-40 border-b border-stone-200 bg-white/95 shadow-sm backdrop-blur">
-    <div class="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-3">
-      <a href="#inicio" class="flex min-w-0 items-center gap-3" aria-label="Frutas y Verduras Mancía, inicio">
-        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-700 text-2xl text-white shadow">🥬</span>
+  <!-- ENCABEZADO -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-stone-200 shadow-xs">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+      <a href="#inicio" class="flex items-center gap-3 min-w-0">
+        <span class="w-11 h-11 rounded-2xl bg-emerald-800 text-white flex items-center justify-center text-2xl shrink-0 shadow-xs">
+          🥬
+        </span>
         <span class="min-w-0">
-          <span class="block truncate text-base font-extrabold text-stone-900 sm:text-xl">Frutas y Verduras Mancía</span>
-          <span id="openStatusBadge" class="mt-1 inline-block rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-extrabold text-emerald-900 sm:text-xs" aria-live="polite">Consultando horario…</span>
+          <span class="block text-base sm:text-xl font-extrabold text-stone-900 truncate">
+            Frutas y Verduras Mancía
+          </span>
+          <span id="openStatusBadge" class="mt-0.5 inline-block text-[11px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900">
+            Consultando horario…
+          </span>
         </span>
       </a>
-      <nav class="flex shrink-0 items-center gap-2" aria-label="Accesos principales">
-        <button type="button" onclick="requestLocalPosAccess()" aria-label="Abrir caja local" title="Caja local" class="flex h-10 w-10 items-center justify-center rounded-xl border border-stone-200 bg-stone-100 text-stone-700 transition hover:border-emerald-300 hover:bg-emerald-50">⚡</button>
-        <a href="dashboard.html" class="rounded-xl bg-stone-900 px-3 py-2.5 text-xs font-extrabold text-amber-300 transition hover:bg-stone-700 sm:text-sm">⚙️ Admin</a>
-        <a href="#ubicacion" class="rounded-xl border border-stone-200 bg-stone-100 px-3 py-2.5 text-xs font-extrabold text-stone-800 transition hover:bg-stone-200 sm:text-sm"><span aria-hidden="true">📍</span><span class="hidden sm:inline"> Cómo llegar</span></a>
+
+      <nav class="flex items-center gap-1.5 sm:gap-2 shrink-0" aria-label="Navegación principal">
+        <button
+          type="button"
+          onclick="requestLocalPosAccess()"
+          aria-label="Caja local"
+          title="Caja local"
+          class="w-11 h-11 rounded-xl bg-stone-100 hover:bg-emerald-50 text-stone-700 hover:text-emerald-800 border border-stone-200 hover:border-emerald-300 flex items-center justify-center text-base transition cursor-pointer"
+        >
+          ⚡
+        </button>
+        <a
+          href="dashboard.html"
+          class="min-h-[44px] inline-flex items-center gap-1.5 bg-stone-900 hover:bg-stone-800 text-amber-300 font-extrabold text-xs sm:text-sm px-3.5 py-2.5 rounded-xl transition"
+        >
+          <span>⚙️</span>
+          <span>Admin</span>
+        </a>
+        <a
+          href="#ubicacion"
+          class="hidden md:inline-flex min-h-[44px] items-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-sm px-3.5 py-2.5 rounded-xl border border-stone-200 transition"
+        >
+          <span>📍</span>
+          <span>Ubicación</span>
+        </a>
       </nav>
     </div>
   </header>
 
-  <section id="inicio" class="hero-pattern overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-800 to-green-950 text-white">
-    <div class="mx-auto max-w-5xl px-4 py-9 sm:py-14">
-      <div class="max-w-2xl space-y-4">
-        <span class="inline-flex rounded-full bg-amber-400 px-3 py-1.5 text-xs font-extrabold text-stone-950 sm:text-sm">📍 Soyapango, San Salvador · Retiro en local</span>
-        <h1 class="text-3xl font-extrabold leading-tight sm:text-5xl">Tus frutas y verduras, listas para recoger.</h1>
-        <p class="max-w-xl text-base leading-relaxed text-emerald-100 sm:text-lg">Elige tus productos, arma tu pedido y envíanos tu lista por WhatsApp. Lo prepararemos para que pases a recogerlo al local.</p>
-        <p class="text-sm font-semibold text-emerald-100">Compra por unidad o aprovecha nuestras presentaciones especiales.</p>
+  <!-- PORTADA -->
+  <section id="inicio" class="bg-gradient-to-br from-emerald-950 via-emerald-800 to-emerald-900 text-white">
+    <div class="max-w-5xl mx-auto px-4 py-8 sm:py-12 space-y-5">
+      <div class="space-y-2.5 max-w-2xl">
+        <span class="inline-flex items-center gap-1.5 bg-amber-400 text-stone-950 text-xs sm:text-sm font-extrabold px-3.5 py-1 rounded-full">
+          📍 Soyapango, San Salvador • Retiro en Local
+        </span>
+        <h1 class="text-2xl sm:text-4xl font-extrabold leading-tight">
+          Elige tus frutas y verduras y recógelas listas en el local.
+        </h1>
+        <p class="text-emerald-100 text-sm sm:text-lg leading-relaxed">
+          Pide <strong>por unidad</strong> o <strong>por porción</strong>, envía tu pedido por WhatsApp y pásalo recogiendo sin filas.
+        </p>
       </div>
-      <div class="mt-7 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
-        <a href="#catalogo" class="flex items-center justify-center gap-2 rounded-2xl bg-amber-400 px-5 py-4 text-base font-extrabold text-stone-950 shadow-lg transition hover:bg-amber-300 active:scale-[.99]">🛒 Ver catálogo</a>
-        <a href="https://wa.me/50368271549?text=Hola%20Frutas%20y%20Verduras%20Manc%C3%ADa%2C%20quisiera%20hacer%20un%20pedido%20para%20recoger%20en%20el%20local." target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-4 text-base font-extrabold text-emerald-900 shadow-lg transition hover:bg-emerald-50">🎤 Hacer pedido por nota de voz</a>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl">
+        <a
+          href="#catalogo"
+          class="min-h-[48px] flex items-center justify-center gap-2 bg-amber-400 hover:bg-amber-300 text-stone-950 font-extrabold text-base px-5 py-3.5 rounded-2xl shadow-md transition active:scale-[0.99]"
+        >
+          <span>🛒</span>
+          <span>Elegir productos</span>
+        </a>
+        <a
+          href="https://wa.me/50368271549?text=Hola%20Frutas%20y%20Verduras%20Manc%C3%ADa%2C%20quisiera%20hacer%20un%20pedido%20para%20recoger%20en%20el%20local."
+          target="_blank"
+          rel="noopener noreferrer"
+          class="min-h-[48px] flex items-center justify-center gap-2 bg-white hover:bg-emerald-50 text-emerald-950 font-extrabold text-base px-5 py-3.5 rounded-2xl shadow-md transition active:scale-[0.99]"
+        >
+          <span>🎤</span>
+          <span>Pedir por nota de voz</span>
+        </a>
       </div>
     </div>
   </section>
 
-  <main id="catalogo" class="mx-auto max-w-5xl px-4 py-8">
-    <div class="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+  <!-- CATÁLOGO -->
+  <main id="catalogo" class="max-w-5xl mx-auto px-4 py-7">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
       <div>
-        <p class="mb-1 text-xs font-extrabold uppercase tracking-[.16em] text-emerald-700">Catálogo</p>
-        <h2 class="text-2xl font-extrabold text-stone-900 sm:text-3xl">¿Qué vas a llevar hoy?</h2>
-        <p class="mt-1 text-sm text-stone-600">Selecciona productos por unidad o por presentación especial.</p>
+        <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-800">Catálogo diario</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-stone-900 mt-0.5">¿Qué vas a llevar hoy?</h2>
+        <p class="text-sm text-stone-600 mt-0.5">Selecciona compra individual o porción de venta.</p>
       </div>
+
       <div class="relative w-full sm:w-80">
-        <label for="searchInput" class="sr-only">Buscar productos</label>
-        <input id="searchInput" type="search" oninput="renderProducts()" placeholder="Buscar un producto…" class="w-full rounded-2xl border-2 border-stone-200 bg-white py-3.5 pl-11 pr-10 text-base font-medium focus:border-emerald-600 focus:outline-none">
-        <span class="absolute left-3.5 top-3.5 text-xl" aria-hidden="true">🔍</span>
-        <button type="button" id="clearSearchBtn" onclick="clearSearch()" aria-label="Limpiar búsqueda" class="absolute right-3 top-3 hidden px-1.5 text-lg font-bold text-stone-400 hover:text-stone-700">×</button>
+        <label for="searchInput" class="sr-only">Buscar producto</label>
+        <input
+          type="search"
+          id="searchInput"
+          oninput="renderProducts()"
+          placeholder="Buscar producto…"
+          class="w-full min-h-[46px] pl-11 pr-10 py-3 bg-white border-2 border-stone-200 rounded-2xl text-base font-medium focus:outline-none focus:border-emerald-700"
+        />
+        <span class="absolute left-3.5 top-3 text-xl" aria-hidden="true">🔍</span>
+        <button
+          type="button"
+          id="clearSearchBtn"
+          onclick="clearSearch()"
+          aria-label="Limpiar búsqueda"
+          class="hidden absolute right-2.5 top-2.5 w-8 h-8 rounded-lg text-stone-400 hover:text-stone-800 font-bold text-lg flex items-center justify-center cursor-pointer"
+        >
+          ×
+        </button>
       </div>
     </div>
-    <div id="categoryFilters" class="no-scrollbar mb-5 flex items-center gap-2.5 overflow-x-auto pb-3" aria-label="Filtrar por categoría"></div>
-    <div id="productsGrid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3" aria-live="polite"></div>
+
+    <div id="categoryFilters" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 mb-5" aria-label="Categorías"></div>
+
+    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5" aria-live="polite"></div>
   </main>
 
-  <section id="mayoreo" class="mx-auto max-w-5xl px-4 pb-9">
-    <div class="flex flex-col items-start justify-between gap-5 rounded-3xl border border-amber-300 bg-amber-50 p-6 sm:flex-row sm:items-center">
-      <div class="space-y-2">
-        <span class="inline-flex rounded-full bg-amber-400 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-stone-950">📦 Ventas al por mayor</span>
-        <h2 class="text-xl font-extrabold text-stone-900 sm:text-2xl">¿Buscas precios al por mayor?</h2>
-        <p class="max-w-xl text-sm leading-relaxed text-stone-700 sm:text-base">Consulta precios por bulto, caja o volumen directamente con nosotros.</p>
+  <!-- MAYOREO -->
+  <section id="mayoreo" class="max-w-5xl mx-auto px-4 pb-8">
+    <div class="bg-amber-50 border-2 border-amber-300 rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <span class="inline-block bg-amber-400 text-stone-950 text-xs font-extrabold uppercase tracking-wide px-3 py-1 rounded-full">
+          📦 Ventas al por mayor
+        </span>
+        <h2 class="text-xl font-extrabold text-stone-900">¿Necesitas precios por volumen o caja?</h2>
+        <p class="text-sm sm:text-base text-stone-700">
+          Escríbenos directamente para cotizar mayoreo en Soyapango.
+        </p>
       </div>
-      <a href="https://wa.me/50379698478?text=Hola%20Frutas%20y%20Verduras%20Manc%C3%ADa%2C%20quisiera%20informaci%C3%B3n%20sobre%20precios%20al%20por%20mayor." target="_blank" rel="noopener noreferrer" class="w-full shrink-0 rounded-2xl bg-stone-900 px-6 py-4 text-center text-base font-extrabold text-amber-300 transition hover:bg-stone-700 sm:w-auto">📲 Mayoreo: 7969-8478</a>
+      <a
+        href="https://wa.me/50379698478?text=Hola%20Frutas%20y%20Verduras%20Manc%C3%ADa%2C%20quisiera%20informaci%C3%B3n%20sobre%20precios%20de%20mayoreo."
+        target="_blank"
+        rel="noopener noreferrer"
+        class="w-full sm:w-auto shrink-0 min-h-[48px] inline-flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-800 text-amber-300 font-extrabold text-base px-6 py-3.5 rounded-2xl shadow-xs transition"
+      >
+        <span>📲 Mayoreo: 7969-8478</span>
+      </a>
     </div>
   </section>
 
-  <section id="ubicacion" class="border-y border-stone-200 bg-white py-10">
-    <div class="mx-auto grid max-w-5xl items-start gap-8 px-4 lg:grid-cols-12">
-      <div class="space-y-4 lg:col-span-5">
+  <!-- UBICACIÓN Y HORARIOS -->
+  <section id="ubicacion" class="bg-white border-y border-stone-200 py-9">
+    <div class="max-w-5xl mx-auto px-4 grid lg:grid-cols-12 gap-7 items-start">
+      <div class="lg:col-span-5 space-y-4">
         <div>
-          <p class="mb-1 text-xs font-extrabold uppercase tracking-[.16em] text-emerald-700">Visítanos</p>
-          <h2 class="text-2xl font-extrabold text-stone-900">Ubicación y horarios</h2>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-800">Visítanos</span>
+          <h2 class="text-2xl font-extrabold text-stone-900 mt-0.5">Ubicación y horarios</h2>
         </div>
-        <div class="space-y-4 rounded-3xl border border-stone-200 bg-stone-50 p-5 text-sm sm:text-base">
-          <div class="flex items-start gap-3"><span class="text-2xl" aria-hidden="true">📍</span><div><p class="font-extrabold text-stone-900">Frutas y Verduras Mancía</p><p class="text-stone-700">Soyapango, San Salvador, El Salvador.</p><p class="mt-1 text-xs text-stone-500">Servicio de retiro en el local.</p></div></div>
-          <div class="flex items-start gap-3"><span class="text-2xl" aria-hidden="true">🕒</span><div><p class="font-extrabold text-stone-900">Horario de atención</p><p class="mt-1 text-stone-700"><strong>Lunes a viernes:</strong><br>6:00 a. m. – 1:00 p. m. y 2:30 p. m. – 6:00 p. m.</p><p class="mt-2 text-stone-700"><strong>Sábado:</strong><br>6:00 a. m. – 11:00 a. m.</p><p class="mt-1 text-xs text-stone-500">Domingo: cerrado.</p></div></div>
-          <div class="flex items-start gap-3"><span class="text-2xl" aria-hidden="true">📞</span><div class="space-y-1"><p class="font-extrabold text-stone-900">Teléfonos y WhatsApp</p><p class="text-stone-700">Pedidos y retiro: <a href="https://wa.me/50368271549" target="_blank" rel="noopener noreferrer" class="font-extrabold text-emerald-700 underline">6827-1549</a></p><p class="text-stone-700">Mayoreo: <a href="https://wa.me/50379698478" target="_blank" rel="noopener noreferrer" class="font-extrabold text-amber-800 underline">7969-8478</a></p></div></div>
+
+        <div class="space-y-4 bg-stone-50 p-5 rounded-3xl border border-stone-200 text-sm sm:text-base">
+          <div class="flex items-start gap-3">
+            <span class="text-2xl" aria-hidden="true">📍</span>
+            <div>
+              <p class="font-extrabold text-stone-900">Frutas y Verduras Mancía</p>
+              <p class="text-stone-700">Soyapango, San Salvador, El Salvador.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <span class="text-2xl" aria-hidden="true">🕒</span>
+            <div>
+              <p class="font-extrabold text-stone-900">Horario de atención</p>
+              <p class="text-stone-700 mt-0.5"><strong>Lunes a viernes:</strong><br>6:00 a. m. – 1:00 p. m. y 2:30 p. m. – 6:00 p. m.</p>
+              <p class="text-stone-700 mt-1.5"><strong>Sábado:</strong><br>6:00 a. m. – 11:00 a. m.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <span class="text-2xl" aria-hidden="true">📞</span>
+            <div class="space-y-1">
+              <p class="font-extrabold text-stone-900">Contacto</p>
+              <p class="text-stone-700">
+                Pedidos retiro: <a href="https://wa.me/50368271549" target="_blank" rel="noopener noreferrer" class="text-emerald-800 font-extrabold underline">6827-1549</a>
+              </p>
+              <p class="text-stone-700">
+                Mayoreo: <a href="https://wa.me/50379698478" target="_blank" rel="noopener noreferrer" class="text-amber-800 font-extrabold underline">7969-8478</a>
+              </p>
+            </div>
+          </div>
         </div>
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
-          <a href="https://maps.app.goo.gl/RDKCMag1Td8bKi8t6" target="_blank" rel="noopener noreferrer" class="rounded-2xl bg-stone-900 px-5 py-4 text-center text-base font-extrabold text-white transition hover:bg-stone-700">🗺️ Abrir en Google Maps</a>
-          <a href="tel:+50368271549" class="rounded-2xl border-2 border-emerald-200 bg-emerald-50 px-5 py-3.5 text-center text-base font-extrabold text-emerald-900 transition hover:bg-emerald-100">📞 Llamar al 6827-1549</a>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
+          <a
+            href="https://maps.app.goo.gl/RDKCMag1Td8bKi8t6"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="min-h-[48px] w-full inline-flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-base py-3.5 px-5 rounded-2xl transition"
+          >
+            <span>🗺️ Abrir en Google Maps</span>
+          </a>
+          <a
+            href="tel:+50368271549"
+            class="min-h-[48px] w-full inline-flex items-center justify-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border-2 border-emerald-200 font-extrabold text-base py-3.5 px-5 rounded-2xl transition"
+          >
+            <span>📞 Llamar al 6827-1549</span>
+          </a>
         </div>
       </div>
+
       <div class="lg:col-span-7">
-        <div id="manciaMap" class="flex h-80 w-full items-center justify-center overflow-hidden rounded-3xl border-2 border-stone-200 bg-stone-100 shadow-sm sm:h-96">
-          <a href="https://maps.app.goo.gl/RDKCMag1Td8bKi8t6" target="_blank" rel="noopener noreferrer" class="font-extrabold text-emerald-800 underline">Ver ubicación en Google Maps</a>
+        <div id="manciaMap" class="w-full h-72 sm:h-96 rounded-3xl overflow-hidden border-2 border-stone-200 bg-stone-100 flex items-center justify-center">
+          <a href="https://maps.app.goo.gl/RDKCMag1Td8bKi8t6" target="_blank" rel="noopener noreferrer" class="text-emerald-800 font-extrabold underline">
+            Ver ubicación en Google Maps
+          </a>
         </div>
       </div>
     </div>
   </section>
 
-  <footer class="border-t border-stone-800 bg-stone-950 py-8 text-stone-300">
-    <div class="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 px-4 text-center text-sm sm:flex-row sm:text-left">
-      <div><p class="font-extrabold text-white">Frutas y Verduras Mancía</p><p class="text-stone-400">Retiro en local · Soyapango, El Salvador</p></div>
-      <a href="dashboard.html" class="rounded-xl border border-stone-700 bg-stone-800 px-4 py-2.5 text-xs font-bold text-stone-200 transition hover:bg-stone-700 sm:text-sm">🔐 Panel de administración</a>
+  <!-- PIE DE PÁGINA -->
+  <footer class="bg-stone-950 text-stone-300 py-7">
+    <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-center sm:text-left">
+      <div>
+        <p class="font-extrabold text-white">Frutas y Verduras Mancía</p>
+        <p class="text-stone-400">Retiro en local • Soyapango, El Salvador</p>
+      </div>
+      <a
+        href="dashboard.html"
+        class="min-h-[44px] inline-flex items-center gap-2 bg-stone-800 hover:bg-stone-700 text-stone-100 border border-stone-700 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition"
+      >
+        <span>🔐 Panel de administración</span>
+      </a>
     </div>
   </footer>
 
-  <!-- Acceso rápido de caja. Este PIN del navegador NO es seguridad real: véase la nota de configuración al final. -->
-  <div id="localPosAuthModal" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-    <button type="button" onclick="closeLocalPosAuthModal()" aria-label="Cerrar ventana" class="absolute inset-0 h-full w-full bg-stone-950/75 backdrop-blur-sm"></button>
-    <div class="pointer-events-none relative flex min-h-screen items-center justify-center p-4">
-      <div class="pointer-events-auto w-full max-w-sm space-y-4 rounded-3xl border-2 border-emerald-700 bg-white p-6 shadow-2xl">
-        <div class="flex items-center justify-between border-b border-stone-100 pb-3"><h2 id="authTitle" class="font-extrabold text-stone-900">🔐 Acceso a caja local</h2><button type="button" onclick="closeLocalPosAuthModal()" class="rounded-xl bg-stone-100 px-3 py-1.5 text-sm font-bold">Cerrar</button></div>
+  <!-- MODAL CONTRASEÑA CAJA LOCAL -->
+  <div id="localPosAuthModal" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true" aria-labelledby="localPosAuthTitle">
+    <button type="button" onclick="closeLocalPosAuthModal()" aria-label="Cerrar ventana" class="absolute inset-0 w-full h-full bg-stone-950/75 backdrop-blur-xs cursor-pointer"></button>
+    <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
+      <div class="w-full max-w-sm bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border-2 border-emerald-700">
+        <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+          <h2 id="localPosAuthTitle" class="font-extrabold text-base text-stone-900">🔐 Acceso a caja local</h2>
+          <button type="button" onclick="closeLocalPosAuthModal()" class="min-h-[38px] px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs cursor-pointer">
+            Cerrar
+          </button>
+        </div>
+
         <form onsubmit="submitLocalPosPassword(event)" class="space-y-3">
-          <label for="localPosPasswordInput" class="block text-xs font-extrabold uppercase tracking-wider text-stone-600">Clave de acceso rápido</label>
-          <input id="localPosPasswordInput" type="password" required autocomplete="current-password" placeholder="Introduce la clave" class="w-full rounded-2xl border-2 border-stone-300 bg-stone-50 px-4 py-3 font-bold focus:border-emerald-700 focus:outline-none">
-          <p id="localPosAuthError" class="hidden rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700">Clave incorrecta. Inténtalo de nuevo.</p>
-          <button type="submit" class="w-full rounded-2xl bg-emerald-700 py-3 font-extrabold text-white transition hover:bg-emerald-800">Abrir caja local</button>
+          <div>
+            <label for="localPosPasswordInput" class="block text-xs font-extrabold uppercase tracking-wider text-stone-600 mb-1.5">
+              Contraseña de caja local
+            </label>
+            <input
+              type="password"
+              id="localPosPasswordInput"
+              required
+              autocomplete="current-password"
+              placeholder="Ingrese contraseña"
+              class="w-full min-h-[46px] px-4 py-3 rounded-2xl border-2 border-stone-300 bg-stone-50 text-stone-900 font-extrabold text-sm focus:outline-none focus:border-emerald-700 focus:bg-white"
+            />
+          </div>
+
+          <p id="localPosAuthError" class="hidden text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+            Contraseña incorrecta. Intente de nuevo.
+          </p>
+
+          <button
+            type="submit"
+            class="w-full min-h-[46px] py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm shadow-md transition cursor-pointer"
+          >
+            Desbloquear caja local
+          </button>
         </form>
-        <p class="text-xs leading-relaxed text-stone-500">Este acceso solo oculta la interfaz en este dispositivo. No protege los datos frente a alguien que inspeccione el código o consulte la base de datos.</p>
       </div>
     </div>
   </div>
 
-  <div id="localPosDrawer" class="fixed inset-0 z-[55] hidden" role="dialog" aria-modal="true" aria-labelledby="posTitle">
-    <button type="button" onclick="toggleLocalPos(false)" aria-label="Cerrar caja" class="absolute inset-0 h-full w-full bg-stone-950/75 backdrop-blur-sm"></button>
-    <aside class="absolute right-0 top-0 flex h-full w-full max-w-xl flex-col bg-white shadow-2xl">
-      <div class="flex items-center justify-between gap-2 border-b border-stone-200 bg-stone-950 p-4 text-white sm:p-5">
-        <h2 id="posTitle" class="text-xl font-extrabold">⚡ Caja local</h2>
-        <div class="flex gap-2"><button type="button" onclick="lockLocalPos()" class="rounded-xl bg-amber-400 px-3 py-2 text-xs font-extrabold text-stone-950">🔒 Bloquear</button><button type="button" onclick="toggleLocalPos(false)" class="rounded-xl bg-white/15 px-3 py-2 text-sm font-extrabold">Cerrar</button></div>
-      </div>
-      <div class="drawer-scroll flex-1 space-y-5 overflow-y-auto p-4 sm:p-5">
-        <div class="grid grid-cols-3 gap-2.5">
-          <div class="rounded-2xl bg-emerald-900 p-3 text-white"><span class="block text-[10px] font-bold uppercase text-emerald-200">Vendido hoy</span><strong id="localPosTodayTotal" class="text-lg font-extrabold">$0.00</strong></div>
-          <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950"><span class="block text-[10px] font-bold uppercase">Efectivo</span><strong id="localPosTodayCash" class="text-base font-extrabold">$0.00</strong></div>
-          <div class="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-amber-950"><span class="block text-[10px] font-bold uppercase">Transferencia</span><strong id="localPosTodayTransfer" class="text-base font-extrabold">$0.00</strong></div>
+  <!-- CAJÓN DE CAJA LOCAL -->
+  <div id="localPosDrawer" class="fixed inset-0 z-[55] hidden" role="dialog" aria-modal="true" aria-labelledby="localPosTitle">
+    <button type="button" onclick="toggleLocalPos(false)" aria-label="Cerrar caja local" class="absolute inset-0 w-full h-full bg-stone-950/75 backdrop-blur-xs cursor-pointer"></button>
+    <aside class="absolute right-0 top-0 h-full w-full max-w-xl bg-white shadow-2xl flex flex-col">
+      <div class="p-4 sm:p-5 border-b border-stone-200 flex items-center justify-between gap-2 bg-stone-950 text-white">
+        <h2 id="localPosTitle" class="font-extrabold text-lg sm:text-xl">⚡ Caja local</h2>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="lockLocalPos()" class="min-h-[40px] px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-extrabold text-xs cursor-pointer">
+            🔒 Bloquear
+          </button>
+          <button type="button" onclick="toggleLocalPos(false)" class="min-h-[40px] px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 font-extrabold text-xs sm:text-sm cursor-pointer">
+            Cerrar
+          </button>
         </div>
-        <div class="flex items-center justify-between gap-3 rounded-2xl border border-stone-200 bg-stone-100 p-3.5 text-xs"><label for="localPosMethod" class="font-extrabold text-stone-700">Método de cobro</label><select id="localPosMethod" class="rounded-xl border border-stone-300 bg-white px-3 py-2 font-bold"><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option></select></div>
-        <div id="localPosFeedback" class="hidden rounded-xl bg-emerald-100 p-3 text-xs font-extrabold text-emerald-950" role="status" aria-live="polite"></div>
-        <div class="space-y-2"><p class="text-xs font-extrabold uppercase tracking-wider text-stone-600">Registro rápido de ventas</p><div id="localOneClickGrid" class="grid grid-cols-1 gap-2.5 sm:grid-cols-2"></div></div>
-        <form onsubmit="submitCustomLocalSale(event)" class="space-y-3 rounded-2xl border-2 border-stone-200 bg-stone-50 p-4">
-          <p class="text-xs font-extrabold uppercase tracking-wider text-stone-700">Registrar otra venta</p>
-          <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-            <input id="customLocalProduct" type="text" required maxlength="80" placeholder="Producto o concepto" class="rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-bold">
-            <input id="customLocalAmount" type="number" step="0.01" min="0.01" required placeholder="Monto $" class="rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm font-extrabold text-emerald-800">
-            <button type="submit" class="rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-extrabold text-stone-950 transition hover:bg-amber-300">+ Registrar venta</button>
+      </div>
+
+      <div class="drawer-scroll flex-1 overflow-y-auto p-4 sm:p-5 space-y-5">
+        <div class="grid grid-cols-3 gap-2">
+          <div class="p-3 rounded-2xl bg-emerald-900 text-white">
+            <span class="block text-[10px] font-bold uppercase text-emerald-200">Vendido hoy</span>
+            <strong id="localPosTodayTotal" class="text-base sm:text-lg font-extrabold">$0.00</strong>
+          </div>
+          <div class="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950">
+            <span class="block text-[10px] font-bold uppercase">Efectivo</span>
+            <strong id="localPosTodayCash" class="text-sm sm:text-base font-extrabold">$0.00</strong>
+          </div>
+          <div class="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950">
+            <span class="block text-[10px] font-bold uppercase">Transferencia</span>
+            <strong id="localPosTodayTransfer" class="text-sm sm:text-base font-extrabold">$0.00</strong>
+          </div>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-between gap-3 text-xs sm:text-sm">
+          <label for="localPosMethod" class="font-extrabold text-stone-700">Método de cobro:</label>
+          <select id="localPosMethod" class="min-h-[40px] px-3 py-2 rounded-xl border border-stone-300 bg-white font-bold">
+            <option value="Efectivo">Efectivo</option>
+            <option value="Transferencia">Transferencia</option>
+          </select>
+        </div>
+
+        <div id="localPosFeedback" class="hidden p-3 rounded-xl bg-emerald-100 text-emerald-950 text-xs font-extrabold" role="status" aria-live="polite"></div>
+
+        <div class="space-y-2">
+          <p class="text-xs font-extrabold uppercase tracking-wider text-stone-600">
+            Registro rápido (unitario o porción)
+          </p>
+          <div id="localOneClickGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+        </div>
+
+        <form onsubmit="submitCustomLocalSale(event)" class="p-4 rounded-2xl bg-stone-50 border-2 border-stone-200 space-y-3">
+          <p class="text-xs font-extrabold uppercase tracking-wider text-stone-700">
+            Otra venta rápida en el local
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <input
+              id="customLocalProduct"
+              type="text"
+              required
+              maxlength="80"
+              placeholder="Producto"
+              class="min-h-[44px] px-3 py-2.5 rounded-xl border border-stone-300 bg-white text-sm font-bold"
+            />
+            <input
+              id="customLocalAmount"
+              type="number"
+              step="0.01"
+              min="0.01"
+              required
+              placeholder="Monto $"
+              class="min-h-[44px] px-3 py-2.5 rounded-xl border border-stone-300 bg-white text-sm font-extrabold text-emerald-800"
+            />
+            <button
+              type="submit"
+              class="min-h-[44px] py-2.5 px-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-extrabold text-sm cursor-pointer"
+            >
+              + Subir venta
+            </button>
           </div>
         </form>
       </div>
     </aside>
   </div>
 
-  <div id="stickyCheckoutBar" class="fixed inset-x-0 bottom-0 z-40 translate-y-full border-t-2 border-emerald-500 bg-emerald-950 px-4 py-3.5 text-white shadow-2xl transition-transform duration-300">
-    <div class="mx-auto flex max-w-5xl items-center justify-between gap-4">
-      <div><p id="stickyItemsCount" class="text-xs font-bold text-emerald-200">0 productos seleccionados</p><p class="text-xl font-extrabold sm:text-2xl">Total: <span id="stickyTotalAmount" class="text-amber-300">$0.00</span></p></div>
-      <button type="button" onclick="toggleCart(true)" class="flex items-center gap-2 rounded-2xl bg-amber-400 px-5 py-3.5 text-sm font-extrabold text-stone-950 shadow-lg transition hover:bg-amber-300 sm:px-7 sm:text-base">Revisar pedido <span aria-hidden="true">➔</span></button>
+  <!-- BARRA INFERIOR DE PEDIDO -->
+  <div id="stickyCheckoutBar" class="fixed bottom-0 inset-x-0 z-40 bg-emerald-950 text-white border-t-2 border-emerald-500 shadow-2xl px-4 py-3.5 transition-transform duration-300 translate-y-full">
+    <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <p id="stickyItemsCount" class="text-xs font-bold text-emerald-200 truncate">0 selecciones en tu pedido</p>
+        <p class="text-lg sm:text-2xl font-extrabold text-white">Total: <span id="stickyTotalAmount" class="text-amber-300">$0.00</span></p>
+      </div>
+      <button
+        type="button"
+        onclick="toggleCart(true)"
+        class="shrink-0 min-h-[48px] bg-amber-400 hover:bg-amber-300 text-stone-950 font-extrabold text-sm sm:text-base px-5 py-3 rounded-2xl shadow-lg transition active:scale-95 flex items-center gap-2 cursor-pointer"
+      >
+        <span>Revisar pedido</span>
+        <span aria-hidden="true">➔</span>
+      </button>
     </div>
   </div>
 
-  <div id="cartDrawer" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
-    <button type="button" onclick="toggleCart(false)" aria-label="Cerrar pedido" class="absolute inset-0 h-full w-full bg-stone-950/75 backdrop-blur-sm"></button>
-    <aside class="absolute right-0 top-0 flex h-full w-full max-w-lg flex-col bg-white shadow-2xl">
-      <div class="flex items-center justify-between border-b border-stone-200 bg-emerald-900 p-4 text-white sm:p-5">
-        <div><h2 id="cartTitle" class="text-xl font-extrabold">Tu pedido para retirar</h2><p class="text-xs text-emerald-100 sm:text-sm">Frutas y Verduras Mancía</p></div>
-        <button type="button" onclick="toggleCart(false)" class="rounded-xl bg-white/15 px-3.5 py-2 text-sm font-extrabold">Cerrar</button>
-      </div>
-      <div id="cartItemsContainer" class="drawer-scroll flex-1 space-y-3 overflow-y-auto p-4" aria-live="polite"></div>
-      <div class="space-y-3.5 border-t-2 border-stone-200 bg-stone-50 p-4 sm:p-5">
-        <div class="flex items-center justify-between gap-2 text-base font-extrabold text-stone-900"><span>Total estimado:</span><span id="cartTotal" class="text-2xl text-emerald-700">$0.00</span></div>
-        <p class="text-xs leading-relaxed text-stone-500">El total se confirma al preparar el pedido. El envío por WhatsApp no representa una venta confirmada ni un cobro.</p>
-        <div class="space-y-3">
-          <div><label for="customerName" class="mb-1 block text-xs font-extrabold uppercase text-stone-600">¿A nombre de quién preparamos el pedido?</label><input id="customerName" type="text" maxlength="80" placeholder="Ej. María / Carlos" class="w-full rounded-xl border-2 border-stone-200 bg-white px-4 py-3 text-base focus:border-emerald-600 focus:outline-none"></div>
-          <div><label for="pickupTime" class="mb-1 block text-xs font-extrabold uppercase text-stone-600">¿Cuándo pasarás a recoger?</label><select id="pickupTime" class="w-full rounded-xl border-2 border-stone-200 bg-white px-4 py-3 text-base focus:border-emerald-600 focus:outline-none"><option value="En 15–20 minutos">En 15–20 minutos</option><option value="En 30–45 minutos">En 30–45 minutos</option><option value="Turno de mañana (desde las 6:00 a. m.)">Turno de mañana (desde las 6:00 a. m.)</option><option value="Turno de tarde (lunes a viernes, 2:30–6:00 p. m.)">Turno de tarde (lunes a viernes, 2:30–6:00 p. m.)</option><option value="Sábado (6:00–11:00 a. m.)">Sábado (6:00–11:00 a. m.)</option></select></div>
-          <div><label for="paymentMethod" class="mb-1 block text-xs font-extrabold uppercase text-stone-600">¿Cómo realizarás el pago?</label><select id="paymentMethod" class="w-full rounded-xl border-2 border-stone-200 bg-white px-4 py-3 text-base focus:border-emerald-600 focus:outline-none"><option value="Efectivo al recoger">Efectivo al recoger</option><option value="Transferencia">Transferencia</option></select></div>
+  <!-- CAJÓN DE PEDIDO PENDIENTE -->
+  <div id="cartDrawer" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="cartDrawerTitle">
+    <button type="button" onclick="toggleCart(false)" aria-label="Cerrar pedido" class="absolute inset-0 w-full h-full bg-stone-950/70 backdrop-blur-xs cursor-pointer"></button>
+    <aside class="absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-2xl flex flex-col">
+      <div class="p-4 sm:p-5 border-b border-stone-200 flex items-center justify-between bg-emerald-900 text-white">
+        <div>
+          <h2 id="cartDrawerTitle" class="font-extrabold text-lg sm:text-xl">Tu pedido para retiro</h2>
+          <p class="text-xs text-emerald-100">Queda como pedido pendiente al enviarlo</p>
         </div>
-        <button type="button" onclick="sendWhatsAppOrder()" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-700 px-5 py-4 text-lg font-extrabold text-white shadow-lg transition hover:bg-emerald-800">📲 Enviar pedido por WhatsApp</button>
+        <button type="button" onclick="toggleCart(false)" class="min-h-[40px] px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 font-extrabold text-xs sm:text-sm cursor-pointer">
+          Cerrar
+        </button>
+      </div>
+
+      <div id="cartItemsContainer" class="drawer-scroll flex-1 overflow-y-auto p-4 space-y-3" aria-live="polite"></div>
+
+      <div class="p-4 sm:p-5 border-t-2 border-stone-200 bg-stone-50 space-y-3.5">
+        <div class="flex items-center justify-between text-base sm:text-lg font-extrabold text-stone-900">
+          <span>Total estimado:</span>
+          <span id="cartTotal" class="text-xl sm:text-2xl text-emerald-800">$0.00</span>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label for="customerName" class="block text-xs font-extrabold uppercase text-stone-600 mb-1">1. ¿A nombre de quién preparamos el pedido?</label>
+            <input
+              type="text"
+              id="customerName"
+              maxlength="80"
+              placeholder="Ej. Doña María / Carlos"
+              class="w-full min-h-[46px] px-4 py-3 bg-white border-2 border-stone-200 rounded-xl text-base font-medium focus:outline-none focus:border-emerald-700"
+            />
+          </div>
+
+          <div>
+            <label for="pickupTime" class="block text-xs font-extrabold uppercase text-stone-600 mb-1">2. ¿Cuándo pasarás a recoger?</label>
+            <select id="pickupTime" class="w-full min-h-[46px] px-4 py-3 bg-white border-2 border-stone-200 rounded-xl text-base font-medium focus:outline-none focus:border-emerald-700">
+              <option value="En 15–20 minutos">En 15–20 minutos</option>
+              <option value="En 30–45 minutos">En 30–45 minutos</option>
+              <option value="Turno mañana L–S (desde 6:00 a. m.)">Turno mañana L–S (desde 6:00 a. m.)</option>
+              <option value="Turno tarde L–V (2:30 p. m. – 6:00 p. m.)">Turno tarde L–V (2:30 p. m. – 6:00 p. m.)</option>
+              <option value="Sábado (6:00 a. m. – 11:00 a. m.)">Sábado (6:00 a. m. – 11:00 a. m.)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="paymentMethod" class="block text-xs font-extrabold uppercase text-stone-600 mb-1">3. ¿Cómo pagarás al recoger?</label>
+            <select id="paymentMethod" class="w-full min-h-[46px] px-4 py-3 bg-white border-2 border-stone-200 rounded-xl text-base font-medium focus:outline-none focus:border-emerald-700">
+              <option value="Efectivo">Efectivo al recoger</option>
+              <option value="Transferencia">Transferencia</option>
+            </select>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onclick="sendWhatsAppOrder()"
+          class="w-full min-h-[50px] bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-base sm:text-lg py-3.5 px-5 rounded-2xl shadow-lg transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <span>📲 Enviar pedido por WhatsApp</span>
+        </button>
       </div>
     </aside>
   </div>
 
-<script>
-  "use strict";
+  <script>
+    "use strict";
 
-  const WHATSAPP_ORDERS = "50368271549";
-  // Este PIN es solo una barrera visual local. No usarlo para proteger información real.
-  // Para seguridad efectiva, implementar Supabase Auth + Row Level Security en servidor.
-  const LOCAL_POS_PIN = "FYVM2026";
-  const SUPABASE_URL = "https://vgvkjhfkpyhvapzbyvwn.supabase.co";
-  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cSCLRLMk06I-T0EKAODTGw_W0uVQJja";
-  const CLOUD_ROW_ID = "frutas_y_verduras_mancia_v1";
-  const STORAGE_KEY = "biz_control_total_v7";
-  const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=85";
+    const WHATSAPP_ORDERS = "50368271549";
+    const LOCAL_POS_PIN = "FYVM2026";
+    const SUPABASE_URL = "https://vgvkjhfkpyhvapzbyvwn.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cSCLRLMk06I-T0EKAODTGw_W0uVQJja";
+    const CLOUD_ROW_ID = "frutas_y_verduras_mancia_v1";
+    const STORAGE_KEY = "biz_control_total_v7";
+    const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=85";
 
-  const supabaseClient = window.supabase?.createClient
-    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
-    : null;
+    const supabaseClient = window.supabase?.createClient
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+      : null;
 
-  const CATALOG_META = {
-    "tomate": {unitPrice:.15,promoQty:10,promoPrice:1,promoLabel:"10 por $1.00",category:"Verduras",badge:"Fresco hoy",image:"https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85"},
-    "cebolla blanca": {unitPrice:.25,promoQty:4,promoPrice:1,promoLabel:"4 por $1.00",category:"Verduras",badge:"Oferta diaria",image:"https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=85"},
-    "cebolla morada": {unitPrice:.25,promoQty:4,promoPrice:1,promoLabel:"4 por $1.00",category:"Verduras",badge:"",image:"https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&fit=crop&w=900&q=85"},
-    "plátano": {unitPrice:.35,promoQty:3,promoPrice:1,promoLabel:"3 por $1.00",category:"Frutas",badge:"Dulce",image:"https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=85"},
-    "chile verde": {unitPrice:.20,promoQty:6,promoPrice:1,promoLabel:"6 por $1.00",category:"Verduras",badge:"",image:"https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=900&q=85"},
-    "jalapeño": {unitPrice:.20,promoQty:6,promoPrice:1,promoLabel:"6 por $1.00",category:"Verduras",badge:"",image:"https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=85"},
-    "ajo": {unitPrice:.50,promoQty:2,promoPrice:1,promoLabel:"2 redes por $1.00",category:"Verduras",badge:"",image:"https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=900&q=85"},
-    "lechuga": {unitPrice:1.75,promoQty:1,promoPrice:1.75,promoLabel:"1 por $1.75",category:"Verduras",badge:"Fresca",image:"https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=900&q=85"},
-    "aguacate": {unitPrice:.50,promoQty:2,promoPrice:1,promoLabel:"2 por $1.00",category:"Frutas",badge:"Al punto",image:"https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=900&q=85"},
-    "limón": {unitPrice:.15,promoQty:8,promoPrice:1,promoLabel:"8 por $1.00",category:"Frutas",badge:"Jugoso",image:"https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=900&q=85"},
-    "papa": {unitPrice:1.50,promoQty:1,promoPrice:1.50,promoLabel:"1 libra por $1.50",category:"Verduras",badge:"Fresca",image:"https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=900&q=85"},
-    "elote": {unitPrice:.75,promoQty:1,promoPrice:.75,promoLabel:"1 por $0.75",category:"Verduras",badge:"Tierno",image:"https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=900&q=85"},
-    "güisquil": {unitPrice:.25,promoQty:4,promoPrice:1,promoLabel:"4 por $1.00",category:"Verduras",badge:"",image:"https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=900&q=85"},
-    "pepino": {unitPrice:.25,promoQty:4,promoPrice:1,promoLabel:"4 por $1.00",category:"Verduras",badge:"",image:"https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=900&q=85"},
-    "rábano": {unitPrice:.15,promoQty:4,promoPrice:.25,promoLabel:"4 por $0.25",category:"Verduras",badge:"",image:"https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=900&q=85"},
-    "zanahoria": {unitPrice:.35,promoQty:3,promoPrice:1,promoLabel:"3 por $1.00",category:"Verduras",badge:"",image:"https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=900&q=85"}
-  };
-
-  const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, ch => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[ch]);
-
-  const money = value => `$${Number(value || 0).toFixed(2)}`;
-  // Literal JavaScript seguro para insertar argumentos dentro de atributos HTML.
-  const jsArg = value => "'" + String(value ?? "")
-    .replace(/\\/g, "\\\\")
-    .replace(/'/g, "\\'")
-    .replace(/\r/g, "\\r")
-    .replace(/\n/g, "\\n")
-    .replace(/</g, "\\x3c")
-    .replace(/>/g, "\\x3e") + "'";
-  const todaySV = () => new Intl.DateTimeFormat("en-CA", {
-    timeZone:"America/El_Salvador",year:"numeric",month:"2-digit",day:"2-digit"
-  }).format(new Date());
-
-  function makeInitialDB() {
-    return {
-      openingCash:0,
-      inventory:Object.entries(CATALOG_META).map(([name,meta],index)=>({
-        id:101+index,
-        name:name.replace(/\b\p{L}/gu, c=>c.toLocaleUpperCase("es")),
-        category:meta.category,unitPrice:meta.unitPrice,promoQty:meta.promoQty,
-        promoPrice:meta.promoPrice,salePrice:meta.promoPrice,promoLabel:meta.promoLabel,
-        badge:meta.badge,image:meta.image
-      })),
-      weeklyPayments:[
-        {id:501,concept:"Alquiler / cuota de puesto semanal",amount:25,payDay:"Domingo",method:"Efectivo",paid:false,paidDate:""},
-        {id:502,concept:"Transporte / flete semanal",amount:15,payDay:"Miércoles",method:"Efectivo",paid:false,paidDate:""}
-      ],
-      // No se insertan ventas ni gastos históricos ficticios.
-      sales:[],
-      expenses:[],
-      orders:[]
+    const CATALOG_META = {
+      "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85" },
+      "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=85" },
+      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&fit=crop&w=900&q=85" },
+      "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=85" },
+      "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=900&q=85" },
+      "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=85" },
+      "ajo": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=900&q=85" },
+      "lechuga": { unitPrice: 1.75, promoQty: 1, promoPrice: 1.75, promoLabel: "1 x $1.75", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=900&q=85" },
+      "aguacate": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", category: "Frutas", badge: "Al punto", image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=900&q=85" },
+      "limón": { unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, promoLabel: "8 x $1.00", category: "Frutas", badge: "Jugoso", image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=900&q=85" },
+      "papa": { unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, promoLabel: "1 libra x $1.50", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=900&q=85" },
+      "elote": { unitPrice: 0.75, promoQty: 1, promoPrice: 0.75, promoLabel: "1 x $0.75", category: "Verduras", badge: "Tierno", image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=900&q=85" },
+      "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=900&q=85" },
+      "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=900&q=85" },
+      "rábano": { unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=900&q=85" },
+      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=900&q=85" }
     };
-  }
 
-  function enrichProduct(item, meta={}) {
-    const promoQty=Math.max(1,Number(item.promoQty ?? meta.promoQty ?? 1));
-    const promoPrice=Number(item.promoPrice ?? item.salePrice ?? meta.promoPrice ?? 1);
-    const unitPrice=Number(item.unitPrice ?? meta.unitPrice ?? (promoPrice/promoQty));
-    return {
-      ...item,
-      name:String(item.name || "Producto"),
-      category:item.category || meta.category || "Verduras",
-      unitPrice:Number(unitPrice.toFixed(2)),
-      promoQty,
-      promoPrice:Number(promoPrice.toFixed(2)),
-      salePrice:Number(promoPrice.toFixed(2)),
-      promoLabel:item.promoLabel || meta.promoLabel || `${promoQty} por ${money(promoPrice)}`,
-      badge:item.badge ?? meta.badge ?? "",
-      image:item.image || meta.image || FALLBACK_IMAGE
+    const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, ch => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[ch]));
+
+    const money = value => `$${Number(value || 0).toFixed(2)}`;
+
+    const jsArg = value => "'" + String(value ?? "")
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'")
+      .replace(/\r/g, "\\r")
+      .replace(/\n/g, "\\n")
+      .replace(/</g, "\\x3c")
+      .replace(/>/g, "\\x3e") + "'";
+
+    const todaySV = () => {
+      try {
+        return new Intl.DateTimeFormat("en-CA", {
+          timeZone: "America/El_Salvador",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
+        }).format(new Date());
+      } catch {
+        const d = new Date(Date.now() - 6 * 3600 * 1000);
+        return d.toISOString().split("T")[0];
+      }
     };
-  }
 
-  function normalizeDB(parsed) {
-    const base=makeInitialDB();
-    if(!parsed || typeof parsed!=="object") return base;
-    const raw=Array.isArray(parsed.inventory)?parsed.inventory:(Array.isArray(parsed.products)?parsed.products:[]);
-    const inventory=base.inventory.map(seed=>{
-      const found=raw.find(p=>String(p.name||"").trim().toLowerCase()===seed.name.toLowerCase());
-      return enrichProduct({...seed,...(found||{}),name:seed.name},CATALOG_META[seed.name.toLowerCase()]||{});
-    });
-    const extras=raw.filter(p=>!base.inventory.some(s=>s.name.toLowerCase()===String(p.name||"").trim().toLowerCase())).map(p=>enrichProduct(p));
-    return {
-      openingCash:Number(parsed.openingCash||0),
-      inventory:[...inventory,...extras],
-      weeklyPayments:Array.isArray(parsed.weeklyPayments)?parsed.weeklyPayments:base.weeklyPayments,
-      sales:Array.isArray(parsed.sales)?parsed.sales:[],
-      expenses:Array.isArray(parsed.expenses)?parsed.expenses:[],
-      orders:Array.isArray(parsed.orders)?parsed.orders:[]
-    };
-  }
-
-  function loadStoreDB() {
-    try {
-      const raw=localStorage.getItem(STORAGE_KEY);
-      if(raw) return normalizeDB(JSON.parse(raw));
-    } catch(error) { console.error("No se pudo leer el inventario local:",error); }
-    const fresh=makeInitialDB();
-    saveStoreDB(fresh);
-    return fresh;
-  }
-
-  function saveStoreDB(db) {
-    try { localStorage.setItem(STORAGE_KEY,JSON.stringify(db)); }
-    catch(error) { console.error("No se pudo guardar la información local:",error); alert("No se pudo guardar en este dispositivo. Revisa el espacio disponible del navegador."); }
-  }
-
-  async function syncStoreDBToCloud(db) {
-    if(!supabaseClient) return {ok:false,reason:"Supabase no está configurado"};
-    const {error}=await supabaseClient.from("store_control").upsert({
-      id:CLOUD_ROW_ID,data:db,updated_at:new Date().toISOString()
-    });
-    if(error) {
-      console.error("Error al sincronizar con Supabase:",error);
-      return {ok:false,reason:error.message};
+    function makeInitialDB() {
+      return {
+        openingCash: 0,
+        inventory: Object.entries(CATALOG_META).map(([name, meta], idx) => ({
+          id: 101 + idx,
+          name: name.replace(/\b\p{L}/gu, c => c.toLocaleUpperCase("es")),
+          category: meta.category,
+          unitPrice: meta.unitPrice,
+          promoQty: meta.promoQty,
+          promoPrice: meta.promoPrice,
+          salePrice: meta.promoPrice,
+          promoLabel: meta.promoLabel,
+          badge: meta.badge,
+          image: meta.image
+        })),
+        weeklyPayments: [
+          { id: 501, concept: "Alquiler / Cuota de puesto semanal", amount: 25.00, payDay: "Domingo", method: "Efectivo", paid: false, paidDate: "" },
+          { id: 502, concept: "Transporte / Flete semanal", amount: 15.00, payDay: "Miércoles", method: "Efectivo", paid: false, paidDate: "" }
+        ],
+        sales: [],
+        expenses: [],
+        orders: []
+      };
     }
-    return {ok:true};
-  }
 
-  async function fetchCloudStoreDB() {
-    if(!supabaseClient) return loadStoreDB();
-    const {data,error}=await supabaseClient.from("store_control").select("data").eq("id",CLOUD_ROW_ID).maybeSingle();
-    if(error) {
-      console.error("No se pudo consultar Supabase:",error);
+    function enrichProduct(item, meta = {}) {
+      const promoQty = Math.max(1, Number(item.promoQty ?? meta.promoQty ?? 1));
+      const promoPrice = Number(item.promoPrice ?? item.salePrice ?? meta.promoPrice ?? 1.00);
+      const unitPrice = Number(item.unitPrice ?? meta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
+      return {
+        id: item.id,
+        name: String(item.name || "Producto").trim(),
+        category: item.category || meta.category || "Verduras",
+        unitPrice: Number(unitPrice.toFixed(2)),
+        promoQty,
+        promoPrice: Number(promoPrice.toFixed(2)),
+        salePrice: Number(promoPrice.toFixed(2)),
+        promoLabel: item.promoLabel || meta.promoLabel || (promoQty > 1 ? `${promoQty} x ${money(promoPrice)}` : `1 x ${money(promoPrice)}`),
+        badge: item.badge ?? meta.badge ?? "",
+        image: item.image || meta.image || FALLBACK_IMAGE
+      };
+    }
+
+    function normalizeDB(parsed) {
+      const base = makeInitialDB();
+      if (!parsed || typeof parsed !== "object") return base;
+      const rawList = Array.isArray(parsed.inventory)
+        ? parsed.inventory
+        : Array.isArray(parsed.products)
+          ? parsed.products
+          : [];
+
+      const inventory = base.inventory.map(seed => {
+        const found = rawList.find(p => String(p.name || "").trim().toLowerCase() === seed.name.toLowerCase());
+        return enrichProduct({ ...seed, ...(found || {}), name: seed.name }, CATALOG_META[seed.name.toLowerCase()] || {});
+      });
+
+      const extras = rawList
+        .filter(p => !base.inventory.some(s => s.name.toLowerCase() === String(p.name || "").trim().toLowerCase()))
+        .map(p => enrichProduct(p));
+
+      return {
+        openingCash: Number(parsed.openingCash || 0),
+        inventory: [...inventory, ...extras],
+        weeklyPayments: Array.isArray(parsed.weeklyPayments) ? parsed.weeklyPayments : base.weeklyPayments,
+        sales: Array.isArray(parsed.sales) ? parsed.sales : [],
+        expenses: Array.isArray(parsed.expenses) ? parsed.expenses : [],
+        orders: Array.isArray(parsed.orders) ? parsed.orders : []
+      };
+    }
+
+    function loadStoreDB() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return normalizeDB(JSON.parse(raw));
+      } catch (e) {}
+      const fresh = makeInitialDB();
+      saveStoreDB(fresh);
+      return fresh;
+    }
+
+    function saveStoreDB(db) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+      } catch (e) {}
+    }
+
+    async function syncStoreDBToCloud(db) {
+      if (!supabaseClient) return { ok: false };
+      try {
+        const { error } = await supabaseClient
+          .from("store_control")
+          .upsert({
+            id: CLOUD_ROW_ID,
+            data: db,
+            updated_at: new Date().toISOString()
+          });
+        return { ok: !error };
+      } catch {
+        return { ok: false };
+      }
+    }
+
+    async function fetchCloudStoreDB() {
+      if (!supabaseClient) return loadStoreDB();
+      try {
+        const { data, error } = await supabaseClient
+          .from("store_control")
+          .select("data")
+          .eq("id", CLOUD_ROW_ID)
+          .maybeSingle();
+
+        if (!error && data?.data) {
+          const normalized = normalizeDB(data.data);
+          saveStoreDB(normalized);
+          return normalized;
+        }
+      } catch (e) {}
       return loadStoreDB();
     }
-    if(data?.data) {
-      const normalized=normalizeDB(data.data);
-      saveStoreDB(normalized);
-      return normalized;
-    }
-    return loadStoreDB();
-  }
 
-  let cart=[];
-  let currentCategory="todos";
-  let isLocalPosUnlocked=false;
-  let activeLocalDay=todaySV();
+    let cart = [];
+    let currentCategory = "todos";
+    let isLocalPosUnlocked = false;
+    let activeLocalDay = todaySV();
 
-  document.addEventListener("DOMContentLoaded",async()=>{
-    renderCategoryFilters();
-    renderProducts();
-    renderLocalPos();
-    initManciaMap();
-    updateOpenStatus();
-    setInterval(()=>{
+    document.addEventListener("DOMContentLoaded", async () => {
+      renderCategoryFilters();
+      renderProducts();
+      renderLocalPos();
+      initManciaMap();
       updateOpenStatus();
-      if(todaySV()!==activeLocalDay){activeLocalDay=todaySV();renderLocalPos();}
-    },30000);
-    const db=await fetchCloudStoreDB();
-    saveStoreDB(db);
-    renderProducts();
-    renderLocalPos();
-  });
-
-  window.addEventListener("storage",event=>{
-    if(event.key===STORAGE_KEY){renderCategoryFilters();renderProducts();renderLocalPos();}
-  });
-
-  function requestLocalPosAccess() {
-    if(isLocalPosUnlocked){toggleLocalPos(true);return;}
-    document.getElementById("localPosAuthError").classList.add("hidden");
-    document.getElementById("localPosPasswordInput").value="";
-    document.getElementById("localPosAuthModal").classList.remove("hidden");
-    setTimeout(()=>document.getElementById("localPosPasswordInput").focus(),40);
-  }
-  function closeLocalPosAuthModal(){document.getElementById("localPosAuthModal").classList.add("hidden");}
-  function submitLocalPosPassword(event) {
-    event.preventDefault();
-    const input=document.getElementById("localPosPasswordInput");
-    if(input.value===LOCAL_POS_PIN) {
-      isLocalPosUnlocked=true;
-      closeLocalPosAuthModal();
-      toggleLocalPos(true);
-    } else {
-      document.getElementById("localPosAuthError").classList.remove("hidden");
-      input.value="";input.focus();
-    }
-  }
-  function lockLocalPos(){isLocalPosUnlocked=false;toggleLocalPos(false);}
-  function toggleLocalPos(open) {
-    if(open&&!isLocalPosUnlocked){requestLocalPosAccess();return;}
-    document.getElementById("localPosDrawer").classList.toggle("hidden",!open);
-    if(open)renderLocalPos();
-  }
-
-  function getEmoji(name="") {
-    const n=name.toLowerCase();
-    if(n.includes("tomate"))return "🍅";
-    if(n.includes("cebolla"))return "🧅";
-    if(n.includes("chile")||n.includes("jalapeño"))return "🌶️";
-    if(n.includes("aguacate"))return "🥑";
-    if(n.includes("limón"))return "🍋";
-    if(n.includes("plátano"))return "🍌";
-    if(n.includes("papa"))return "🥔";
-    if(n.includes("ajo"))return "🧄";
-    if(n.includes("zanahoria"))return "🥕";
-    if(n.includes("pepino"))return "🥒";
-    if(n.includes("lechuga"))return "🥬";
-    if(n.includes("elote"))return "🌽";
-    if(n.includes("rábano"))return "🌱";
-    return "🥬";
-  }
-
-  function renderLocalPos() {
-    const db=loadStoreDB(),today=todaySV();
-    activeLocalDay=today;
-    const sales=db.sales.filter(s=>s.date===today);
-    const sum=list=>list.reduce((acc,s)=>acc+Number(s.amount||0),0);
-    document.getElementById("localPosTodayTotal").textContent=money(sum(sales));
-    document.getElementById("localPosTodayCash").textContent=money(sum(sales.filter(s=>s.method==="Efectivo")));
-    document.getElementById("localPosTodayTransfer").textContent=money(sum(sales.filter(s=>s.method==="Transferencia")));
-    document.getElementById("localOneClickGrid").innerHTML=db.inventory.map(item=>{
-      const name=escapeHTML(item.name),category=escapeHTML(item.category||"Verduras");
-      const price=Number(item.unitPrice||0),promo=Number(item.promoPrice||item.salePrice||0);
-      const label=escapeHTML(item.promoLabel||"Presentación especial");
-      return `<div class="flex flex-col justify-between gap-2 rounded-2xl border-2 border-emerald-200 bg-emerald-50/80 p-3">
-        <span class="flex items-center gap-1.5 truncate text-sm font-extrabold text-emerald-950">${getEmoji(item.name)} <span class="truncate">${name}</span></span>
-        <div class="grid grid-cols-2 gap-1.5">
-          <button type="button" onclick="recordLocalSale(${jsArg(item.name+" (Por unidad)")},${price},${jsArg(item.category||"Verduras")})" class="rounded-xl border border-emerald-300 bg-white px-2 py-2 text-xs font-extrabold text-emerald-950 transition hover:bg-emerald-700 hover:text-white">1 u · ${money(price)}</button>
-          <button type="button" onclick="recordLocalSale(${jsArg(item.name+" ("+(item.promoLabel||"Promo")+")")},${promo},${jsArg(item.category||"Verduras")})" class="truncate rounded-xl bg-amber-400 px-2 py-2 text-xs font-extrabold text-stone-950 transition hover:bg-amber-300">${label}</button>
-        </div>
-      </div>`;
-    }).join("");
-  }
-
-  async function recordLocalSale(productName,amount,category="Verduras") {
-    if(!isLocalPosUnlocked){requestLocalPosAccess();return;}
-    const value=Number(amount);
-    if(!Number.isFinite(value)||value<=0)return;
-    const db=await fetchCloudStoreDB();
-    db.sales.unshift({id:crypto.randomUUID?.()||String(Date.now()),date:todaySV(),product:String(productName),amount:Number(value.toFixed(2)),category:String(category),method:document.getElementById("localPosMethod").value});
-    saveStoreDB(db);
-    renderLocalPos();
-    const result=await syncStoreDBToCloud(db);
-    const feedback=document.getElementById("localPosFeedback");
-    feedback.textContent=result.ok?`✓ Venta registrada: ${productName} · ${money(value)}`:`Venta guardada en este dispositivo. No se sincronizó: ${result.reason||"revisa la conexión"}.`;
-    feedback.classList.remove("hidden");
-  }
-
-  function submitCustomLocalSale(event) {
-    event.preventDefault();
-    if(!isLocalPosUnlocked){requestLocalPosAccess();return;}
-    const name=document.getElementById("customLocalProduct").value.trim();
-    const amount=Number(document.getElementById("customLocalAmount").value);
-    if(!name||!Number.isFinite(amount)||amount<=0)return;
-    recordLocalSale(name,amount,"Otros");
-    document.getElementById("customLocalProduct").value="";
-    document.getElementById("customLocalAmount").value="";
-  }
-
-  function initManciaMap() {
-    const el=document.getElementById("manciaMap");
-    if(!el||typeof L==="undefined")return;
-    const lat=13.7173809,lng=-89.1497671;
-    el.innerHTML="";
-    const map=L.map(el).setView([lat,lng],17);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map);
-    L.marker([lat,lng]).addTo(map).bindPopup("<strong>Frutas y Verduras Mancía</strong><br>Soyapango, El Salvador").openPopup();
-  }
-
-  function updateOpenStatus() {
-    const badge=document.getElementById("openStatusBadge");
-    try {
-      const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/El_Salvador",weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date());
-      const values={};parts.forEach(p=>values[p.type]=p.value);
-      const day=({Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6})[values.weekday];
-      const mins=Number(values.hour)*60+Number(values.minute);
-      const open=day===6?(mins>=360&&mins<660):(day>=1&&day<=5&&((mins>=360&&mins<780)||(mins>=870&&mins<1080)));
-      badge.textContent=open?"🟢 Abierto ahora · Retiro en local":"⚪ Cerrado ahora · Consulta nuestros horarios";
-      badge.className=open?"mt-1 inline-block rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-extrabold text-emerald-900 sm:text-xs":"mt-1 inline-block rounded-full bg-stone-200 px-2.5 py-1 text-[10px] font-extrabold text-stone-700 sm:text-xs";
-    } catch(error) {badge.textContent="Horario: lunes a sábado";}
-  }
-
-  function setCategory(category){currentCategory=category;renderCategoryFilters();renderProducts();}
-  function renderCategoryFilters() {
-    const categories=[{id:"todos",label:"Todos"},{id:"Verduras",label:"🥬 Verduras"},{id:"Frutas",label:"🍎 Frutas"},{id:"Otros",label:"🧺 Otros"}];
-    document.getElementById("categoryFilters").innerHTML=categories.map(c=>{
-      const active=currentCategory===c.id;
-      return `<button type="button" aria-pressed="${active}" onclick="setCategory(${jsArg(c.id)})" class="${active?"bg-emerald-700 text-white shadow-sm":"border-2 border-stone-200 bg-white text-stone-800 hover:bg-stone-50"} shrink-0 rounded-2xl px-5 py-3 text-sm font-extrabold transition">${c.label}</button>`;
-    }).join("");
-  }
-  function clearSearch(){document.getElementById("searchInput").value="";renderProducts();}
-  function cartKey(name,mode){return `${name}__${mode}`;}
-  function getCartItem(key){return cart.find(item=>item.key===key);}
-
-  function renderProducts() {
-    const grid=document.getElementById("productsGrid");
-    const search=document.getElementById("searchInput").value.toLocaleLowerCase("es").trim();
-    document.getElementById("clearSearchBtn").classList.toggle("hidden",!search);
-    const db=loadStoreDB();
-    const filtered=db.inventory.filter(p=>(currentCategory==="todos"||(p.category||"").toLowerCase()===currentCategory.toLowerCase())&&p.name.toLocaleLowerCase("es").includes(search));
-    if(!filtered.length) {
-      grid.innerHTML='<div class="col-span-full space-y-3 rounded-3xl border-2 border-stone-200 bg-white py-12 text-center"><p class="text-lg font-bold text-stone-700">No encontramos productos con ese nombre.</p><button type="button" onclick="clearSearch()" class="rounded-xl bg-emerald-700 px-5 py-2.5 font-bold text-white">Ver todos los productos</button></div>';
-      return;
-    }
-    grid.innerHTML=filtered.map(product=>{
-      const name=escapeHTML(product.name),badge=escapeHTML(product.badge||product.category||"Fresco");
-      const unitPrice=Number(product.unitPrice||0),promoPrice=Number(product.promoPrice||product.salePrice||0);
-      const promoQty=Math.max(1,Number(product.promoQty||1)),promoLabel=escapeHTML(product.promoLabel||`${promoQty} por ${money(promoPrice)}`);
-      const image=escapeHTML(product.image||FALLBACK_IMAGE);
-      const unitKey=cartKey(product.name,"unit"),promoKey=cartKey(product.name,"promo");
-      const unitCart=getCartItem(unitKey),promoCart=getCartItem(promoKey);
-      const count=(unitCart?.qty||0)+(promoCart?.qty||0);
-      const unitControl=unitCart
-        ? `<div class="flex items-center gap-1.5 rounded-xl border border-stone-300 bg-white p-0.5"><button type="button" aria-label="Quitar una unidad de ${name}" onclick="changeTypedQty(${jsArg(unitKey)},-1)" class="h-8 w-8 rounded-lg bg-stone-100 font-extrabold">−</button><span class="w-5 text-center text-xs font-extrabold">${unitCart.qty}</span><button type="button" aria-label="Agregar una unidad de ${name}" onclick="changeTypedQty(${jsArg(unitKey)},1)" class="h-8 w-8 rounded-lg bg-stone-900 font-extrabold text-white">+</button></div>`
-        : `<button type="button" onclick="addTypedToCart(${jsArg(product.name)} ,'unit','Por unidad',${unitPrice},1)" class="rounded-xl bg-stone-900 px-3.5 py-2.5 text-xs font-extrabold text-white transition hover:bg-stone-700">+ 1 unidad</button>`;
-      const promoControl=promoCart
-        ? `<div class="flex items-center gap-1.5 rounded-xl border border-emerald-500 bg-white p-0.5"><button type="button" aria-label="Quitar una presentación de ${name}" onclick="changeTypedQty(${jsArg(promoKey)},-1)" class="h-8 w-8 rounded-lg bg-emerald-50 font-extrabold">−</button><span class="w-5 text-center text-xs font-extrabold">${promoCart.qty}</span><button type="button" aria-label="Agregar una presentación de ${name}" onclick="changeTypedQty(${jsArg(promoKey)},1)" class="h-8 w-8 rounded-lg bg-emerald-700 font-extrabold text-white">+</button></div>`
-        : `<button type="button" onclick="addTypedToCart(${jsArg(product.name)},'promo',${jsArg(product.promoLabel||"Presentación especial")},${promoPrice},${promoQty})" class="rounded-xl bg-emerald-700 px-3.5 py-2.5 text-xs font-extrabold text-white transition hover:bg-emerald-800">+ Agregar</button>`;
-      return `<article class="flex flex-col overflow-hidden rounded-3xl border-2 ${count?"border-emerald-600 ring-2 ring-emerald-100":"border-stone-200"} bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-        <div class="relative overflow-hidden bg-stone-100"><img src="${image}" alt="${name}" class="product-image" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}'"><span class="absolute left-3 top-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-extrabold text-stone-950 shadow">${badge}</span>${count?`<span class="absolute right-3 top-3 rounded-full bg-emerald-800 px-3 py-1 text-xs font-extrabold text-white">En bolsa: ${count}</span>`:""}</div>
-        <div class="flex flex-1 flex-col justify-between gap-4 p-4">
-          <div><h3 class="text-lg font-extrabold text-stone-900">${name}</h3><p class="mt-1 text-xs font-medium text-stone-500">Elige cómo deseas comprarlo.</p></div>
-          <div class="space-y-2 border-t border-stone-100 pt-3">
-            <div class="flex items-center justify-between gap-2 rounded-2xl border border-stone-200 bg-stone-50 px-3 py-2.5"><div><span class="block text-[10px] font-extrabold uppercase text-stone-500">Por unidad</span><strong class="text-base text-stone-900">${money(unitPrice)} <span class="text-xs font-bold text-stone-500">c/u</span></strong></div>${unitControl}</div>
-            <div class="flex items-center justify-between gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2.5"><div class="min-w-0"><span class="block text-[10px] font-extrabold uppercase text-emerald-800">Presentación especial</span><strong class="block truncate text-base text-emerald-900">${promoLabel}</strong></div>${promoControl}</div>
-          </div>
-        </div>
-      </article>`;
-    }).join("");
-  }
-
-  function addTypedToCart(name,mode,modeLabel,price,packSize) {
-    const key=cartKey(name,mode),existing=getCartItem(key);
-    if(existing)existing.qty++;
-    else cart.push({key,name,mode,modeLabel,price:Number(price),packSize:Number(packSize)||1,qty:1});
-    renderProducts();updateCartUI();
-  }
-  function changeTypedQty(key,delta) {
-    const item=getCartItem(key);if(!item)return;
-    item.qty+=delta;if(item.qty<=0)cart=cart.filter(row=>row.key!==key);
-    renderProducts();updateCartUI();
-  }
-  function updateCartUI() {
-    const totalItems=cart.reduce((sum,item)=>sum+item.qty,0);
-    const total=cart.reduce((sum,item)=>sum+item.price*item.qty,0);
-    document.getElementById("cartTotal").textContent=money(total);
-    document.getElementById("stickyTotalAmount").textContent=money(total);
-    document.getElementById("stickyItemsCount").textContent=totalItems===1?"1 selección en tu pedido":`${totalItems} selecciones en tu pedido`;
-    document.getElementById("stickyCheckoutBar").classList.toggle("translate-y-full",totalItems===0);
-    const container=document.getElementById("cartItemsContainer");
-    if(!cart.length){container.innerHTML='<div class="py-12 text-center text-stone-500"><p class="mb-2 text-4xl">🧺</p><p class="text-lg font-extrabold">Tu pedido está vacío</p><p class="mt-1 text-sm">Regresa al catálogo para agregar productos.</p></div>';return;}
-    container.innerHTML=cart.map(item=>{
-      const name=escapeHTML(item.name),mode=escapeHTML(item.modeLabel);
-      return `<div class="flex items-center justify-between gap-3 rounded-2xl border-2 border-stone-200 bg-stone-50 p-3.5"><div class="min-w-0"><p class="font-extrabold text-stone-900">${name}</p><p class="text-xs font-bold text-stone-500">${item.mode==="unit"?`Por unidad (${money(item.price)} c/u)`:`Presentación: ${mode}`}</p><p class="mt-0.5 text-base font-extrabold text-emerald-700">${money(item.price*item.qty)}</p></div><div class="flex shrink-0 items-center gap-2"><button type="button" aria-label="Quitar una selección" onclick="changeTypedQty(${jsArg(item.key)},-1)" class="h-9 w-9 rounded-xl border bg-white font-bold">−</button><span class="w-6 text-center font-extrabold">${item.qty}</span><button type="button" aria-label="Agregar una selección" onclick="changeTypedQty(${jsArg(item.key)},1)" class="h-9 w-9 rounded-xl bg-emerald-700 font-bold text-white">+</button></div></div>`;
-    }).join("");
-  }
-  function toggleCart(open) {
-    document.getElementById("cartDrawer").classList.toggle("hidden",!open);
-    if(open)updateCartUI();
-  }
-
-  async function sendWhatsAppOrder() {
-    if(!cart.length){alert("Agrega al menos un producto a tu pedido.");return;}
-    const name=document.getElementById("customerName").value.trim()||"Cliente";
-    const pickup=document.getElementById("pickupTime").value;
-    const payment=document.getElementById("paymentMethod").value;
-    const total=cart.reduce((sum,item)=>sum+item.price*item.qty,0);
-    const lines=cart.map(item=>{
-      const description=item.mode==="unit"?`${item.qty} unidad(es)`:`${item.qty} presentación(es) de ${item.modeLabel}`;
-      return `• ${item.name} — ${description}: ${money(item.price*item.qty)}`;
-    }).join("\n");
-    const message=`Hola, Frutas y Verduras Mancía. Quisiera solicitar este pedido para retiro:\n\nNombre: ${name}\nHora de retiro: ${pickup}\nForma de pago: ${payment}\n\nProductos:\n${lines}\n\nTotal estimado: ${money(total)}\n\nQuedo pendiente de confirmación.`;
-    const url=`https://wa.me/${WHATSAPP_ORDERS}?text=${encodeURIComponent(message)}`;
-
-    // No registrar como venta: el mensaje aún debe ser recibido, confirmado y cobrado.
-    const db=loadStoreDB();
-    db.orders.unshift({
-      id:crypto.randomUUID?.()||String(Date.now()),
-      createdAt:new Date().toISOString(),
-      date:todaySV(),
-      customer:name,
-      pickup,
-      payment,
-      items:cart.map(item=>({...item})),
-      estimatedTotal:Number(total.toFixed(2)),
-      status:"Pendiente de confirmación"
+      setInterval(() => {
+        updateOpenStatus();
+        if (todaySV() !== activeLocalDay) {
+          activeLocalDay = todaySV();
+          renderLocalPos();
+        }
+      }, 30000);
+      await fetchCloudStoreDB();
+      renderProducts();
+      renderLocalPos();
     });
-    saveStoreDB(db);
-    const syncResult=await syncStoreDBToCloud(db);
-    if(!syncResult.ok)console.warn("El pedido quedó guardado localmente, pero no se sincronizó:",syncResult.reason);
 
-    const opened=window.open(url,"_blank","noopener,noreferrer");
-    if(!opened) {
-      // Si el navegador bloquea la ventana emergente, el usuario puede abrir el enlace desde el aviso.
-      alert("El navegador bloqueó la apertura de WhatsApp. Permite las ventanas emergentes e inténtalo de nuevo.");
-      return;
-    }
-    cart=[];updateCartUI();renderProducts();toggleCart(false);
-    document.getElementById("customerName").value="";
-  }
+    window.addEventListener("storage", (e) => {
+      if (e.key === STORAGE_KEY) {
+        renderCategoryFilters();
+        renderProducts();
+        renderLocalPos();
+      }
+    });
 
-  // Mantiene los botones utilizables con Escape al cerrar los paneles.
-  document.addEventListener("keydown",event=>{
-    if(event.key==="Escape") {
-      if(!document.getElementById("cartDrawer").classList.contains("hidden"))toggleCart(false);
-      if(!document.getElementById("localPosDrawer").classList.contains("hidden"))toggleLocalPos(false);
-      if(!document.getElementById("localPosAuthModal").classList.contains("hidden"))closeLocalPosAuthModal();
+    function requestLocalPosAccess() {
+      if (isLocalPosUnlocked) {
+        toggleLocalPos(true);
+        return;
+      }
+      document.getElementById("localPosAuthError").classList.add("hidden");
+      document.getElementById("localPosPasswordInput").value = "";
+      document.getElementById("localPosAuthModal").classList.remove("hidden");
+      setTimeout(() => document.getElementById("localPosPasswordInput").focus(), 40);
     }
-  });
-</script>
+
+    function closeLocalPosAuthModal() {
+      document.getElementById("localPosAuthModal").classList.add("hidden");
+    }
+
+    function submitLocalPosPassword(event) {
+      event.preventDefault();
+      const input = document.getElementById("localPosPasswordInput");
+      if (input.value === LOCAL_POS_PIN) {
+        isLocalPosUnlocked = true;
+        closeLocalPosAuthModal();
+        toggleLocalPos(true);
+      } else {
+        document.getElementById("localPosAuthError").classList.remove("hidden");
+        input.value = "";
+        input.focus();
+      }
+    }
+
+    function lockLocalPos() {
+      isLocalPosUnlocked = false;
+      toggleLocalPos(false);
+    }
+
+    function toggleLocalPos(open) {
+      if (open && !isLocalPosUnlocked) {
+        requestLocalPosAccess();
+        return;
+      }
+      document.getElementById("localPosDrawer").classList.toggle("hidden", !open);
+      if (open) renderLocalPos();
+    }
+
+    function getEmoji(name = "") {
+      const n = name.toLowerCase();
+      if (n.includes("tomate")) return "🍅";
+      if (n.includes("cebolla")) return "🧅";
+      if (n.includes("chile") || n.includes("jalapeño")) return "🌶️";
+      if (n.includes("aguacate")) return "🥑";
+      if (n.includes("limón")) return "🍋";
+      if (n.includes("plátano")) return "🍌";
+      if (n.includes("papa")) return "🥔";
+      if (n.includes("ajo")) return "🧄";
+      if (n.includes("zanahoria")) return "🥕";
+      if (n.includes("pepino")) return "🥒";
+      if (n.includes("lechuga")) return "🥬";
+      if (n.includes("elote")) return "🌽";
+      if (n.includes("rábano")) return "🌱";
+      return "🥬";
+    }
+
+    function renderLocalPos() {
+      const db = loadStoreDB();
+      const today = todaySV();
+      activeLocalDay = today;
+      const sales = db.sales.filter(s => s.date === today);
+      const sum = list => list.reduce((acc, s) => acc + Number(s.amount || 0), 0);
+
+      document.getElementById("localPosTodayTotal").textContent = money(sum(sales));
+      document.getElementById("localPosTodayCash").textContent = money(sum(sales.filter(s => s.method === "Efectivo")));
+      document.getElementById("localPosTodayTransfer").textContent = money(sum(sales.filter(s => s.method === "Transferencia")));
+
+      document.getElementById("localOneClickGrid").innerHTML = db.inventory.map(item => {
+        const safeName = escapeHTML(item.name);
+        const price = Number(item.unitPrice || 0);
+        const promo = Number(item.promoPrice || item.salePrice || 0);
+        const label = escapeHTML(item.promoLabel || `1 x ${money(promo)}`);
+        const cat = item.category || "Verduras";
+
+        return `
+          <div class="p-3 rounded-2xl bg-emerald-50/80 border-2 border-emerald-200 flex flex-col justify-between gap-2">
+            <span class="flex items-center gap-1.5 truncate text-sm font-extrabold text-emerald-950">
+              <span>${getEmoji(item.name)}</span>
+              <span class="truncate">${safeName}</span>
+            </span>
+            <div class="grid grid-cols-2 gap-1.5">
+              <button
+                type="button"
+                onclick="recordLocalSale(${jsArg(item.name + " (Unitario)")}, ${price}, ${jsArg(cat)})"
+                class="min-h-[42px] rounded-xl border border-emerald-300 bg-white hover:bg-emerald-700 text-emerald-950 hover:text-white px-2 py-2 text-xs font-extrabold transition cursor-pointer"
+              >
+                1 u • ${money(price)}
+              </button>
+              <button
+                type="button"
+                onclick="recordLocalSale(${jsArg(item.name + " (" + (item.promoLabel || "Promo") + ")")}, ${promo}, ${jsArg(cat)})"
+                class="min-h-[42px] truncate rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 px-2 py-2 text-xs font-extrabold transition cursor-pointer"
+              >
+                ${label}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function recordLocalSale(productName, amount, category = "Verduras") {
+      if (!isLocalPosUnlocked) {
+        requestLocalPosAccess();
+        return;
+      }
+      const value = Number(amount);
+      if (!Number.isFinite(value) || value <= 0) return;
+      const method = document.getElementById("localPosMethod").value || "Efectivo";
+
+      const db = await fetchCloudStoreDB();
+      db.sales.unshift({
+        id: crypto.randomUUID?.() || String(Date.now()),
+        date: todaySV(),
+        product: String(productName),
+        amount: Number(value.toFixed(2)),
+        category: String(category),
+        method
+      });
+
+      saveStoreDB(db);
+      renderLocalPos();
+      const syncResult = await syncStoreDBToCloud(db);
+
+      const feedback = document.getElementById("localPosFeedback");
+      feedback.textContent = syncResult.ok
+        ? `✓ Venta registrada: ${productName} • ${money(value)} (${method})`
+        : `✓ Guardado localmente: ${productName} • ${money(value)} (${method})`;
+      feedback.classList.remove("hidden");
+    }
+
+    function submitCustomLocalSale(event) {
+      event.preventDefault();
+      if (!isLocalPosUnlocked) {
+        requestLocalPosAccess();
+        return;
+      }
+      const name = document.getElementById("customLocalProduct").value.trim();
+      const amount = Number(document.getElementById("customLocalAmount").value);
+      if (!name || !Number.isFinite(amount) || amount <= 0) return;
+      recordLocalSale(name, amount, "Otros");
+      document.getElementById("customLocalProduct").value = "";
+      document.getElementById("customLocalAmount").value = "";
+    }
+
+    function initManciaMap() {
+      const el = document.getElementById("manciaMap");
+      if (!el || typeof L === "undefined") return;
+      const lat = 13.7173809;
+      const lng = -89.1497671;
+      el.innerHTML = "";
+      const map = L.map(el).setView([lat, lng], 17);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap"
+      }).addTo(map);
+      L.marker([lat, lng]).addTo(map).bindPopup("<strong>Frutas y Verduras Mancía</strong><br>Soyapango, El Salvador").openPopup();
+    }
+
+    function updateOpenStatus() {
+      const badge = document.getElementById("openStatusBadge");
+      try {
+        const parts = new Intl.DateTimeFormat("en-US", {
+          timeZone: "America/El_Salvador",
+          weekday: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false
+        }).formatToParts(new Date());
+        const values = {};
+        parts.forEach(p => { values[p.type] = p.value; });
+        const day = ({ Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 })[values.weekday];
+        const mins = Number(values.hour) * 60 + Number(values.minute);
+        const open = day === 6
+          ? (mins >= 360 && mins < 660)
+          : (day >= 1 && day <= 5 && ((mins >= 360 && mins < 780) || (mins >= 870 && mins < 1080)));
+
+        badge.textContent = open
+          ? "🟢 Abierto ahora • Retiro en local"
+          : "🔴 Cerrado ahora • L–V 6AM–1PM / 2:30PM–6PM • Sáb 6AM–11AM";
+        badge.className = open
+          ? "mt-0.5 inline-block text-[11px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900"
+          : "mt-0.5 inline-block text-[11px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-stone-200 text-stone-800";
+      } catch (e) {
+        badge.textContent = "🟢 L–V: 6AM–1PM / 2:30PM–6PM • Sáb: 6AM–11AM";
+      }
+    }
+
+    function setCategory(category) {
+      currentCategory = category;
+      renderCategoryFilters();
+      renderProducts();
+    }
+
+    function renderCategoryFilters() {
+      const categories = [
+        { id: "todos", label: "Todos" },
+        { id: "Verduras", label: "🥬 Verduras" },
+        { id: "Frutas", label: "🍎 Frutas" },
+        { id: "Otros", label: "🧺 Otros" }
+      ];
+      document.getElementById("categoryFilters").innerHTML = categories.map(c => {
+        const active = currentCategory === c.id;
+        return `
+          <button
+            type="button"
+            aria-pressed="${active}"
+            onclick="setCategory(${jsArg(c.id)})"
+            class="${active
+              ? "bg-emerald-800 text-white shadow-xs"
+              : "bg-white text-stone-800 border-2 border-stone-200 hover:bg-stone-50"
+            } shrink-0 min-h-[42px] rounded-2xl px-4 py-2.5 text-sm font-extrabold transition cursor-pointer"
+          >
+            ${c.label}
+          </button>
+        `;
+      }).join("");
+    }
+
+    function clearSearch() {
+      document.getElementById("searchInput").value = "";
+      renderProducts();
+    }
+
+    function cartKey(name, mode) {
+      return `${name}__${mode}`;
+    }
+
+    function getCartItem(key) {
+      return cart.find(item => item.key === key);
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById("productsGrid");
+      const search = document.getElementById("searchInput").value.toLocaleLowerCase("es").trim();
+      document.getElementById("clearSearchBtn").classList.toggle("hidden", !search);
+
+      const db = loadStoreDB();
+      const filtered = db.inventory.filter(p =>
+        (currentCategory === "todos" || (p.category || "").toLowerCase() === currentCategory.toLowerCase()) &&
+        p.name.toLocaleLowerCase("es").includes(search)
+      );
+
+      if (!filtered.length) {
+        grid.innerHTML = `
+          <div class="col-span-full space-y-3 rounded-3xl border-2 border-stone-200 bg-white py-12 px-4 text-center">
+            <p class="text-lg font-extrabold text-stone-700">No encontramos productos con ese nombre.</p>
+            <button type="button" onclick="clearSearch()" class="min-h-[44px] rounded-xl bg-emerald-700 px-5 py-2.5 font-bold text-white cursor-pointer">
+              Ver todos los productos
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(product => {
+        const name = escapeHTML(product.name);
+        const badge = escapeHTML(product.badge || product.category || "Fresco");
+        const unitPrice = Number(product.unitPrice || 0);
+        const promoPrice = Number(product.promoPrice || product.salePrice || 0);
+        const promoQty = Math.max(1, Number(product.promoQty || 1));
+        const promoLabel = escapeHTML(product.promoLabel || `${promoQty} x ${money(promoPrice)}`);
+        const image = escapeHTML(product.image || FALLBACK_IMAGE);
+
+        const unitKey = cartKey(product.name, "unit");
+        const promoKey = cartKey(product.name, "promo");
+        const unitCart = getCartItem(unitKey);
+        const promoCart = getCartItem(promoKey);
+        const count = (unitCart?.qty || 0) + (promoCart?.qty || 0);
+
+        const unitControl = unitCart
+          ? `<div class="flex items-center gap-1 rounded-xl border border-stone-300 bg-white p-0.5">
+               <button type="button" aria-label="Quitar unidad de ${name}" onclick="changeTypedQty(${jsArg(unitKey)}, -1)" class="w-9 h-9 rounded-lg bg-stone-100 font-extrabold text-base cursor-pointer">−</button>
+               <span class="w-6 text-center text-xs font-extrabold">${unitCart.qty}</span>
+               <button type="button" aria-label="Agregar unidad de ${name}" onclick="changeTypedQty(${jsArg(unitKey)}, 1)" class="w-9 h-9 rounded-lg bg-stone-900 font-extrabold text-base text-white cursor-pointer">+</button>
+             </div>`
+          : `<button type="button" onclick="addTypedToCart(${jsArg(product.name)}, 'unit', 'Por unidad', ${unitPrice}, 1)" class="min-h-[40px] rounded-xl bg-stone-900 hover:bg-stone-800 px-3.5 py-2 text-xs font-extrabold text-white transition cursor-pointer">+ 1 u</button>`;
+
+        const promoControl = promoCart
+          ? `<div class="flex items-center gap-1 rounded-xl border border-emerald-500 bg-white p-0.5">
+               <button type="button" aria-label="Quitar porción de ${name}" onclick="changeTypedQty(${jsArg(promoKey)}, -1)" class="w-9 h-9 rounded-lg bg-emerald-50 font-extrabold text-base cursor-pointer">−</button>
+               <span class="w-6 text-center text-xs font-extrabold text-emerald-950">${promoCart.qty}</span>
+               <button type="button" aria-label="Agregar porción de ${name}" onclick="changeTypedQty(${jsArg(promoKey)}, 1)" class="w-9 h-9 rounded-lg bg-emerald-700 font-extrabold text-base text-white cursor-pointer">+</button>
+             </div>`
+          : `<button type="button" onclick="addTypedToCart(${jsArg(product.name)}, 'promo', ${jsArg(product.promoLabel || "Porción")}, ${promoPrice}, ${promoQty})" class="min-h-[40px] rounded-xl bg-emerald-700 hover:bg-emerald-800 px-3.5 py-2 text-xs font-extrabold text-white transition cursor-pointer">+ Porción</button>`;
+
+        return `
+          <article class="flex flex-col overflow-hidden rounded-3xl border-2 ${count ? "border-emerald-700 ring-2 ring-emerald-100" : "border-stone-200"} bg-white shadow-xs transition">
+            <div class="relative overflow-hidden bg-stone-100">
+              <img src="${image}" alt="${name}" class="product-img" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}'">
+              <span class="absolute left-3 top-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-extrabold text-stone-950 shadow-xs">${badge}</span>
+              ${count ? `<span class="absolute right-3 top-3 rounded-full bg-emerald-800 px-3 py-1 text-xs font-extrabold text-white">En pedido: ${count}</span>` : ""}
+            </div>
+
+            <div class="flex flex-1 flex-col justify-between gap-3.5 p-4">
+              <div>
+                <h3 class="text-lg font-extrabold text-stone-900">${name}</h3>
+                <p class="text-xs font-medium text-stone-500 mt-0.5">Elige individual o porción</p>
+              </div>
+
+              <div class="space-y-2 border-t border-stone-100 pt-3">
+                <div class="flex items-center justify-between gap-2 rounded-2xl border border-stone-200 bg-stone-50 px-3 py-2">
+                  <div>
+                    <span class="block text-[10px] font-extrabold uppercase text-stone-500">Individual</span>
+                    <strong class="text-base text-stone-900">${money(unitPrice)} <span class="text-xs font-bold text-stone-500">c/u</span></strong>
+                  </div>
+                  ${unitControl}
+                </div>
+
+                <div class="flex items-center justify-between gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-3 py-2">
+                  <div class="min-w-0">
+                    <span class="block text-[10px] font-extrabold uppercase text-emerald-800">Porción / Promo</span>
+                    <strong class="block truncate text-base text-emerald-900">${promoLabel}</strong>
+                  </div>
+                  ${promoControl}
+                </div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function addTypedToCart(name, mode, modeLabel, price, packSize) {
+      const key = cartKey(name, mode);
+      const existing = getCartItem(key);
+      if (existing) existing.qty += 1;
+      else cart.push({ key, name, mode, modeLabel, price: Number(price), packSize: Number(packSize) || 1, qty: 1 });
+      renderProducts();
+      updateCartUI();
+    }
+
+    function changeTypedQty(key, delta) {
+      const item = getCartItem(key);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) cart = cart.filter(row => row.key !== key);
+      renderProducts();
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+      const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+      document.getElementById("cartTotal").textContent = money(total);
+      document.getElementById("stickyTotalAmount").textContent = money(total);
+      document.getElementById("stickyItemsCount").textContent = totalItems === 1
+        ? "1 selección en tu pedido"
+        : `${totalItems} selecciones en tu pedido`;
+      document.getElementById("stickyCheckoutBar").classList.toggle("translate-y-full", totalItems === 0);
+
+      const container = document.getElementById("cartItemsContainer");
+      if (!cart.length) {
+        container.innerHTML = `
+          <div class="py-12 text-center text-stone-500">
+            <p class="mb-2 text-4xl">🧺</p>
+            <p class="text-lg font-extrabold">Tu pedido está vacío</p>
+            <p class="mt-1 text-sm">Agrega productos del catálogo para armar tu lista.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = cart.map(item => {
+        const name = escapeHTML(item.name);
+        const mode = escapeHTML(item.modeLabel);
+        return `
+          <div class="flex items-center justify-between gap-3 rounded-2xl border-2 border-stone-200 bg-stone-50 p-3.5">
+            <div class="min-w-0">
+              <p class="font-extrabold text-stone-900 truncate">${name}</p>
+              <p class="text-xs font-bold text-stone-500">${item.mode === "unit" ? `Unitario (${money(item.price)} c/u)` : `Porción: ${mode}`}</p>
+              <p class="mt-0.5 text-base font-extrabold text-emerald-800">${money(item.price * item.qty)}</p>
+            </div>
+            <div class="flex shrink-0 items-center gap-1.5">
+              <button type="button" aria-label="Quitar uno" onclick="changeTypedQty(${jsArg(item.key)}, -1)" class="w-10 h-10 rounded-xl border bg-white font-extrabold text-base cursor-pointer">−</button>
+              <span class="w-6 text-center font-extrabold text-sm">${item.qty}</span>
+              <button type="button" aria-label="Agregar uno" onclick="changeTypedQty(${jsArg(item.key)}, 1)" class="w-10 h-10 rounded-xl bg-emerald-700 font-extrabold text-base text-white cursor-pointer">+</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function toggleCart(open) {
+      document.getElementById("cartDrawer").classList.toggle("hidden", !open);
+      if (open) updateCartUI();
+    }
+
+    async function sendWhatsAppOrder() {
+      if (!cart.length) {
+        alert("Agrega al menos un producto a tu pedido.");
+        return;
+      }
+      const name = document.getElementById("customerName").value.trim() || "Cliente";
+      const pickup = document.getElementById("pickupTime").value;
+      const payment = document.getElementById("paymentMethod").value;
+      const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+      const lines = cart.map(item => {
+        const desc = item.mode === "unit" ? `${item.qty} unidad(es)` : `${item.qty}x (${item.modeLabel})`;
+        return `• ${item.name} [${desc}] — ${money(item.price * item.qty)}`;
+      }).join("\n");
+
+      const message = `Hola *Frutas y Verduras Mancía*, quiero solicitar este pedido para retiro:\n\n*Nombre:* ${name}\n*Retiro:* ${pickup}\n*Pago:* ${payment}\n\n*Productos:*\n${lines}\n\n*Total estimado:* ${money(total)}`;
+      const url = `https://wa.me/${WHATSAPP_ORDERS}?text=${encodeURIComponent(message)}`;
+
+      // Se guarda como pedido pendiente, nunca como venta confirmada.
+      const db = await fetchCloudStoreDB();
+      db.orders.unshift({
+        id: crypto.randomUUID?.() || String(Date.now()),
+        createdAt: new Date().toISOString(),
+        date: todaySV(),
+        customer: name,
+        pickup,
+        payment,
+        items: cart.map(item => ({ ...item })),
+        estimatedTotal: Number(total.toFixed(2)),
+        status: "Pendiente"
+      });
+      saveStoreDB(db);
+      await syncStoreDBToCloud(db);
+
+      const opened = window.open(url, "_blank", "noopener,noreferrer");
+      if (!opened) {
+        alert("Tu pedido quedó guardado como pendiente. Permite ventanas emergentes para abrir WhatsApp.");
+      }
+
+      cart = [];
+      updateCartUI();
+      renderProducts();
+      toggleCart(false);
+      document.getElementById("customerName").value = "";
+    }
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        if (!document.getElementById("cartDrawer").classList.contains("hidden")) toggleCart(false);
+        if (!document.getElementById("localPosDrawer").classList.contains("hidden")) toggleLocalPos(false);
+        if (!document.getElementById("localPosAuthModal").classList.contains("hidden")) closeLocalPosAuthModal();
+      }
+    });
+  </script>
 </body>
 </html>
