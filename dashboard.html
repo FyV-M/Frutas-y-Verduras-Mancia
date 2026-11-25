@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#14532d" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#065f46" />
   <title>Control Total | Frutas y Verduras Mancía</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -14,52 +14,45 @@
   <style>
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f4f7f4;
+      color: #0f172a;
       -webkit-tap-highlight-color: transparent;
     }
-    .bar-fill {
-      transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .card-lift {
-      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-    }
-    .card-lift:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px -6px rgba(20, 83, 45, 0.12), 0 4px 10px -4px rgba(15, 23, 42, 0.06);
-    }
+    .bar-fill { transition: width 380ms ease; }
   </style>
 </head>
-<body class="bg-[#f4f7f4] text-slate-900 antialiased pb-16">
+<body class="antialiased pb-16">
 
-  <!-- ACCESO ÚNICO: ADMINISTRACIÓN -->
-  <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#0d3b22] via-[#14532d] to-[#0f172a]">
-    <div class="w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-emerald-200 p-7 space-y-6">
+  <!-- ACCESO ÚNICO POR SUPABASE -->
+  <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-emerald-950 via-emerald-900 to-slate-900">
+    <div class="w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-emerald-200 p-6 sm:p-7 space-y-6">
       <div class="space-y-1.5 border-b border-slate-100 pb-4">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#14532d] text-xs font-extrabold">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-extrabold">
           <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
           Frutas y Verduras Mancía
-        </div>
+        </span>
         <h1 class="text-2xl font-extrabold text-slate-900 pt-1">Control Total</h1>
-        <p class="text-xs text-slate-500">Soyapango, San Salvador • Caja, precios unitarios y por dólar, pagos semanales y cierre Excel.</p>
+        <p class="text-xs text-slate-500">Acceso administrativo por Supabase • Soyapango, San Salvador.</p>
       </div>
 
       <form onsubmit="handleLogin(event)" class="space-y-4">
         <div>
           <label for="loginEmail" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-            Correo de acceso
+            Correo administrador
           </label>
           <input
             type="email"
             id="loginEmail"
             required
             autocomplete="username"
-            placeholder="frutasyverdurasmancia@gmail.com"
-            class="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 bg-slate-50 text-slate-900 font-bold text-sm focus:outline-none focus:border-[#14532d] focus:bg-white transition"
+            placeholder="correo@ejemplo.com"
+            class="w-full min-h-[46px] px-4 py-3 rounded-2xl border-2 border-slate-200 bg-slate-50 text-slate-900 font-bold text-sm focus:outline-none focus:border-emerald-800 focus:bg-white transition"
           />
         </div>
 
         <div>
           <label for="loginPass" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-            Clave de acceso
+            Contraseña
           </label>
           <input
             type="password"
@@ -67,18 +60,18 @@
             required
             autocomplete="current-password"
             placeholder="••••••••"
-            class="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 bg-slate-50 text-slate-900 font-bold text-sm focus:outline-none focus:border-[#14532d] focus:bg-white transition"
+            class="w-full min-h-[46px] px-4 py-3 rounded-2xl border-2 border-slate-200 bg-slate-50 text-slate-900 font-bold text-sm focus:outline-none focus:border-emerald-800 focus:bg-white transition"
           />
         </div>
 
         <p id="loginError" class="hidden text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-2xl px-3.5 py-2.5">
-          Credencial no válida. Verifique correo y contraseña e intente de nuevo.
+          Credencial no válida. Verifica tu correo y contraseña.
         </p>
 
         <button
           type="submit"
           id="loginBtn"
-          class="w-full py-3.5 rounded-2xl bg-[#14532d] hover:bg-[#0f3f22] text-white font-extrabold text-sm tracking-wide shadow-lg shadow-emerald-950/20 transition cursor-pointer active:scale-[0.99]"
+          class="w-full min-h-[48px] py-3.5 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-sm shadow-lg transition cursor-pointer"
         >
           Entrar a Control Total
         </button>
@@ -86,69 +79,71 @@
     </div>
   </div>
 
-  <!-- PANEL PRINCIPAL -->
+  <!-- PANEL ADMINISTRATIVO -->
   <div id="appScreen" class="hidden">
-    <header class="sticky top-0 z-30 bg-[#14532d] text-white border-b border-emerald-900 shadow-md">
-      <div class="max-w-6xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="px-2.5 py-0.5 rounded-full bg-white/15 text-emerald-100 text-[11px] font-bold">
-              ● Frutas y Verduras Mancía
-            </span>
-            <h1 class="text-base sm:text-lg font-extrabold tracking-tight">Control Total de Operación</h1>
-            <span id="todayBadgeHeader" class="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[11px] font-extrabold"></span>
+    <header class="sticky top-0 z-30 bg-emerald-900 text-white border-b border-emerald-950 shadow-md">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3">
+        <div class="flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-base sm:text-lg font-extrabold tracking-tight truncate">Control Total</h1>
+              <span id="todayBadgeHeader" class="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[11px] font-extrabold"></span>
+            </div>
+            <p class="text-xs text-emerald-100/80 truncate">Soyapango • Pedidos, caja, precios, pagos semanales y Excel</p>
           </div>
-          <p class="text-xs text-emerald-100/80 mt-0.5">Soyapango, San Salvador • Reinicio diario a las 12:00 a. m. • Sincronizado</p>
+
+          <div class="flex items-center gap-1.5 shrink-0">
+            <a
+              href="index.html"
+              class="min-h-[40px] inline-flex items-center px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-extrabold text-xs transition"
+            >
+              🛒 Tienda
+            </a>
+            <button
+              type="button"
+              onclick="logout()"
+              class="min-h-[40px] px-3 py-2 rounded-xl bg-slate-950/50 hover:bg-slate-950 text-emerald-100 font-bold text-xs transition cursor-pointer"
+            >
+              Salir
+            </button>
+          </div>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap">
-          <a
-            href="index.html"
-            class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-extrabold text-xs shadow transition cursor-pointer"
-          >
-            🛒 Tienda
-          </a>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
           <button
             type="button"
             onclick="openModal('ventaModal')"
-            class="px-3.5 py-2 rounded-xl bg-[#ea780b] hover:bg-[#d46b06] text-white font-extrabold text-xs shadow transition cursor-pointer active:scale-95"
+            class="min-h-[42px] px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs shadow-xs cursor-pointer transition"
           >
-            + Entrada / Venta
+            + Venta / Entrada
           </button>
           <button
             type="button"
             onclick="openModal('gastoModal')"
-            class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow transition cursor-pointer active:scale-95"
+            class="min-h-[42px] px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow-xs cursor-pointer transition"
           >
             + Gasto / Salida
           </button>
           <button
             type="button"
             onclick="openNewProductModal()"
-            class="px-3.5 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-extrabold text-xs shadow transition cursor-pointer active:scale-95"
+            class="min-h-[42px] px-3 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-extrabold text-xs shadow-xs cursor-pointer transition"
           >
-            + Producto / Precios
+            + Producto / Precio
           </button>
           <button
             type="button"
             onclick="openModal('weeklyModal')"
-            class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs shadow transition cursor-pointer active:scale-95"
+            class="min-h-[42px] px-3 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs shadow-xs cursor-pointer transition"
           >
             + Pago semanal
           </button>
           <button
             type="button"
             onclick="openCloseDayModal()"
-            class="px-3.5 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs shadow transition cursor-pointer active:scale-95"
+            class="col-span-2 sm:col-span-1 min-h-[42px] px-3 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs shadow-xs cursor-pointer transition"
           >
-            📊 Cierre Día (Excel + WhatsApp)
-          </button>
-          <button
-            type="button"
-            onclick="logout()"
-            class="px-3.5 py-2 rounded-xl bg-slate-900/70 hover:bg-slate-900 text-emerald-100 font-bold text-xs transition cursor-pointer"
-          >
-            Salir
+            📊 Cierre Día
           </button>
         </div>
       </div>
@@ -156,29 +151,42 @@
 
     <main class="max-w-6xl mx-auto px-4 pt-5 space-y-6">
 
-      <div id="statusToast" class="hidden rounded-2xl px-4 py-3 text-xs font-bold border flex items-center justify-between gap-2"></div>
+      <div id="statusToast" class="hidden rounded-2xl px-4 py-3 text-xs font-bold border flex items-center justify-between gap-2" role="status" aria-live="polite"></div>
 
-      <!-- 1. INDICADORES EJECUTIVOS Y FLUJO DE CAJA -->
+      <!-- PEDIDOS PENDIENTES -->
+      <section class="bg-white rounded-3xl border-2 border-amber-300 shadow-xs p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">📥 Pedidos pendientes por confirmar</h2>
+            <p class="text-xs text-slate-500">Se registran en caja solo cuando confirmas que el cliente retiró y pagó.</p>
+          </div>
+          <span id="pendingOrdersBadge" class="px-3 py-1 rounded-full bg-amber-100 text-amber-950 text-xs font-extrabold">0 pendientes</span>
+        </div>
+
+        <div id="pendingOrdersList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+      </section>
+
+      <!-- INDICADORES -->
       <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div class="card-lift bg-white rounded-3xl p-4 border border-emerald-200/90 border-t-4 border-t-[#14532d] shadow-xs">
-          <p class="text-[11px] font-extrabold uppercase tracking-wider text-[#14532d]">Entradas acumuladas</p>
-          <p id="kpiIngresos" class="text-2xl font-extrabold text-[#14532d] mt-1">$0.00</p>
+        <div class="bg-white rounded-3xl p-4 border border-emerald-200 border-t-4 border-t-emerald-800 shadow-xs">
+          <p class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800">Entradas confirmadas</p>
+          <p id="kpiIngresos" class="text-2xl font-extrabold text-emerald-900 mt-1">$0.00</p>
           <p id="kpiPromedioDia" class="text-xs font-semibold text-slate-500 mt-1">Promedio diario: $0.00</p>
         </div>
 
-        <div class="card-lift bg-white rounded-3xl p-4 border border-rose-200/90 border-t-4 border-t-rose-600 shadow-xs">
-          <p class="text-[11px] font-extrabold uppercase tracking-wider text-rose-700">Salidas totales (gastos + pagos)</p>
+        <div class="bg-white rounded-3xl p-4 border border-rose-200 border-t-4 border-t-rose-600 shadow-xs">
+          <p class="text-[11px] font-extrabold uppercase tracking-wider text-rose-700">Salidas totales</p>
           <p id="kpiEgresos" class="text-2xl font-extrabold text-rose-600 mt-1">$0.00</p>
           <p id="kpiDesgloseEgresos" class="text-xs font-semibold text-slate-500 mt-1">Diarios: $0.00 • Semanales: $0.00</p>
         </div>
 
-        <div class="card-lift bg-white rounded-3xl p-4 border border-amber-200/90 border-t-4 border-t-[#ea780b] shadow-xs">
-          <p class="text-[11px] font-extrabold uppercase tracking-wider text-[#b45309]">Balance neto acumulado</p>
+        <div class="bg-white rounded-3xl p-4 border border-amber-200 border-t-4 border-t-amber-500 shadow-xs">
+          <p class="text-[11px] font-extrabold uppercase tracking-wider text-amber-800">Balance neto</p>
           <p id="kpiNeto" class="text-2xl font-extrabold text-slate-900 mt-1">$0.00</p>
           <p id="kpiMargen" class="text-xs font-semibold text-slate-500 mt-1">Margen: 0.0%</p>
         </div>
 
-        <div class="card-lift bg-white rounded-3xl p-4 border border-teal-200/90 border-t-4 border-t-teal-600 shadow-xs">
+        <div class="bg-white rounded-3xl p-4 border border-teal-200 border-t-4 border-t-teal-600 shadow-xs">
           <p class="text-[11px] font-extrabold uppercase tracking-wider text-teal-800">Efectivo físico en caja</p>
           <p id="kpiCajaActual" class="text-2xl font-extrabold text-teal-700 mt-1">$0.00</p>
           <div class="flex items-center justify-between gap-2 mt-1">
@@ -187,38 +195,38 @@
               type="button"
               id="baseCashBtn"
               onclick="editOpeningCash()"
-              class="text-xs font-extrabold text-[#14532d] hover:underline cursor-pointer"
+              class="text-xs font-extrabold text-emerald-800 hover:underline cursor-pointer"
             >
-              Base inicial ($0.00)
+              Base ($0.00)
             </button>
           </div>
         </div>
       </section>
 
-      <!-- DESGLOSE DE CAJA POR MÉTODO DE PAGO -->
-      <section class="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-4">
+      <!-- DESGLOSE POR MÉTODO -->
+      <section class="bg-white rounded-3xl border border-slate-200 shadow-xs p-4 sm:p-5">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Dinero que entra y sale por método de pago (neto acumulado)</h2>
+          <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Flujo por método de pago (neto acumulado)</h2>
           <span id="baseCashHeaderLabel" class="text-[11px] text-slate-500 font-semibold">Base inicial: $0.00</span>
         </div>
         <div id="methodBreakdown" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
       </section>
 
-      <!-- 2. CATÁLOGO DE PRODUCTOS: PRECIO UNITARIO Y POR EL DÓLAR -->
-      <section class="bg-white rounded-3xl border border-teal-200/90 shadow-sm p-5 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
+      <!-- CATÁLOGO DE 16 PRODUCTOS -->
+      <section class="bg-white rounded-3xl border border-teal-200 shadow-xs p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div>
-            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Precios por Unidad y por el Dólar (Tienda y Caja Local)</h2>
-            <p class="text-xs text-slate-500">Configura el precio individual (ej. $0.25 c/u) y la porción/promo del dólar (ej. 4 x $1.00).</p>
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Precios por unidad y porción</h2>
+            <p class="text-xs text-slate-500">Sincronizado con la tienda y la caja local.</p>
           </div>
-          <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex items-center gap-2">
             <span id="productsCountBadge" class="px-3 py-1.5 rounded-xl bg-teal-50 border border-teal-200 text-teal-900 text-xs font-extrabold">0 productos</span>
             <button
               type="button"
               onclick="openNewProductModal()"
-              class="px-3.5 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-xs cursor-pointer transition"
+              class="min-h-[38px] px-3.5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-xs cursor-pointer transition"
             >
-              + Nuevo / Editar producto
+              + Nuevo / Editar
             </button>
           </div>
         </div>
@@ -226,21 +234,21 @@
         <div id="productsCatalogGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
       </section>
 
-      <!-- 3. PAGOS SEMANALES -->
-      <section class="bg-white rounded-3xl border border-amber-200/90 shadow-sm p-5 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
+      <!-- PAGOS SEMANALES -->
+      <section class="bg-white rounded-3xl border border-amber-200 shadow-xs p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div>
-            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Pagos semanales programados y registrados</h2>
-            <p class="text-xs text-slate-500">Alquiler, transporte semanal, ayuda/planilla u otros compromisos semanales. Al marcar <strong>Pagado</strong>, descuenta de caja.</p>
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Pagos semanales</h2>
+            <p class="text-xs text-slate-500">Al marcar como pagado, se descuenta de la caja.</p>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
             <span id="weeklyTotalBadge" class="px-3 py-1.5 rounded-xl bg-amber-100 text-amber-950 text-xs font-extrabold">Total semanal: $0.00</span>
             <button
               type="button"
               onclick="openModal('weeklyModal')"
-              class="px-3.5 py-1.5 rounded-xl bg-[#ea780b] hover:bg-[#d46b06] text-white font-extrabold text-xs cursor-pointer transition"
+              class="min-h-[38px] px-3.5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs cursor-pointer transition"
             >
-              + Agregar pago semanal
+              + Agregar pago
             </button>
           </div>
         </div>
@@ -248,27 +256,27 @@
         <div id="weeklyPaymentsList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
       </section>
 
-      <!-- 4. EVOLUCIÓN DÍA POR DÍA -->
-      <section class="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-5 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3.5">
+      <!-- EVOLUCIÓN DIARIA -->
+      <section class="bg-white rounded-3xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <div>
-            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Evolución diaria desde el Día 1</h2>
-            <p class="text-xs text-slate-500">Cada fecha única es una jornada. La tienda local inicia en $0.00 cada día a las 12:00 a. m.</p>
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Evolución diaria</h2>
+            <p class="text-xs text-slate-500">Toca cualquier jornada para filtrar el detalle.</p>
           </div>
-          <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex items-center gap-2">
             <button
               type="button"
               onclick="selectToday()"
-              class="px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs shadow-xs cursor-pointer transition"
+              class="min-h-[38px] px-3.5 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-xs cursor-pointer transition"
             >
               Ver Hoy
             </button>
             <button
               type="button"
               onclick="selectDay('ALL')"
-              class="px-3.5 py-1.5 rounded-xl bg-[#ea780b] hover:bg-[#d46b06] text-white font-extrabold text-xs shadow-xs cursor-pointer transition"
+              class="min-h-[38px] px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs cursor-pointer transition"
             >
-              Ver todos los días
+              Todos los días
             </button>
           </div>
         </div>
@@ -276,19 +284,19 @@
         <div id="dailyTimeline" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5"></div>
       </section>
 
-      <!-- 5. DESGLOSE DE PRODUCTOS VENDIDOS -->
-      <section class="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-5 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
+      <!-- DESGLOSE POR PRODUCTO -->
+      <section class="bg-white rounded-3xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div>
-            <h2 id="productSectionTitle" class="text-base sm:text-lg font-extrabold text-slate-900">Desglose de ventas por producto — Todos los días</h2>
-            <p id="productSectionSubtitle" class="text-xs text-slate-500">Ordenado por monto vendido acumulado.</p>
+            <h2 id="productSectionTitle" class="text-base sm:text-lg font-extrabold text-slate-900">Desglose por producto — Todos los días</h2>
+            <p id="productSectionSubtitle" class="text-xs text-slate-500">Ordenado por monto vendido.</p>
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
             <select
               id="daySelector"
               onchange="onDaySelectorChange()"
-              class="px-3 py-2 rounded-xl border-2 border-emerald-200 bg-emerald-50/60 text-xs font-extrabold text-[#14532d] focus:outline-none focus:border-[#14532d] cursor-pointer"
+              class="min-h-[40px] px-3 py-2 rounded-xl border-2 border-emerald-200 bg-emerald-50/60 text-xs font-extrabold text-emerald-900 focus:outline-none focus:border-emerald-800 cursor-pointer"
             >
               <option value="ALL">Todos los días</option>
             </select>
@@ -297,85 +305,62 @@
               type="button"
               id="sortToggleBtn"
               onclick="toggleSort()"
-              class="px-3.5 py-2 rounded-xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 text-xs font-extrabold text-amber-950 cursor-pointer transition"
+              class="min-h-[40px] px-3.5 py-2 rounded-xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 text-xs font-extrabold text-amber-950 cursor-pointer transition"
             >
               Mayor a menor ↓
             </button>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div class="rounded-2xl bg-[#14532d] text-white p-4 shadow-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="rounded-2xl bg-emerald-900 text-white p-4">
             <p class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-200">Mayor venta del periodo</p>
-            <p id="topProductText" class="text-base font-extrabold mt-1">—</p>
+            <p id="topProductText" class="text-sm sm:text-base font-extrabold mt-1">—</p>
           </div>
-          <div class="rounded-2xl bg-[#fff7ed] border border-amber-200 text-slate-900 p-4 shadow-xs">
-            <p class="text-[11px] font-extrabold uppercase tracking-wider text-[#ea780b]">Menor venta del periodo</p>
-            <p id="bottomProductText" class="text-base font-extrabold mt-1">—</p>
+          <div class="rounded-2xl bg-amber-50 border border-amber-200 text-slate-900 p-4">
+            <p class="text-[11px] font-extrabold uppercase tracking-wider text-amber-800">Menor venta del periodo</p>
+            <p id="bottomProductText" class="text-sm sm:text-base font-extrabold mt-1">—</p>
           </div>
         </div>
 
         <div id="productBarsList" class="space-y-2.5 pt-1"></div>
       </section>
 
-      <!-- 6. LIBRO DE MOVIMIENTOS: ENTRADAS Y GASTOS DIARIOS -->
+      <!-- LIBRO DE ENTRADAS Y GASTOS -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div class="bg-white rounded-3xl border border-emerald-200/80 shadow-sm p-5 space-y-3">
+        <div class="bg-white rounded-3xl border border-emerald-200 shadow-xs p-4 sm:p-5 space-y-3">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h2 class="text-sm font-extrabold uppercase tracking-wider text-[#14532d]">Entradas / Ventas</h2>
-            <span id="salesCountBadge" class="px-2.5 py-1 rounded-full bg-emerald-100 text-[#14532d] text-xs font-extrabold">0 líneas</span>
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-emerald-900">Entradas / Ventas</h2>
+            <span id="salesCountBadge" class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-extrabold">0 líneas</span>
           </div>
           <div id="salesLedger" class="max-h-96 overflow-y-auto divide-y divide-slate-100 text-xs pr-1"></div>
         </div>
 
-        <div class="bg-white rounded-3xl border border-rose-200/80 shadow-sm p-5 space-y-3">
+        <div class="bg-white rounded-3xl border border-rose-200 shadow-xs p-4 sm:p-5 space-y-3">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h2 class="text-sm font-extrabold uppercase tracking-wider text-rose-700">Gastos diarios (Insumos / Mercadería)</h2>
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-rose-700">Gastos diarios</h2>
             <span id="expensesCountBadge" class="px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 text-xs font-extrabold">0 gastos</span>
           </div>
           <div id="expensesLedger" class="max-h-96 overflow-y-auto divide-y divide-slate-100 text-xs pr-1"></div>
         </div>
       </section>
 
-      <!-- 7. RESPALDO Y EXPORTACIÓN -->
-      <footer class="bg-white rounded-3xl border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
-        <span class="font-medium">Sincronizado con Supabase y respaldo local en el navegador.</span>
-        <div class="flex items-center gap-2 flex-wrap">
-          <button
-            type="button"
-            onclick="openCloseDayModal()"
-            class="px-3.5 py-1.5 rounded-xl bg-[#14532d] hover:bg-[#0f3f22] text-white font-bold cursor-pointer transition"
-          >
-            📊 Exportar Excel del Día
+      <!-- RESPALDO Y EXPORTACIÓN -->
+      <footer class="bg-white rounded-3xl border border-slate-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <span class="font-medium text-center sm:text-left">Sincronizado con Supabase y respaldo local.</span>
+        <div class="flex items-center gap-2 flex-wrap justify-center">
+          <button type="button" onclick="openCloseDayModal()" class="min-h-[38px] px-3.5 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold cursor-pointer">
+            📊 Exportar Excel
           </button>
-          <button
-            type="button"
-            onclick="copyBackup()"
-            class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold cursor-pointer transition"
-          >
-            Copiar JSON
-          </button>
-          <button
-            type="button"
-            onclick="downloadBackup()"
-            class="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#14532d] font-bold cursor-pointer transition"
-          >
+          <button type="button" onclick="downloadBackup()" class="min-h-[38px] px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold cursor-pointer">
             Descargar .json
           </button>
-          <button
-            type="button"
-            onclick="document.getElementById('importFileInput').click()"
-            class="px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold cursor-pointer transition"
-          >
+          <button type="button" onclick="document.getElementById('importFileInput').click()" class="min-h-[38px] px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold cursor-pointer">
             Importar JSON
           </button>
           <input type="file" id="importFileInput" accept=".json,application/json" onchange="importBackup(event)" class="hidden" />
-          <button
-            type="button"
-            onclick="restoreSeed()"
-            class="px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold cursor-pointer transition"
-          >
-            Restaurar datos base
+          <button type="button" onclick="restoreSeed()" class="min-h-[38px] px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold cursor-pointer">
+            Reiniciar base limpia
           </button>
         </div>
       </footer>
@@ -383,48 +368,44 @@
     </main>
   </div>
 
-  <!-- MODAL CIERRE DEL DÍA (EXCEL + WHATSAPP AL JEFE) -->
-  <div id="closeDayModal" class="fixed inset-0 z-50 hidden">
-    <div onclick="closeModal('closeDayModal')" class="absolute inset-0 bg-slate-950/60"></div>
+  <!-- MODAL CIERRE DEL DÍA -->
+  <div id="closeDayModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="closeDayTitle">
+    <button type="button" onclick="closeModal('closeDayModal')" aria-label="Cerrar modal" class="absolute inset-0 w-full h-full bg-slate-950/60 cursor-pointer"></button>
     <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
-      <div class="w-full max-w-md bg-white rounded-3xl p-6 space-y-4 pointer-events-auto shadow-2xl border-2 border-emerald-500">
+      <div class="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border-2 border-emerald-500">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 class="text-base font-extrabold text-[#14532d]">📊 Cierre del Día y Envío al Jefe</h3>
-          <button type="button" onclick="closeModal('closeDayModal')" class="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs cursor-pointer">✕</button>
+          <h3 id="closeDayTitle" class="text-base font-extrabold text-emerald-900">📊 Cierre del día y envío</h3>
+          <button type="button" onclick="closeModal('closeDayModal')" class="min-h-[36px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
         </div>
 
         <div class="space-y-3">
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label for="closeReportDate" class="block text-xs font-bold text-slate-600 mb-1">Jornada a cerrar</label>
-              <input type="date" id="closeReportDate" onchange="updateCloseDayPreview()" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-bold focus:outline-none focus:border-[#14532d]" />
+              <label for="closeReportDate" class="block text-xs font-bold text-slate-600 mb-1">Jornada</label>
+              <input type="date" id="closeReportDate" onchange="updateCloseDayPreview()" class="w-full min-h-[42px] px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold" />
             </div>
             <div>
-              <label for="bossWhatsappInput" class="block text-xs font-bold text-slate-600 mb-1">WhatsApp del Jefe</label>
-              <input type="text" id="bossWhatsappInput" value="50379698478" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-extrabold focus:outline-none focus:border-[#14532d]" />
+              <label for="bossWhatsappInput" class="block text-xs font-bold text-slate-600 mb-1">WhatsApp destino</label>
+              <input type="text" id="bossWhatsappInput" value="50379698478" class="w-full min-h-[42px] px-3 py-2 rounded-xl border border-slate-300 text-xs font-extrabold" />
             </div>
           </div>
 
           <div id="closeDayPreviewBox" class="rounded-2xl bg-emerald-50/70 border border-emerald-200 p-3.5 text-xs space-y-1.5 text-slate-800"></div>
 
-          <p class="text-[11px] text-slate-500 leading-relaxed">
-            Al pulsar el botón, se descargará automáticamente el archivo <strong>Excel (.xlsx)</strong> con 3 hojas (Resumen, Ventas y Gastos) y se abrirá el WhatsApp del jefe con el cuadre del día listo para enviar y adjuntar el Excel.
-          </p>
-
-          <div class="grid grid-cols-1 gap-2.5 pt-1">
+          <div class="grid grid-cols-1 gap-2 pt-1">
             <button
               type="button"
               onclick="executeEndOfDayReport(true)"
-              class="w-full py-3.5 rounded-2xl bg-[#14532d] hover:bg-[#0f3f22] text-white font-extrabold text-sm shadow-lg cursor-pointer transition"
+              class="w-full min-h-[46px] py-3 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-sm shadow-md cursor-pointer"
             >
-              📥 Descargar Excel (.xlsx) y Enviar por WhatsApp
+              📥 Descargar Excel (.xlsx) y abrir WhatsApp
             </button>
             <button
               type="button"
               onclick="executeEndOfDayReport(false)"
-              class="w-full py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs cursor-pointer transition"
+              class="w-full min-h-[42px] py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs cursor-pointer"
             >
-              Solo descargar archivo Excel (.xlsx)
+              Solo descargar Excel (.xlsx)
             </button>
           </div>
         </div>
@@ -432,38 +413,38 @@
     </div>
   </div>
 
-  <!-- MODAL NUEVA VENTA / ENTRADA -->
-  <div id="ventaModal" class="fixed inset-0 z-50 hidden">
-    <div onclick="closeModal('ventaModal')" class="absolute inset-0 bg-slate-950/60"></div>
+  <!-- MODAL NUEVA VENTA -->
+  <div id="ventaModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="ventaModalTitle">
+    <button type="button" onclick="closeModal('ventaModal')" aria-label="Cerrar modal" class="absolute inset-0 w-full h-full bg-slate-950/60 cursor-pointer"></button>
     <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
-      <div class="w-full max-w-md bg-white rounded-3xl p-6 space-y-4 pointer-events-auto shadow-2xl border border-emerald-200">
+      <div class="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border border-emerald-200">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 class="text-base font-extrabold text-[#14532d]">Registrar venta / entrada de dinero</h3>
-          <button type="button" onclick="closeModal('ventaModal')" class="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs cursor-pointer">✕</button>
+          <h3 id="ventaModalTitle" class="text-base font-extrabold text-emerald-900">Registrar venta / entrada</h3>
+          <button type="button" onclick="closeModal('ventaModal')" class="min-h-[36px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
         </div>
 
         <form onsubmit="addSale(event)" class="space-y-3">
           <div>
             <label for="saleProduct" class="block text-xs font-bold text-slate-600 mb-1">Producto o concepto</label>
-            <input type="text" id="saleProduct" list="productSuggestions" required placeholder="Ej. Tomate, Cebolla, Pepino, Aguacate" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:outline-none focus:border-[#14532d]" />
+            <input type="text" id="saleProduct" list="productSuggestions" required placeholder="Ej. Tomate, Cebolla Blanca" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold" />
             <datalist id="productSuggestions"></datalist>
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label for="saleAmount" class="block text-xs font-bold text-slate-600 mb-1">Monto ($)</label>
-              <input type="number" step="0.01" min="0.01" id="saleAmount" required placeholder="0.00" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold focus:outline-none focus:border-[#14532d]" />
+              <input type="number" step="0.01" min="0.01" id="saleAmount" required placeholder="0.00" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold" />
             </div>
             <div>
               <label for="saleDate" class="block text-xs font-bold text-slate-600 mb-1">Fecha</label>
-              <input type="date" id="saleDate" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:outline-none focus:border-[#14532d]" />
+              <input type="date" id="saleDate" required class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold" />
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label for="saleCategory" class="block text-xs font-bold text-slate-600 mb-1">Categoría</label>
-              <select id="saleCategory" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold">
+              <select id="saleCategory" class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold">
                 <option value="Verduras">Verduras</option>
                 <option value="Frutas">Frutas</option>
                 <option value="Otros">Otros</option>
@@ -471,7 +452,7 @@
             </div>
             <div>
               <label for="saleMethod" class="block text-xs font-bold text-slate-600 mb-1">Método</label>
-              <select id="saleMethod" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold">
+              <select id="saleMethod" class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold">
                 <option value="Efectivo">Efectivo</option>
                 <option value="Transferencia">Transferencia</option>
                 <option value="Tarjeta">Tarjeta</option>
@@ -479,7 +460,7 @@
             </div>
           </div>
 
-          <button type="submit" class="w-full py-3 rounded-2xl bg-[#14532d] hover:bg-[#0f3f22] text-white font-extrabold text-sm shadow-md cursor-pointer">
+          <button type="submit" class="w-full min-h-[46px] py-3 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-sm shadow-md cursor-pointer">
             Guardar entrada
           </button>
         </form>
@@ -487,46 +468,46 @@
     </div>
   </div>
 
-  <!-- MODAL NUEVO GASTO DIARIO -->
-  <div id="gastoModal" class="fixed inset-0 z-50 hidden">
-    <div onclick="closeModal('gastoModal')" class="absolute inset-0 bg-slate-950/60"></div>
+  <!-- MODAL NUEVO GASTO -->
+  <div id="gastoModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="gastoModalTitle">
+    <button type="button" onclick="closeModal('gastoModal')" aria-label="Cerrar modal" class="absolute inset-0 w-full h-full bg-slate-950/60 cursor-pointer"></button>
     <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
-      <div class="w-full max-w-md bg-white rounded-3xl p-6 space-y-4 pointer-events-auto shadow-2xl border border-rose-200">
+      <div class="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border border-rose-200">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 class="text-base font-extrabold text-rose-700">Registrar gasto diario / salida de caja</h3>
-          <button type="button" onclick="closeModal('gastoModal')" class="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs cursor-pointer">✕</button>
+          <h3 id="gastoModalTitle" class="text-base font-extrabold text-rose-700">Registrar gasto diario</h3>
+          <button type="button" onclick="closeModal('gastoModal')" class="min-h-[36px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
         </div>
 
         <form onsubmit="addExpense(event)" class="space-y-3">
           <div>
-            <label for="expDesc" class="block text-xs font-bold text-slate-600 mb-1">Insumo, producto o detalle</label>
-            <input type="text" id="expDesc" required placeholder="Ej. Bolsas gabacha, Caja de tomate, Hielo" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:outline-none focus:border-rose-600" />
+            <label for="expDesc" class="block text-xs font-bold text-slate-600 mb-1">Descripción</label>
+            <input type="text" id="expDesc" required placeholder="Ej. Bolsas, Mercadería, Transporte" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold" />
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label for="expAmt" class="block text-xs font-bold text-slate-600 mb-1">Monto total ($)</label>
-              <input type="number" step="0.01" min="0.01" id="expAmt" required placeholder="0.00" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold focus:outline-none focus:border-rose-600" />
+              <label for="expAmt" class="block text-xs font-bold text-slate-600 mb-1">Monto ($)</label>
+              <input type="number" step="0.01" min="0.01" id="expAmt" required placeholder="0.00" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold" />
             </div>
             <div>
               <label for="expDt" class="block text-xs font-bold text-slate-600 mb-1">Fecha</label>
-              <input type="date" id="expDt" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:outline-none focus:border-rose-600" />
+              <input type="date" id="expDt" required class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold" />
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label for="expType" class="block text-xs font-bold text-slate-600 mb-1">Tipo de gasto</label>
-              <select id="expType" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold">
-                <option value="Insumos">Insumos (bolsas, empaque, aseo)</option>
-                <option value="Mercadería">Mercadería (compra de frutas/verduras)</option>
-                <option value="Transporte">Transporte diario</option>
-                <option value="Operativo">Operativo diario</option>
+              <label for="expType" class="block text-xs font-bold text-slate-600 mb-1">Tipo</label>
+              <select id="expType" class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold">
+                <option value="Insumos">Insumos</option>
+                <option value="Mercadería">Mercadería</option>
+                <option value="Transporte">Transporte</option>
+                <option value="Operativo">Operativo</option>
               </select>
             </div>
             <div>
               <label for="expPay" class="block text-xs font-bold text-slate-600 mb-1">Método de pago</label>
-              <select id="expPay" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold">
+              <select id="expPay" class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold">
                 <option value="Efectivo">Efectivo</option>
                 <option value="Transferencia">Transferencia</option>
                 <option value="Tarjeta">Tarjeta</option>
@@ -534,53 +515,53 @@
             </div>
           </div>
 
-          <button type="submit" class="w-full py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm shadow-md cursor-pointer">
-            Guardar gasto y descontar de caja
+          <button type="submit" class="w-full min-h-[46px] py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm shadow-md cursor-pointer">
+            Guardar gasto
           </button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- MODAL PRODUCTO: PRECIO UNITARIO + PRECIO POR EL DÓLAR -->
-  <div id="productModal" class="fixed inset-0 z-50 hidden">
-    <div onclick="closeModal('productModal')" class="absolute inset-0 bg-slate-950/60"></div>
+  <!-- MODAL PRODUCTO -->
+  <div id="productModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
+    <button type="button" onclick="closeModal('productModal')" aria-label="Cerrar modal" class="absolute inset-0 w-full h-full bg-slate-950/60 cursor-pointer"></button>
     <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
-      <div class="w-full max-w-md bg-white rounded-3xl p-6 space-y-4 pointer-events-auto shadow-2xl border border-teal-200">
+      <div class="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border border-teal-200">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 class="text-base font-extrabold text-teal-800">Producto: Unitario y por el Dólar</h3>
-          <button type="button" onclick="closeModal('productModal')" class="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs cursor-pointer">✕</button>
+          <h3 id="productModalTitle" class="text-base font-extrabold text-teal-900">Producto: unitario y porción</h3>
+          <button type="button" onclick="closeModal('productModal')" class="min-h-[36px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
         </div>
 
         <form onsubmit="saveProductItem(event)" class="space-y-3">
           <div>
             <label for="prodName" class="block text-xs font-bold text-slate-600 mb-1">Nombre del producto</label>
-            <input type="text" id="prodName" list="productSuggestions" required placeholder="Ej. Tomate, Cebolla, Rábano" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:outline-none focus:border-teal-600" />
+            <input type="text" id="prodName" list="productSuggestions" required placeholder="Ej. Tomate" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold" />
           </div>
 
-          <div class="grid grid-cols-3 gap-2.5">
+          <div class="grid grid-cols-3 gap-2">
             <div>
               <label for="prodUnitPrice" class="block text-xs font-bold text-slate-600 mb-1">Unitario ($)</label>
-              <input type="number" step="0.01" min="0.01" id="prodUnitPrice" value="0.25" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold focus:outline-none focus:border-teal-600" />
+              <input type="number" step="0.01" min="0.01" id="prodUnitPrice" value="0.25" required class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold" />
             </div>
             <div>
               <label for="prodPromoQty" class="block text-xs font-bold text-slate-600 mb-1">Cant. promo</label>
-              <input type="number" step="1" min="1" id="prodPromoQty" value="4" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold focus:outline-none focus:border-teal-600" />
+              <input type="number" step="1" min="1" id="prodPromoQty" value="4" required class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold" />
             </div>
             <div>
-              <label for="prodPromoPrice" class="block text-xs font-bold text-slate-600 mb-1">Precio promo ($)</label>
-              <input type="number" step="0.01" min="0.01" id="prodPromoPrice" value="1.00" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold focus:outline-none focus:border-teal-600" />
+              <label for="prodPromoPrice" class="block text-xs font-bold text-slate-600 mb-1">Precio ($)</label>
+              <input type="number" step="0.01" min="0.01" id="prodPromoPrice" value="1.00" required class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold" />
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label for="prodPromoLabel" class="block text-xs font-bold text-slate-600 mb-1">Texto promo / dólar</label>
-              <input type="text" id="prodPromoLabel" required placeholder="Ej. 4 x $1.00" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:outline-none focus:border-teal-600" />
+              <label for="prodPromoLabel" class="block text-xs font-bold text-slate-600 mb-1">Texto de porción</label>
+              <input type="text" id="prodPromoLabel" required placeholder="Ej. 4 x $1.00" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold" />
             </div>
             <div>
               <label for="prodCategory" class="block text-xs font-bold text-slate-600 mb-1">Categoría</label>
-              <select id="prodCategory" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold">
+              <select id="prodCategory" class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold">
                 <option value="Verduras">Verduras</option>
                 <option value="Frutas">Frutas</option>
                 <option value="Otros">Otros</option>
@@ -589,12 +570,12 @@
           </div>
 
           <div>
-            <label for="prodBadge" class="block text-xs font-bold text-slate-600 mb-1">Etiqueta corta (opcional)</label>
-            <input type="text" id="prodBadge" placeholder="Ej. Fresco hoy, Oferta diaria" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:outline-none focus:border-teal-600" />
+            <label for="prodBadge" class="block text-xs font-bold text-slate-600 mb-1">Etiqueta (opcional)</label>
+            <input type="text" id="prodBadge" placeholder="Ej. Fresco hoy" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold" />
           </div>
 
-          <button type="submit" class="w-full py-3 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-sm shadow-md cursor-pointer">
-            Guardar en Tienda y Caja Local
+          <button type="submit" class="w-full min-h-[46px] py-3 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-sm shadow-md cursor-pointer">
+            Guardar producto
           </button>
         </form>
       </div>
@@ -602,29 +583,29 @@
   </div>
 
   <!-- MODAL PAGO SEMANAL -->
-  <div id="weeklyModal" class="fixed inset-0 z-50 hidden">
-    <div onclick="closeModal('weeklyModal')" class="absolute inset-0 bg-slate-950/60"></div>
+  <div id="weeklyModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="weeklyModalTitle">
+    <button type="button" onclick="closeModal('weeklyModal')" aria-label="Cerrar modal" class="absolute inset-0 w-full h-full bg-slate-950/60 cursor-pointer"></button>
     <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
-      <div class="w-full max-w-md bg-white rounded-3xl p-6 space-y-4 pointer-events-auto shadow-2xl border border-amber-200">
+      <div class="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border border-amber-200">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 class="text-base font-extrabold text-amber-900">Nuevo pago semanal</h3>
-          <button type="button" onclick="closeModal('weeklyModal')" class="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs cursor-pointer">✕</button>
+          <h3 id="weeklyModalTitle" class="text-base font-extrabold text-amber-900">Nuevo pago semanal</h3>
+          <button type="button" onclick="closeModal('weeklyModal')" class="min-h-[36px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
         </div>
 
         <form onsubmit="addWeeklyPayment(event)" class="space-y-3">
           <div>
-            <label for="wkConcept" class="block text-xs font-bold text-slate-600 mb-1">Concepto del pago semanal</label>
-            <input type="text" id="wkConcept" required placeholder="Ej. Alquiler de puesto, Flete semanal, Ayudante" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:outline-none focus:border-[#ea780b]" />
+            <label for="wkConcept" class="block text-xs font-bold text-slate-600 mb-1">Concepto</label>
+            <input type="text" id="wkConcept" required placeholder="Ej. Alquiler de puesto" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold" />
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label for="wkAmount" class="block text-xs font-bold text-slate-600 mb-1">Monto semanal ($)</label>
-              <input type="number" step="0.01" min="0.01" id="wkAmount" required placeholder="0.00" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold focus:outline-none focus:border-[#ea780b]" />
+              <label for="wkAmount" class="block text-xs font-bold text-slate-600 mb-1">Monto ($)</label>
+              <input type="number" step="0.01" min="0.01" id="wkAmount" required placeholder="0.00" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold" />
             </div>
             <div>
               <label for="wkDay" class="block text-xs font-bold text-slate-600 mb-1">Día de pago</label>
-              <select id="wkDay" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold">
+              <select id="wkDay" class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold">
                 <option value="Lunes">Lunes</option>
                 <option value="Martes">Martes</option>
                 <option value="Miércoles">Miércoles</option>
@@ -636,25 +617,25 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label for="wkMethod" class="block text-xs font-bold text-slate-600 mb-1">Método de pago</label>
-              <select id="wkMethod" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold">
+              <label for="wkMethod" class="block text-xs font-bold text-slate-600 mb-1">Método</label>
+              <select id="wkMethod" class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold">
                 <option value="Efectivo">Efectivo</option>
                 <option value="Transferencia">Transferencia</option>
                 <option value="Tarjeta">Tarjeta</option>
               </select>
             </div>
             <div>
-              <label for="wkPaid" class="block text-xs font-bold text-slate-600 mb-1">Estado inicial</label>
-              <select id="wkPaid" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold">
-                <option value="false">Pendiente esta semana</option>
-                <option value="true">Pagado (descontar caja)</option>
+              <label for="wkPaid" class="block text-xs font-bold text-slate-600 mb-1">Estado</label>
+              <select id="wkPaid" class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold">
+                <option value="false">Pendiente</option>
+                <option value="true">Pagado</option>
               </select>
             </div>
           </div>
 
-          <button type="submit" class="w-full py-3 rounded-2xl bg-[#ea780b] hover:bg-[#d46b06] text-white font-extrabold text-sm shadow-md cursor-pointer">
+          <button type="submit" class="w-full min-h-[46px] py-3 rounded-2xl bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-sm shadow-md cursor-pointer">
             Guardar pago semanal
           </button>
         </form>
@@ -663,18 +644,32 @@
   </div>
 
   <script>
+    "use strict";
+
     const SUPABASE_URL = "https://vgvkjhfkpyhvapzbyvwn.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cSCLRLMk06I-T0EKAODTGw_W0uVQJja";
     const CLOUD_ROW_ID = "frutas_y_verduras_mancia_v1";
-    const STORAGE_KEY = "biz_control_total_v6";
+    const STORAGE_KEY = "biz_control_total_v7";
     const DEFAULT_BOSS_WHATSAPP = "50379698478";
+    const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=85";
 
-    const supabaseClient =
-      typeof window.supabase !== "undefined" &&
-      SUPABASE_URL &&
-      !SUPABASE_PUBLISHABLE_KEY.startsWith("PEGA_AQUI")
-        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
-        : null;
+    const supabaseClient = window.supabase?.createClient
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+      : null;
+
+    const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, ch => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[ch]));
+
+    const jsArg = value => "'" + String(value ?? "")
+      .replace(/\\/g, "\\\\")
+      .replace(/'/g, "\\'")
+      .replace(/\r/g, "\\r")
+      .replace(/\n/g, "\\n")
+      .replace(/</g, "\\x3c")
+      .replace(/>/g, "\\x3e") + "'";
+
+    const fmt = v => `$${Number(v || 0).toFixed(2)}`;
 
     function todayISO() {
       try {
@@ -691,97 +686,102 @@
     }
 
     const CATALOG_META = {
-      "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80" },
-      "cebolla": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80" },
-      "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80" },
-      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80" },
-      "chile / jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=600&q=80" },
-      "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=600&q=80" },
-      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=600&q=80" },
-      "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=600&q=80" },
-      "rábano": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=600&q=80" },
-      "aguacate": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", category: "Frutas", badge: "Al punto", image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=600&q=80" },
-      "limones": { unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, promoLabel: "8 x $1.00", category: "Frutas", badge: "Jugoso", image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=600&q=80" },
-      "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=600&q=80" },
-      "papa": { unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, promoLabel: "1 lb x $1.50", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=600&q=80" },
-      "ajo": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=600&q=80" }
+      "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85" },
+      "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=85" },
+      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&fit=crop&w=900&q=85" },
+      "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=85" },
+      "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=900&q=85" },
+      "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=85" },
+      "ajo": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=900&q=85" },
+      "lechuga": { unitPrice: 1.75, promoQty: 1, promoPrice: 1.75, promoLabel: "1 x $1.75", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=900&q=85" },
+      "aguacate": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", category: "Frutas", badge: "Al punto", image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=900&q=85" },
+      "limón": { unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, promoLabel: "8 x $1.00", category: "Frutas", badge: "Jugoso", image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=900&q=85" },
+      "papa": { unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, promoLabel: "1 libra x $1.50", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=900&q=85" },
+      "elote": { unitPrice: 0.75, promoQty: 1, promoPrice: 0.75, promoLabel: "1 x $0.75", category: "Verduras", badge: "Tierno", image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=900&q=85" },
+      "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=900&q=85" },
+      "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=900&q=85" },
+      "rábano": { unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=900&q=85" },
+      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=900&q=85" }
     };
 
     const seedData = () => ({
       openingCash: 0.00,
-      products: [
-        { id: 101, name: "Tomate", category: "Verduras", unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, salePrice: 1.00, promoLabel: "10 x $1.00", badge: "Fresco hoy", image: CATALOG_META["tomate"].image },
-        { id: 102, name: "Cebolla", category: "Verduras", unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, salePrice: 1.00, promoLabel: "4 x $1.00", badge: "Oferta diaria", image: CATALOG_META["cebolla"].image },
-        { id: 103, name: "Chile / Jalapeño", category: "Verduras", unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, salePrice: 1.00, promoLabel: "6 x $1.00", badge: "", image: CATALOG_META["chile / jalapeño"].image },
-        { id: 104, name: "Güisquil", category: "Verduras", unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, salePrice: 1.00, promoLabel: "4 x $1.00", badge: "", image: CATALOG_META["güisquil"].image },
-        { id: 105, name: "Zanahoria", category: "Verduras", unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, salePrice: 1.00, promoLabel: "3 x $1.00", badge: "", image: CATALOG_META["zanahoria"].image },
-        { id: 106, name: "Pepino", category: "Verduras", unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, salePrice: 1.00, promoLabel: "4 x $1.00", badge: "", image: CATALOG_META["pepino"].image },
-        { id: 107, name: "Rábano", category: "Verduras", unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, salePrice: 1.00, promoLabel: "4 x $1.00", badge: "", image: CATALOG_META["rábano"].image },
-        { id: 108, name: "Aguacate", category: "Frutas", unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, salePrice: 1.00, promoLabel: "2 x $1.00", badge: "Al punto", image: CATALOG_META["aguacate"].image },
-        { id: 109, name: "Limones", category: "Frutas", unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, salePrice: 1.00, promoLabel: "8 x $1.00", badge: "Jugoso", image: CATALOG_META["limones"].image },
-        { id: 110, name: "Plátano", category: "Frutas", unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, salePrice: 1.00, promoLabel: "3 x $1.00", badge: "Dulces", image: CATALOG_META["plátano"].image },
-        { id: 111, name: "Papa", category: "Verduras", unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, salePrice: 1.50, promoLabel: "1 lb x $1.50", badge: "Fresco", image: CATALOG_META["papa"].image },
-        { id: 112, name: "Ajo", category: "Verduras", unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, salePrice: 1.00, promoLabel: "2 redes x $1.00", badge: "", image: CATALOG_META["ajo"].image }
-      ],
+      products: Object.entries(CATALOG_META).map(([name, meta], idx) => ({
+        id: 101 + idx,
+        name: name.replace(/\b\p{L}/gu, c => c.toLocaleUpperCase("es")),
+        category: meta.category,
+        unitPrice: meta.unitPrice,
+        promoQty: meta.promoQty,
+        promoPrice: meta.promoPrice,
+        salePrice: meta.promoPrice,
+        promoLabel: meta.promoLabel,
+        badge: meta.badge,
+        image: meta.image
+      })),
       weeklyPayments: [
         { id: 501, concept: "Alquiler / Cuota de puesto semanal", amount: 25.00, payDay: "Domingo", method: "Efectivo", paid: false, paidDate: "" },
         { id: 502, concept: "Transporte / Flete semanal", amount: 15.00, payDay: "Miércoles", method: "Efectivo", paid: false, paidDate: "" }
       ],
-      sales: [
-        { id: 1801, date: "2026-11-18", product: "Ventas del día (libreta)", amount: 24.00, category: "Verduras", method: "Efectivo" },
-        { id: 1901, date: "2026-11-19", product: "Ventas del día (libreta)", amount: 13.00, category: "Verduras", method: "Efectivo" },
-        { id: 2001, date: "2026-11-20", product: "Ventas del día (libreta)", amount: 45.00, category: "Verduras", method: "Efectivo" },
-        { id: 2101, date: "2026-11-21", product: "Ventas del día (libreta)", amount: 75.00, category: "Verduras", method: "Efectivo" },
-        { id: 2201, date: "2026-11-22", product: "Ventas del día (libreta)", amount: 43.00, category: "Verduras", method: "Efectivo" },
-        { id: 2301, date: "2026-11-23", product: "Ventas en efectivo (libreta hoy)", amount: 62.25, category: "Verduras", method: "Efectivo" },
-        { id: 2302, date: "2026-11-23", product: "Cobros por transferencia (libreta hoy)", amount: 44.60, category: "Otros", method: "Transferencia" },
-        { id: 2401, date: "2026-11-24", product: "Ventas del día (libreta)", amount: 31.25, category: "Verduras", method: "Efectivo" }
-      ],
-      expenses: [
-        {
-          id: 2399,
-          date: "2026-11-23",
-          description: "Gasto del día (bolsas / insumos)",
-          amount: 10.18,
-          type: "Insumos",
-          method: "Efectivo"
-        }
-      ]
+      sales: [],
+      expenses: [],
+      orders: []
     });
 
     const normalizeDB = (raw) => {
       const base = seedData();
       if (!raw || typeof raw !== "object") return base;
+
       const sourceList = Array.isArray(raw.products)
         ? raw.products
         : Array.isArray(raw.inventory)
           ? raw.inventory
-          : base.products;
+          : [];
 
-      const prods = sourceList.map((item, idx) => {
-        const meta = CATALOG_META[(item.name || "").toLowerCase().trim()] || {};
-        const promoPrice = Number(item.promoPrice || item.salePrice || meta.promoPrice || 1.00);
-        const promoQty = Math.max(1, Number(item.promoQty || meta.promoQty || 1));
-        const unitPrice = Number(item.unitPrice || meta.unitPrice || (promoPrice / promoQty) || 0.25);
-        const promoLabel = item.promoLabel || meta.promoLabel || `${promoQty} x $${promoPrice.toFixed(2)}`;
+      const prods = base.products.map(seed => {
+        const found = sourceList.find(p => String(p.name || "").trim().toLowerCase() === seed.name.toLowerCase());
+        const meta = CATALOG_META[seed.name.toLowerCase()] || {};
+        const item = { ...seed, ...(found || {}), name: seed.name };
+        const promoPrice = Number(item.promoPrice ?? item.salePrice ?? meta.promoPrice ?? 1.00);
+        const promoQty = Math.max(1, Number(item.promoQty ?? meta.promoQty ?? 1));
+        const unitPrice = Number(item.unitPrice ?? meta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
         return {
-          id: item.id || (100 + idx + 1),
-          name: String(item.name || "").trim(),
+          id: item.id,
+          name: item.name,
           category: item.category || meta.category || "Verduras",
           unitPrice: Number(unitPrice.toFixed(2)),
           promoQty,
           promoPrice: Number(promoPrice.toFixed(2)),
           salePrice: Number(promoPrice.toFixed(2)),
-          promoLabel,
-          badge: item.badge !== undefined ? item.badge : (meta.badge || ""),
-          image: item.image || meta.image || "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80"
+          promoLabel: item.promoLabel || meta.promoLabel || `${promoQty} x ${fmt(promoPrice)}`,
+          badge: item.badge ?? meta.badge ?? "",
+          image: item.image || meta.image || FALLBACK_IMAGE
         };
-      }).filter(p => p.name);
+      });
 
-      const cleanSales = (Array.isArray(raw.sales) ? raw.sales : base.sales)
+      const extraProds = sourceList
+        .filter(p => !base.products.some(s => s.name.toLowerCase() === String(p.name || "").trim().toLowerCase()))
+        .map((item, idx) => {
+          const promoPrice = Number(item.promoPrice ?? item.salePrice ?? 1.00);
+          const promoQty = Math.max(1, Number(item.promoQty ?? 1));
+          const unitPrice = Number(item.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
+          return {
+            id: item.id || (900 + idx),
+            name: String(item.name || "Producto").trim(),
+            category: item.category || "Verduras",
+            unitPrice: Number(unitPrice.toFixed(2)),
+            promoQty,
+            promoPrice: Number(promoPrice.toFixed(2)),
+            salePrice: Number(promoPrice.toFixed(2)),
+            promoLabel: item.promoLabel || `${promoQty} x ${fmt(promoPrice)}`,
+            badge: item.badge || "",
+            image: item.image || FALLBACK_IMAGE
+          };
+        });
+
+      const cleanSales = (Array.isArray(raw.sales) ? raw.sales : [])
         .filter(s => s && typeof s.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.date.trim()))
         .map(s => ({
-          id: s.id || Date.now() + Math.random(),
+          id: s.id || (crypto.randomUUID?.() || String(Date.now() + Math.random())),
           date: s.date.trim(),
           product: String(s.product || "Venta").trim(),
           amount: Number(s.amount || 0),
@@ -789,23 +789,10 @@
           method: s.method || "Efectivo"
         }));
 
-      // Asegura que la venta de 2026-11-24 ($31.25) esté presente si el historial aún no la incluye
-      const hasNov24Sale = cleanSales.some(s => s.date === "2026-11-24" && Math.abs(Number(s.amount) - 31.25) < 0.001);
-      if (!hasNov24Sale) {
-        cleanSales.push({
-          id: 2401,
-          date: "2026-11-24",
-          product: "Ventas del día (libreta)",
-          amount: 31.25,
-          category: "Verduras",
-          method: "Efectivo"
-        });
-      }
-
-      const cleanExpenses = (Array.isArray(raw.expenses) ? raw.expenses : base.expenses)
+      const cleanExpenses = (Array.isArray(raw.expenses) ? raw.expenses : [])
         .filter(g => g && typeof g.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(g.date.trim()))
         .map(g => ({
-          id: g.id || Date.now() + Math.random(),
+          id: g.id || (crypto.randomUUID?.() || String(Date.now() + Math.random())),
           date: g.date.trim(),
           description: String(g.description || "Gasto").trim(),
           amount: Number(g.amount || 0),
@@ -813,12 +800,15 @@
           method: g.method || "Efectivo"
         }));
 
+      const cleanOrders = Array.isArray(raw.orders) ? raw.orders : [];
+
       return {
-        openingCash: Number.isFinite(Number(raw.openingCash)) ? Number(raw.openingCash) : base.openingCash,
-        products: prods.length ? prods : base.products,
+        openingCash: Number.isFinite(Number(raw.openingCash)) ? Number(raw.openingCash) : 0,
+        products: [...prods, ...extraProds],
         weeklyPayments: Array.isArray(raw.weeklyPayments) ? raw.weeklyPayments : base.weeklyPayments,
         sales: cleanSales,
-        expenses: cleanExpenses
+        expenses: cleanExpenses,
+        orders: cleanOrders
       };
     };
 
@@ -838,8 +828,6 @@
     let toastTimer = null;
     let activeDayTracker = todayISO();
 
-    const fmt = v => `$${Number(v || 0).toFixed(2)}`;
-
     async function syncToCloud() {
       if (!supabaseClient) return;
       try {
@@ -851,11 +839,9 @@
             updated_at: new Date().toISOString()
           });
         if (error) {
-          showToast("Guardado local; revisa políticas o conexión con Supabase.", "danger");
+          showToast("Guardado local; verifica la conexión o permisos con Supabase.", "danger");
         }
-      } catch {
-        // Conserva copia local si no hay conexión
-      }
+      } catch {}
     }
 
     const saveDB = () => {
@@ -874,20 +860,13 @@
             .eq("id", CLOUD_ROW_ID)
             .maybeSingle();
 
-          if (!error && data && data.data) {
-            const normalized = normalizeDB(data.data);
-            const hadNov24 = Array.isArray(data.data.sales) && data.data.sales.some(s => s.date === "2026-11-24" && Math.abs(Number(s.amount) - 31.25) < 0.001);
-            db = normalized;
+          if (!error && data?.data) {
+            db = normalizeDB(data.data);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-            if (!hadNov24) {
-              await syncToCloud();
-            }
           } else if (!error && !data) {
             await syncToCloud();
           }
-        } catch {
-          // Usa datos locales si no hay red
-        }
+        } catch {}
       }
       render();
     }
@@ -901,7 +880,7 @@
         if (saleDateEl) saleDateEl.value = nowDay;
         if (expDateEl) expDateEl.value = nowDay;
         render();
-        showToast(`Nuevo día (${nowDay}): contador diario de caja local reiniciado en $0.00.`);
+        showToast(`Nueva jornada (${nowDay}): contador diario iniciado en $0.00.`);
       }
     }
 
@@ -912,7 +891,7 @@
         try {
           db = normalizeDB(JSON.parse(e.newValue));
           render();
-          showToast("Nuevo movimiento sincronizado desde la tienda.");
+          showToast("Datos actualizados.");
         } catch {}
       }
     });
@@ -922,9 +901,9 @@
       if (!el) return;
       const styles = tone === "danger"
         ? "bg-rose-50 text-rose-800 border-rose-200"
-        : "bg-emerald-50 text-[#14532d] border-emerald-200";
+        : "bg-emerald-50 text-emerald-900 border-emerald-200";
       el.className = `rounded-2xl px-4 py-3 text-xs font-bold border flex items-center justify-between gap-2 ${styles}`;
-      el.innerHTML = `<span>${msg}</span><button type="button" onclick="hideToast()" class="text-[11px] underline cursor-pointer">Cerrar</button>`;
+      el.innerHTML = `<span>${escapeHTML(msg)}</span><button type="button" onclick="hideToast()" class="text-[11px] underline cursor-pointer">Cerrar</button>`;
       el.classList.remove("hidden");
       clearTimeout(toastTimer);
       toastTimer = setTimeout(hideToast, 4200);
@@ -943,13 +922,13 @@
       const btnEl = document.getElementById("loginBtn");
 
       if (!supabaseClient) {
-        errorEl.textContent = "Configura SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY en dashboard.html antes de iniciar sesión.";
+        errorEl.textContent = "Configura Supabase para iniciar sesión.";
         errorEl.classList.remove("hidden");
         return;
       }
 
       btnEl.disabled = true;
-      btnEl.textContent = "Verificando...";
+      btnEl.textContent = "Verificando…";
 
       const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
@@ -957,7 +936,7 @@
       btnEl.textContent = "Entrar a Control Total";
 
       if (error || !data.session) {
-        errorEl.textContent = "Credencial no válida. Verifique correo y contraseña e intente de nuevo.";
+        errorEl.textContent = "Credencial no válida. Verifica tu correo y contraseña.";
         errorEl.classList.remove("hidden");
         return;
       }
@@ -1009,6 +988,56 @@
       render();
     }
 
+    function confirmPendingOrder(orderId) {
+      const idx = db.orders.findIndex(o => String(o.id) === String(orderId));
+      if (idx === -1) return;
+      const order = db.orders[idx];
+      const saleDate = todayISO();
+      const method = order.payment === "Transferencia" ? "Transferencia" : "Efectivo";
+
+      const items = Array.isArray(order.items) ? order.items : [];
+      if (items.length) {
+        items.forEach((item, i) => {
+          const prod = db.products.find(p => p.name.toLowerCase() === String(item.name || "").toLowerCase());
+          const label = item.mode === "unit"
+            ? `${item.name} (${item.qty} u)`
+            : `${item.name} (${item.qty}x ${item.modeLabel || "Porción"})`;
+          db.sales.unshift({
+            id: `${Date.now()}-${i}`,
+            date: saleDate,
+            product: `${label} — ${order.customer || "Cliente"}`,
+            amount: Number((Number(item.price || 0) * Number(item.qty || 1)).toFixed(2)),
+            category: prod?.category || "Verduras",
+            method
+          });
+        });
+      } else {
+        db.sales.unshift({
+          id: String(Date.now()),
+          date: saleDate,
+          product: `Pedido ${order.customer || "Cliente"}`,
+          amount: Number(order.estimatedTotal || 0),
+          category: "Verduras",
+          method
+        });
+      }
+
+      db.orders.splice(idx, 1);
+      saveDB();
+      render();
+      showToast(`Pedido de ${order.customer || "Cliente"} confirmado y registrado en caja (${method}).`);
+    }
+
+    function cancelPendingOrder(orderId) {
+      const order = db.orders.find(o => String(o.id) === String(orderId));
+      if (!order) return;
+      if (!confirm(`¿Descartar el pedido pendiente de "${order.customer || "Cliente"}"?`)) return;
+      db.orders = db.orders.filter(o => String(o.id) !== String(orderId));
+      saveDB();
+      render();
+      showToast(`Pedido descartado: ${order.customer || "Cliente"}`, "danger");
+    }
+
     function addSale(e) {
       e.preventDefault();
       const product = document.getElementById("saleProduct").value.trim();
@@ -1019,7 +1048,7 @@
       if (!product || isNaN(amount) || amount <= 0 || !date) return;
 
       db.sales.unshift({
-        id: Date.now(),
+        id: crypto.randomUUID?.() || String(Date.now()),
         product,
         amount,
         date,
@@ -1045,7 +1074,7 @@
       if (!description || isNaN(amount) || amount <= 0 || !date) return;
 
       db.expenses.unshift({
-        id: Date.now(),
+        id: crypto.randomUUID?.() || String(Date.now()),
         description,
         amount,
         date,
@@ -1062,20 +1091,20 @@
     }
 
     function deleteSale(id) {
-      const item = db.sales.find(x => x.id === id);
+      const item = db.sales.find(x => String(x.id) === String(id));
       if (!item) return;
       if (!confirm(`¿Eliminar la venta de "${item.product}" por ${fmt(item.amount)}?`)) return;
-      db.sales = db.sales.filter(x => x.id !== id);
+      db.sales = db.sales.filter(x => String(x.id) !== String(id));
       saveDB();
       render();
       showToast(`Venta eliminada: ${item.product}`, "danger");
     }
 
     function deleteExpense(id) {
-      const item = db.expenses.find(x => x.id === id);
+      const item = db.expenses.find(x => String(x.id) === String(id));
       if (!item) return;
       if (!confirm(`¿Eliminar el gasto "${item.description}" por ${fmt(item.amount)}?`)) return;
-      db.expenses = db.expenses.filter(x => x.id !== id);
+      db.expenses = db.expenses.filter(x => String(x.id) !== String(id));
       saveDB();
       render();
       showToast(`Gasto eliminado: ${item.description}`, "danger");
@@ -1093,7 +1122,7 @@
     }
 
     function openEditProduct(id) {
-      const item = db.products.find(x => x.id === id);
+      const item = db.products.find(x => String(x.id) === String(id));
       if (!item) return;
       document.getElementById("prodName").value = item.name;
       document.getElementById("prodUnitPrice").value = Number(item.unitPrice || 0.25).toFixed(2);
@@ -1136,7 +1165,7 @@
           id: Date.now(),
           ...payload,
           badge: badge || meta.badge || "",
-          image: meta.image || "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80"
+          image: meta.image || FALLBACK_IMAGE
         });
       }
 
@@ -1148,10 +1177,10 @@
     }
 
     function deleteProductItem(id) {
-      const item = db.products.find(x => x.id === id);
+      const item = db.products.find(x => String(x.id) === String(id));
       if (!item) return;
-      if (!confirm(`¿Quitar "${item.name}" de la tienda y caja local?`)) return;
-      db.products = db.products.filter(x => x.id !== id);
+      if (!confirm(`¿Quitar "${item.name}" del catálogo?`)) return;
+      db.products = db.products.filter(x => String(x.id) !== String(id));
       saveDB();
       render();
       showToast(`Producto eliminado: ${item.name}`, "danger");
@@ -1184,7 +1213,7 @@
     }
 
     function toggleWeeklyPaid(id) {
-      const wk = db.weeklyPayments.find(x => x.id === id);
+      const wk = db.weeklyPayments.find(x => String(x.id) === String(id));
       if (!wk) return;
       wk.paid = !wk.paid;
       wk.paidDate = wk.paid ? todayISO() : "";
@@ -1199,10 +1228,10 @@
     }
 
     function deleteWeeklyPayment(id) {
-      const wk = db.weeklyPayments.find(x => x.id === id);
+      const wk = db.weeklyPayments.find(x => String(x.id) === String(id));
       if (!wk) return;
       if (!confirm(`¿Eliminar el pago semanal "${wk.concept}"?`)) return;
-      db.weeklyPayments = db.weeklyPayments.filter(x => x.id !== id);
+      db.weeklyPayments = db.weeklyPayments.filter(x => String(x.id) !== String(id));
       saveDB();
       render();
       showToast(`Pago semanal eliminado: ${wk.concept}`, "danger");
@@ -1216,7 +1245,7 @@
         db.openingCash = n;
         saveDB();
         render();
-        showToast(`Base inicial de caja actualizada a ${fmt(n)}`);
+        showToast(`Base inicial actualizada a ${fmt(n)}`);
       }
     }
 
@@ -1269,14 +1298,14 @@
       const reportDate = document.getElementById("closeReportDate").value || todayISO();
       const r = computeDailyReportData(reportDate);
       document.getElementById("closeDayPreviewBox").innerHTML = `
-        <p class="font-extrabold text-[#14532d] text-sm">Resumen Jornada ${r.reportDate}</p>
+        <p class="font-extrabold text-emerald-900 text-sm">Jornada ${escapeHTML(r.reportDate)}</p>
         <div class="grid grid-cols-2 gap-1 pt-1">
-          <span>Ventas del día:</span><strong class="text-right text-emerald-700">${fmt(r.salesTotal)}</strong>
-          <span>• En Efectivo:</span><strong class="text-right">${fmt(r.salesEfectivo)}</strong>
+          <span>Ventas confirmadas:</span><strong class="text-right text-emerald-700">${fmt(r.salesTotal)}</strong>
+          <span>• Efectivo:</span><strong class="text-right">${fmt(r.salesEfectivo)}</strong>
           <span>• Transferencia:</span><strong class="text-right">${fmt(r.salesTransf)}</strong>
-          <span>Gastos / Salidas día:</span><strong class="text-right text-rose-600">-${fmt(r.outTotal)}</strong>
-          <span class="border-t border-emerald-200 pt-1 font-extrabold">Balance Neto Día:</span><strong class="border-t border-emerald-200 pt-1 text-right text-[#14532d]">${fmt(r.netDay)}</strong>
-          <span>Efectivo físico en caja:</span><strong class="text-right text-teal-800">${fmt(r.physicalCashBalance)}</strong>
+          <span>Salidas del día:</span><strong class="text-right text-rose-600">-${fmt(r.outTotal)}</strong>
+          <span class="border-t border-emerald-200 pt-1 font-extrabold">Balance neto:</span><strong class="border-t border-emerald-200 pt-1 text-right text-emerald-900">${fmt(r.netDay)}</strong>
+          <span>Efectivo en caja:</span><strong class="text-right text-teal-800">${fmt(r.physicalCashBalance)}</strong>
         </div>
       `;
     }
@@ -1287,103 +1316,80 @@
       const r = computeDailyReportData(reportDate);
 
       if (typeof XLSX === "undefined") {
-        alert("No se pudo cargar el generador de Excel. Revisa tu conexión a internet.");
+        alert("No se pudo cargar la librería de Excel.");
         return;
       }
 
       const wb = XLSX.utils.book_new();
 
       const resumenRows = [
-        ["FRUTAS Y VERDURAS MANCÍA — CIERRE DIARIO DE OPERACIÓN"],
+        ["FRUTAS Y VERDURAS MANCÍA — CIERRE DIARIO"],
         ["Ubicación", "Soyapango, San Salvador"],
         ["Fecha de cierre", r.reportDate],
         [],
         ["INDICADOR", "MONTO ($)"],
-        ["Total Ventas / Entradas del día", Number(r.salesTotal.toFixed(2))],
-        ["   - Ventas en Efectivo", Number(r.salesEfectivo.toFixed(2))],
-        ["   - Ventas por Transferencia", Number(r.salesTransf.toFixed(2))],
-        ["   - Ventas con Tarjeta", Number(r.salesTarjeta.toFixed(2))],
-        ["Total Gastos Diarios", Number(r.expDailyTotal.toFixed(2))],
-        ["Total Pagos Semanales Pagados hoy", Number(r.expWeeklyTotal.toFixed(2))],
-        ["Total Salidas del Día", Number(r.outTotal.toFixed(2))],
+        ["Ventas confirmadas del día", Number(r.salesTotal.toFixed(2))],
+        ["  - Efectivo", Number(r.salesEfectivo.toFixed(2))],
+        ["  - Transferencia", Number(r.salesTransf.toFixed(2))],
+        ["  - Tarjeta", Number(r.salesTarjeta.toFixed(2))],
+        ["Gastos diarios", Number(r.expDailyTotal.toFixed(2))],
+        ["Pagos semanales pagados hoy", Number(r.expWeeklyTotal.toFixed(2))],
+        ["Total salidas del día", Number(r.outTotal.toFixed(2))],
         ["BALANCE NETO DEL DÍA", Number(r.netDay.toFixed(2))],
-        [],
-        ["EFECTIVO FÍSICO ACUMULADO EN CAJA", Number(r.physicalCashBalance.toFixed(2))]
+        ["EFECTIVO FÍSICO EN CAJA", Number(r.physicalCashBalance.toFixed(2))]
       ];
       const wsResumen = XLSX.utils.aoa_to_sheet(resumenRows);
-      wsResumen["!cols"] = [{ wch: 42 }, { wch: 18 }];
-      XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen del Dia");
+      wsResumen["!cols"] = [{ wch: 38 }, { wch: 18 }];
+      XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen");
 
-      const ventasRows = [
-        ["Fecha", "Producto / Concepto", "Categoría", "Método de Pago", "Monto ($)"]
-      ];
+      const ventasRows = [["Fecha", "Producto / Concepto", "Categoría", "Método", "Monto ($)"]];
       if (r.daySales.length) {
-        r.daySales.forEach(s => {
-          ventasRows.push([s.date, s.product, s.category, s.method, Number(Number(s.amount).toFixed(2))]);
-        });
+        r.daySales.forEach(s => ventasRows.push([s.date, s.product, s.category, s.method, Number(Number(s.amount).toFixed(2))]));
       } else {
-        ventasRows.push([r.reportDate, "Sin ventas registradas en esta fecha", "-", "-", 0]);
+        ventasRows.push([r.reportDate, "Sin ventas confirmadas en esta fecha", "-", "-", 0]);
       }
       const wsVentas = XLSX.utils.aoa_to_sheet(ventasRows);
-      wsVentas["!cols"] = [{ wch: 14 }, { wch: 36 }, { wch: 14 }, { wch: 18 }, { wch: 14 }];
-      XLSX.utils.book_append_sheet(wb, wsVentas, "Ventas del Dia");
+      wsVentas["!cols"] = [{ wch: 14 }, { wch: 36 }, { wch: 14 }, { wch: 16 }, { wch: 14 }];
+      XLSX.utils.book_append_sheet(wb, wsVentas, "Ventas");
 
-      const gastosRows = [
-        ["Fecha", "Descripción / Concepto", "Tipo", "Método de Pago", "Monto ($)"]
-      ];
-      r.dayExpenses.forEach(g => {
-        gastosRows.push([g.date, g.description, g.type, g.method, Number(Number(g.amount).toFixed(2))]);
-      });
-      r.dayWeeklyPaid.forEach(w => {
-        gastosRows.push([w.paidDate, `${w.concept} (Pago semanal)`, "Semanal", w.method, Number(Number(w.amount).toFixed(2))]);
-      });
+      const gastosRows = [["Fecha", "Descripción", "Tipo", "Método", "Monto ($)"]];
+      r.dayExpenses.forEach(g => gastosRows.push([g.date, g.description, g.type, g.method, Number(Number(g.amount).toFixed(2))]));
+      r.dayWeeklyPaid.forEach(w => gastosRows.push([w.paidDate, `${w.concept} (Semanal)`, "Semanal", w.method, Number(Number(w.amount).toFixed(2))]));
       if (gastosRows.length === 1) {
         gastosRows.push([r.reportDate, "Sin gastos registrados en esta fecha", "-", "-", 0]);
       }
       const wsGastos = XLSX.utils.aoa_to_sheet(gastosRows);
-      wsGastos["!cols"] = [{ wch: 14 }, { wch: 38 }, { wch: 16 }, { wch: 18 }, { wch: 14 }];
-      XLSX.utils.book_append_sheet(wb, wsGastos, "Gastos del Dia");
+      wsGastos["!cols"] = [{ wch: 14 }, { wch: 36 }, { wch: 16 }, { wch: 16 }, { wch: 14 }];
+      XLSX.utils.book_append_sheet(wb, wsGastos, "Gastos");
 
       const fileName = `Cierre_Mancia_${r.reportDate}.xlsx`;
       XLSX.writeFile(wb, fileName);
 
       closeModal("closeDayModal");
-      showToast(`Excel "${fileName}" generado y descargado.`);
+      showToast(`Excel "${fileName}" descargado.`);
 
       if (sendWhatsapp && bossPhone) {
         const waText =
           `📊 *CIERRE DEL DÍA — FRUTAS Y VERDURAS MANCÍA*\n` +
           `📅 *Fecha:* ${r.reportDate}\n\n` +
-          `💰 *Ventas del día:* ${fmt(r.salesTotal)}\n` +
+          `💰 *Ventas confirmadas:* ${fmt(r.salesTotal)}\n` +
           `   • Efectivo: ${fmt(r.salesEfectivo)}\n` +
           `   • Transferencia: ${fmt(r.salesTransf)}\n` +
-          `📉 *Salidas / Gastos del día:* -${fmt(r.outTotal)}\n` +
-          `✅ *Balance Neto del Día:* ${fmt(r.netDay)}\n\n` +
-          `💵 *Efectivo físico en caja:* ${fmt(r.physicalCashBalance)}\n\n` +
-          `📎 _Adjunto archivo Excel descargado (${fileName}) con el detalle completo._`;
+          `📉 *Salidas del día:* -${fmt(r.outTotal)}\n` +
+          `✅ *Balance neto:* ${fmt(r.netDay)}\n` +
+          `💵 *Efectivo en caja:* ${fmt(r.physicalCashBalance)}`;
 
-        window.open(`https://wa.me/${bossPhone}?text=${encodeURIComponent(waText)}`, "_blank");
+        window.open(`https://wa.me/${bossPhone}?text=${encodeURIComponent(waText)}`, "_blank", "noopener,noreferrer");
       }
     }
 
     function restoreSeed() {
-      if (!confirm("¿Restaurar los datos base desde el Día 1?")) return;
+      if (!confirm("¿Reiniciar los movimientos y dejar el catálogo limpio de 16 productos?")) return;
       db = seedData();
       selectedDay = "ALL";
       saveDB();
       render();
-      showToast("Datos base restaurados.");
-    }
-
-    function copyBackup() {
-      const json = JSON.stringify(db, null, 2);
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(json)
-          .then(() => showToast("Respaldo JSON copiado al portapapeles."))
-          .catch(() => prompt("Copia el respaldo:", json));
-      } else {
-        prompt("Copia el respaldo:", json);
-      }
+      showToast("Datos reiniciados.");
     }
 
     function downloadBackup() {
@@ -1395,7 +1401,7 @@
       a.download = `control-total-mancia-${todayISO()}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast("Archivo JSON descargado.");
+      showToast("Respaldo JSON descargado.");
     }
 
     function importBackup(event) {
@@ -1405,15 +1411,15 @@
       reader.onload = () => {
         try {
           const parsed = JSON.parse(String(reader.result || "{}"));
-          if (!Array.isArray(parsed.sales) || !Array.isArray(parsed.expenses)) {
-            alert("El archivo no tiene la estructura esperada.");
+          if (!Array.isArray(parsed.sales) && !Array.isArray(parsed.expenses) && !Array.isArray(parsed.orders)) {
+            alert("Archivo JSON no válido.");
             return;
           }
           db = normalizeDB(parsed);
           selectedDay = "ALL";
           saveDB();
           render();
-          showToast(`Respaldo importado: ${db.sales.length} entradas y ${db.expenses.length} gastos.`);
+          showToast("Respaldo importado correctamente.");
         } catch {
           alert("No se pudo leer el archivo JSON.");
         }
@@ -1430,8 +1436,8 @@
       }
       const todayStr = todayISO();
       const options = [
-        `<option value="ALL">Todos los días (${allDates.length} jornadas)</option>`,
-        ...allDates.map((d, idx) => `<option value="${d}">Día ${idx + 1} • ${d}${d === todayStr ? " (Hoy)" : ""}</option>`)
+        `<option value="ALL">Todos los días (${allDates.length})</option>`,
+        ...allDates.map((d, idx) => `<option value="${escapeHTML(d)}">Día ${idx + 1} • ${escapeHTML(d)}${d === todayStr ? " (Hoy)" : ""}</option>`)
       ];
       select.innerHTML = options.join("");
       select.value = selectedDay;
@@ -1444,7 +1450,7 @@
         ...db.products.map(x => x.name),
         ...db.sales.map(x => x.product)
       ])];
-      dl.innerHTML = names.map(n => `<option value="${n}"></option>`).join("");
+      dl.innerHTML = names.map(n => `<option value="${escapeHTML(n)}"></option>`).join("");
     }
 
     function render() {
@@ -1454,6 +1460,50 @@
       if (headerTodayBadge) headerTodayBadge.textContent = `Hoy: ${t}`;
 
       syncProductSuggestions();
+
+      // Pedidos pendientes
+      const pendingOrders = Array.isArray(db.orders) ? db.orders : [];
+      document.getElementById("pendingOrdersBadge").textContent = `${pendingOrders.length} ${pendingOrders.length === 1 ? "pendiente" : "pendientes"}`;
+      document.getElementById("pendingOrdersList").innerHTML = pendingOrders.length
+        ? pendingOrders.map(order => {
+            const customer = escapeHTML(order.customer || "Cliente");
+            const pickup = escapeHTML(order.pickup || "Retiro en local");
+            const payment = escapeHTML(order.payment || "Efectivo");
+            const itemsSummary = Array.isArray(order.items) && order.items.length
+              ? escapeHTML(order.items.map(i => `${i.name} (${i.qty}x ${i.modeLabel || "Unidad"})`).join(", "))
+              : "Detalle en WhatsApp";
+
+            return `
+              <div class="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 flex flex-col justify-between gap-3">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between gap-2">
+                    <p class="text-sm font-extrabold text-slate-900">${customer}</p>
+                    <span class="text-sm font-extrabold text-emerald-900">${fmt(order.estimatedTotal)}</span>
+                  </div>
+                  <p class="text-xs text-slate-600">${pickup} • <strong>${payment}</strong> • ${escapeHTML(order.date || t)}</p>
+                  <p class="text-xs text-slate-700 bg-white rounded-xl p-2 border border-amber-100">${itemsSummary}</p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onclick="confirmPendingOrder(${jsArg(order.id)})"
+                    class="flex-1 min-h-[40px] px-3 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-xs cursor-pointer transition"
+                  >
+                    ✓ Confirmar venta
+                  </button>
+                  <button
+                    type="button"
+                    onclick="cancelPendingOrder(${jsArg(order.id)})"
+                    class="min-h-[40px] px-3 py-2 rounded-xl bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 font-bold text-xs cursor-pointer transition"
+                  >
+                    Descartar
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join("")
+        : `<p class="col-span-full text-xs text-slate-400 py-3">No hay pedidos pendientes por confirmar.</p>`;
 
       const totalSales = db.sales.reduce((s, x) => s + Number(x.amount), 0);
       const dailyExpensesTotal = db.expenses.reduce((s, x) => s + Number(x.amount), 0);
@@ -1484,9 +1534,9 @@
       const netToday = cashInToday - cashOutToday;
 
       document.getElementById("kpiIngresos").textContent = fmt(totalSales);
-      document.getElementById("kpiPromedioDia").textContent = `Promedio diario (${dayCount} días): ${fmt(totalSales / dayCount)}`;
+      document.getElementById("kpiPromedioDia").textContent = `Promedio diario (${dayCount} ${dayCount === 1 ? "día" : "días"}): ${fmt(totalSales / dayCount)}`;
       document.getElementById("kpiEgresos").textContent = fmt(totalOutflows);
-      document.getElementById("kpiDesgloseEgresos").textContent = `Diarios: ${fmt(dailyExpensesTotal)} • Semanales pagados: ${fmt(paidWeeklyTotal)}`;
+      document.getElementById("kpiDesgloseEgresos").textContent = `Diarios: ${fmt(dailyExpensesTotal)} • Semanales: ${fmt(paidWeeklyTotal)}`;
 
       const netoEl = document.getElementById("kpiNeto");
       netoEl.textContent = fmt(net);
@@ -1494,9 +1544,9 @@
       document.getElementById("kpiMargen").textContent = `Margen: ${margin.toFixed(1)}%`;
 
       document.getElementById("kpiCajaActual").textContent = fmt(cashBalance);
-      document.getElementById("kpiCajaHoy").textContent = `Hoy (${t}): ${netToday >= 0 ? "+" : ""}${fmt(netToday)}`;
-      document.getElementById("baseCashBtn").textContent = `Base inicial (${fmt(openingCash)})`;
-      document.getElementById("baseCashHeaderLabel").textContent = `Base inicial en efectivo: ${fmt(openingCash)}`;
+      document.getElementById("kpiCajaHoy").textContent = `Hoy: ${netToday >= 0 ? "+" : ""}${fmt(netToday)}`;
+      document.getElementById("baseCashBtn").textContent = `Base (${fmt(openingCash)})`;
+      document.getElementById("baseCashHeaderLabel").textContent = `Base inicial: ${fmt(openingCash)}`;
 
       const methods = ["Efectivo", "Transferencia", "Tarjeta"];
       document.getElementById("methodBreakdown").innerHTML = methods.map(m => {
@@ -1505,78 +1555,76 @@
           + db.weeklyPayments.filter(w => w.paid && w.method === m).reduce((s, w) => s + Number(w.amount), 0);
         const mNet = mIn - mOut;
         return `
-          <div class="rounded-2xl bg-[#f9fbf9] border border-slate-200 p-3.5 space-y-1">
+          <div class="rounded-2xl bg-slate-50 border border-slate-200 p-3.5 space-y-1">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-extrabold text-slate-800">${m}</span>
-              <span class="text-sm font-extrabold ${mNet >= 0 ? "text-[#14532d]" : "text-rose-600"}">${fmt(mNet)}</span>
+              <span class="text-xs font-extrabold text-slate-800">${escapeHTML(m)}</span>
+              <span class="text-sm font-extrabold ${mNet >= 0 ? "text-emerald-900" : "text-rose-600"}">${fmt(mNet)}</span>
             </div>
             <div class="flex items-center justify-between text-[11px] text-slate-500">
               <span>Entra: <strong class="text-emerald-700">${fmt(mIn)}</strong></span>
               <span>Sale: <strong class="text-rose-600">${fmt(mOut)}</strong></span>
             </div>
-          </div>`;
+          </div>
+        `;
       }).join("");
 
       document.getElementById("productsCountBadge").textContent = `${db.products.length} productos`;
-
-      document.getElementById("productsCatalogGrid").innerHTML = db.products.length
-        ? db.products.map(item => `
-          <div class="rounded-2xl border bg-[#f9fbf9] border-slate-200 p-3.5 flex items-center justify-between gap-2">
-            <div class="min-w-0">
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <p class="text-sm font-extrabold text-slate-900">${item.name}</p>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white border border-slate-200 text-slate-600">${item.category}</span>
-              </div>
-              <p class="text-xs font-extrabold text-slate-800 mt-1">
-                Unitario: <span class="text-slate-950">${fmt(item.unitPrice)} c/u</span> • Promo: <span class="text-[#14532d]">${item.promoLabel || fmt(item.promoPrice)}</span>
-              </p>
+      document.getElementById("productsCatalogGrid").innerHTML = db.products.map(item => `
+        <div class="rounded-2xl border bg-slate-50/80 border-slate-200 p-3.5 flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <p class="text-sm font-extrabold text-slate-900 truncate">${escapeHTML(item.name)}</p>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white border border-slate-200 text-slate-600">${escapeHTML(item.category)}</span>
             </div>
+            <p class="text-xs font-bold text-slate-700 mt-1">
+              ${fmt(item.unitPrice)} c/u • <span class="text-emerald-800 font-extrabold">${escapeHTML(item.promoLabel || fmt(item.promoPrice))}</span>
+            </p>
+          </div>
+          <div class="flex items-center gap-1 shrink-0">
+            <button type="button" onclick="openEditProduct(${jsArg(item.id)})" class="min-h-[34px] px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:bg-teal-50 hover:text-teal-800 font-bold text-[11px] cursor-pointer">Editar</button>
+            <button type="button" onclick="deleteProductItem(${jsArg(item.id)})" aria-label="Eliminar ${escapeHTML(item.name)}" class="min-h-[34px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer">✕</button>
+          </div>
+        </div>
+      `).join("");
 
-            <div class="flex items-center gap-1 shrink-0">
-              <button type="button" onclick="openEditProduct(${item.id})" title="Editar precios" class="px-2.5 h-7 rounded-lg bg-white border border-slate-300 hover:bg-teal-50 hover:text-teal-800 font-bold text-[11px] cursor-pointer">Editar</button>
-              <button type="button" onclick="deleteProductItem(${item.id})" title="Eliminar" class="px-2 h-7 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer">✕</button>
-            </div>
-          </div>`).join("")
-        : `<p class="text-xs text-slate-400 py-3">Sin productos registrados todavía.</p>`;
-
-      document.getElementById("weeklyTotalBadge").textContent = `Compromiso semanal: ${fmt(scheduledWeeklyTotal)} (Pagado: ${fmt(paidWeeklyTotal)})`;
+      document.getElementById("weeklyTotalBadge").textContent = `Semanal: ${fmt(scheduledWeeklyTotal)} (Pagado: ${fmt(paidWeeklyTotal)})`;
       document.getElementById("weeklyPaymentsList").innerHTML = db.weeklyPayments.length
         ? db.weeklyPayments.map(wk => `
-          <div class="rounded-2xl border p-4 flex items-center justify-between gap-3 ${wk.paid ? "bg-emerald-50/50 border-emerald-200" : "bg-amber-50/50 border-amber-200"}">
+          <div class="rounded-2xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${wk.paid ? "bg-emerald-50/50 border-emerald-200" : "bg-amber-50/50 border-amber-200"}">
             <div>
               <div class="flex items-center gap-2 flex-wrap">
-                <p class="text-sm font-extrabold text-slate-900">${wk.concept}</p>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${wk.paid ? "bg-emerald-600 text-white" : "bg-amber-500 text-slate-950"}">
+                <p class="text-sm font-extrabold text-slate-900">${escapeHTML(wk.concept)}</p>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${wk.paid ? "bg-emerald-700 text-white" : "bg-amber-400 text-slate-950"}">
                   ${wk.paid ? "Pagado" : "Pendiente"}
                 </span>
               </div>
               <p class="text-xs text-slate-600 mt-1">
-                Cada <strong>${wk.payDay}</strong> • ${wk.method} • <strong class="text-rose-700">${fmt(wk.amount)}</strong>
+                Cada <strong>${escapeHTML(wk.payDay)}</strong> • ${escapeHTML(wk.method)} • <strong class="text-rose-700">${fmt(wk.amount)}</strong>
               </p>
-              ${wk.paid && wk.paidDate ? `<p class="text-[10px] text-slate-400 mt-0.5">Pagado el ${wk.paidDate}</p>` : ""}
             </div>
 
             <div class="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
-                onclick="toggleWeeklyPaid(${wk.id})"
-                class="px-3 py-1.5 rounded-xl font-extrabold text-xs cursor-pointer transition ${
+                onclick="toggleWeeklyPaid(${jsArg(wk.id)})"
+                class="min-h-[38px] px-3 py-1.5 rounded-xl font-extrabold text-xs cursor-pointer transition ${
                   wk.paid
                     ? "bg-slate-200 hover:bg-slate-300 text-slate-800"
-                    : "bg-[#14532d] hover:bg-[#0f3f22] text-white"
+                    : "bg-emerald-800 hover:bg-emerald-900 text-white"
                 }"
               >
-                ${wk.paid ? "Marcar pendiente" : "Marcar pagado"}
+                ${wk.paid ? "Pendiente" : "Marcar pagado"}
               </button>
               <button
                 type="button"
-                onclick="deleteWeeklyPayment(${wk.id})"
-                class="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-xs cursor-pointer"
+                onclick="deleteWeeklyPayment(${jsArg(wk.id)})"
+                class="min-h-[38px] px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-xs cursor-pointer"
               >
                 ✕
               </button>
             </div>
-          </div>`).join("")
+          </div>
+        `).join("")
         : `<p class="text-xs text-slate-400 py-3">Sin pagos semanales registrados.</p>`;
 
       const dayTotals = allDates.map(d => db.sales.filter(x => x.date === d).reduce((s, x) => s + Number(x.amount), 0));
@@ -1584,59 +1632,48 @@
 
       document.getElementById("dailyTimeline").innerHTML = allDates.map((d, idx) => {
         const dSales = dayTotals[idx];
-        const prevSales = idx > 0 ? dayTotals[idx - 1] : null;
         const dExp = db.expenses.filter(x => x.date === d).reduce((s, x) => s + Number(x.amount), 0);
         const dLines = db.sales.filter(x => x.date === d).length;
         const barPct = dSales > 0 ? Math.max(8, Math.round((dSales / maxDayVal) * 100)) : 0;
         const active = selectedDay === d;
         const isToday = d === t;
 
-        let trendBadge = `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-[#b45309] text-[10px] font-extrabold">${isToday ? "Hoy" : "Día 1"}</span>`;
-        if (prevSales !== null && prevSales > 0) {
-          const diffPct = ((dSales - prevSales) / prevSales) * 100;
-          if (diffPct >= 0) {
-            trendBadge = `<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-[#14532d] text-[10px] font-extrabold">▲ +${diffPct.toFixed(0)}%</span>`;
-          } else {
-            trendBadge = `<span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px] font-extrabold">▼ ${diffPct.toFixed(0)}%</span>`;
-          }
-        }
-
         return `
           <button
             type="button"
-            onclick="selectDay('${d}')"
-            class="card-lift text-left p-4 rounded-2xl border-2 transition cursor-pointer space-y-2 ${
+            onclick="selectDay(${jsArg(d)})"
+            class="text-left p-4 rounded-2xl border-2 transition cursor-pointer space-y-2 ${
               active
-                ? "bg-emerald-50/90 border-[#14532d] ring-2 ring-[#14532d]/20"
+                ? "bg-emerald-50 border-emerald-800 ring-2 ring-emerald-800/15"
                 : isToday
-                  ? "bg-amber-50/40 border-amber-400 hover:bg-white"
-                  : "bg-[#f9fbf9] border-slate-200 hover:bg-white hover:border-emerald-400"
+                  ? "bg-amber-50/50 border-amber-400 hover:bg-white"
+                  : "bg-slate-50 border-slate-200 hover:bg-white hover:border-emerald-400"
             }"
           >
             <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-600">Día ${idx + 1} • ${d}${isToday ? " • HOY" : ""}</span>
-              ${trendBadge}
+              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-600">Día ${idx + 1} • ${escapeHTML(d)}</span>
+              <span class="px-2 py-0.5 rounded-full ${isToday ? "bg-amber-300 text-slate-950" : "bg-slate-200 text-slate-700"} text-[10px] font-extrabold">
+                ${isToday ? "Hoy" : `${dLines} reg.`}
+              </span>
             </div>
-            <div class="flex items-baseline justify-between">
-              <p class="text-xl font-extrabold text-[#14532d]">${fmt(dSales)}</p>
-              <span class="text-[11px] font-bold text-slate-500">${dLines} ${dLines === 1 ? "registro" : "registros"}</span>
-            </div>
+            <p class="text-xl font-extrabold text-emerald-900">${fmt(dSales)}</p>
             <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-              <div class="bar-fill h-full bg-gradient-to-r from-[#14532d] to-[#ea780b] rounded-full" style="width:${barPct}%"></div>
+              <div class="bar-fill h-full bg-gradient-to-r from-emerald-800 to-amber-500 rounded-full" style="width:${barPct}%"></div>
             </div>
             <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/70">
-              <span>Gastos día: <strong class="text-rose-600">${fmt(dExp)}</strong></span>
-              <span>Neto día: <strong class="text-slate-800">${fmt(dSales - dExp)}</strong></span>
+              <span>Gastos: <strong class="text-rose-600">${fmt(dExp)}</strong></span>
+              <span>Neto: <strong class="text-slate-800">${fmt(dSales - dExp)}</strong></span>
             </div>
-          </button>`;
+          </button>
+        `;
       }).join("");
 
       const scopedSales = selectedDay === "ALL" ? db.sales : db.sales.filter(x => x.date === selectedDay);
       const scopedTotal = scopedSales.reduce((s, x) => s + Number(x.amount), 0);
 
       document.getElementById("productSectionTitle").textContent = selectedDay === "ALL"
-        ? "Desglose de ventas por producto — Todos los días"
-        : `Desglose de ventas por producto — Jornada ${selectedDay}`;
+        ? "Desglose por producto — Todos los días"
+        : `Desglose por producto — ${selectedDay}`;
       document.getElementById("productSectionSubtitle").textContent = `Total en vista: ${fmt(scopedTotal)} (${scopedSales.length} registros)`;
 
       const agg = {};
@@ -1651,56 +1688,50 @@
       const maxProdVal = desc.length ? desc[0][1].amount : 1;
 
       document.getElementById("topProductText").textContent = desc.length
-        ? `${desc[0][0]} • ${fmt(desc[0][1].amount)} (${desc[0][1].count} ${desc[0][1].count === 1 ? "vez" : "veces"})`
+        ? `${desc[0][0]} • ${fmt(desc[0][1].amount)} (${desc[0][1].count})`
         : "Sin datos";
       document.getElementById("bottomProductText").textContent = desc.length
-        ? `${desc[desc.length - 1][0]} • ${fmt(desc[desc.length - 1][1].amount)} (${desc[desc.length - 1][1].count} ${desc[desc.length - 1][1].count === 1 ? "vez" : "veces"})`
+        ? `${desc[desc.length - 1][0]} • ${fmt(desc[desc.length - 1][1].amount)} (${desc[desc.length - 1][1].count})`
         : "Sin datos";
 
       document.getElementById("productBarsList").innerHTML = ordered.length
         ? ordered.map(([prod, info], idx) => {
             const widthPct = Math.max(7, Math.round((info.amount / maxProdVal) * 100));
             const sharePct = scopedTotal > 0 ? ((info.amount / scopedTotal) * 100).toFixed(1) : "0.0";
-            const grad = idx === 0 && sortDesc ? "from-[#14532d] to-emerald-600" : "from-[#ea780b] to-amber-500";
             return `
-              <div class="p-3 rounded-2xl bg-[#f9fbf9] hover:bg-white border border-slate-200/80 transition space-y-1.5">
+              <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
                 <div class="flex items-center justify-between gap-2 text-xs sm:text-sm">
-                  <div class="font-extrabold text-slate-900">
-                    <span class="text-slate-400 mr-1">${idx + 1}.</span>${prod}
+                  <div class="font-extrabold text-slate-900 truncate">
+                    <span class="text-slate-400 mr-1">${idx + 1}.</span>${escapeHTML(prod)}
                     <span class="ml-1.5 px-2 py-0.5 rounded-full bg-white border border-slate-200 text-[10px] font-bold text-slate-600">
-                      ${info.count} ${info.count === 1 ? "vez" : "veces"} • ${sharePct}%
+                      ${info.count} • ${sharePct}%
                     </span>
                   </div>
-                  <span class="font-extrabold text-[#14532d] shrink-0">${fmt(info.amount)}</span>
+                  <span class="font-extrabold text-emerald-900 shrink-0">${fmt(info.amount)}</span>
                 </div>
                 <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div class="bar-fill h-full bg-gradient-to-r ${grad} rounded-full" style="width:${widthPct}%"></div>
+                  <div class="bar-fill h-full bg-gradient-to-r from-emerald-800 to-amber-500 rounded-full" style="width:${widthPct}%"></div>
                 </div>
-              </div>`;
+              </div>
+            `;
           }).join("")
-        : `<p class="text-xs text-slate-400 py-4">No hay ventas en este filtro.</p>`;
+        : `<p class="text-xs text-slate-400 py-4">No hay ventas confirmadas en este filtro.</p>`;
 
       const visibleSales = selectedDay === "ALL" ? db.sales : db.sales.filter(x => x.date === selectedDay);
       document.getElementById("salesCountBadge").textContent = `${visibleSales.length} líneas`;
       document.getElementById("salesLedger").innerHTML = visibleSales.length
         ? visibleSales.map(s => `
           <div class="py-2.5 flex items-center justify-between gap-2">
-            <div>
-              <p class="font-bold text-slate-800">${s.product}</p>
-              <p class="text-[11px] text-slate-400">${s.date} • <span class="text-[#14532d] font-semibold">${s.category}</span> • ${s.method}</p>
+            <div class="min-w-0">
+              <p class="font-bold text-slate-800 truncate">${escapeHTML(s.product)}</p>
+              <p class="text-[11px] text-slate-400">${escapeHTML(s.date)} • <span class="text-emerald-800 font-semibold">${escapeHTML(s.category)}</span> • ${escapeHTML(s.method)}</p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
-              <span class="px-2.5 py-1 rounded-xl bg-emerald-50 text-[#14532d] font-extrabold">${fmt(s.amount)}</span>
-              <button
-                type="button"
-                onclick="deleteSale(${s.id})"
-                title="Eliminar venta"
-                class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer transition"
-              >
-                ✕
-              </button>
+              <span class="px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-900 font-extrabold">${fmt(s.amount)}</span>
+              <button type="button" onclick="deleteSale(${jsArg(s.id)})" aria-label="Eliminar venta" class="min-h-[34px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer">✕</button>
             </div>
-          </div>`).join("")
+          </div>
+        `).join("")
         : `<p class="py-4 text-slate-400">Sin entradas en este filtro.</p>`;
 
       const visibleExp = selectedDay === "ALL" ? db.expenses : db.expenses.filter(x => x.date === selectedDay);
@@ -1708,22 +1739,16 @@
       document.getElementById("expensesLedger").innerHTML = visibleExp.length
         ? visibleExp.map(g => `
           <div class="py-2.5 flex items-center justify-between gap-2">
-            <div>
-              <p class="font-bold text-slate-800">${g.description}</p>
-              <p class="text-[11px] text-slate-400">${g.date} • <span class="text-rose-600 font-semibold">${g.type}</span> • ${g.method}</p>
+            <div class="min-w-0">
+              <p class="font-bold text-slate-800 truncate">${escapeHTML(g.description)}</p>
+              <p class="text-[11px] text-slate-400">${escapeHTML(g.date)} • <span class="text-rose-600 font-semibold">${escapeHTML(g.type)}</span> • ${escapeHTML(g.method)}</p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <span class="px-2.5 py-1 rounded-xl bg-rose-50 text-rose-600 font-extrabold">${fmt(g.amount)}</span>
-              <button
-                type="button"
-                onclick="deleteExpense(${g.id})"
-                title="Eliminar gasto"
-                class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer transition"
-              >
-                ✕
-              </button>
+              <button type="button" onclick="deleteExpense(${jsArg(g.id)})" aria-label="Eliminar gasto" class="min-h-[34px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer">✕</button>
             </div>
-          </div>`).join("")
+          </div>
+        `).join("")
         : `<p class="py-4 text-slate-400">Sin gastos en este filtro.</p>`;
     }
   </script>
