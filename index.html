@@ -465,7 +465,8 @@
         { id: 2101, date: "2026-11-21", product: "Ventas del día (libreta)", amount: 75.00, qty: 0, category: "Verduras", method: "Efectivo" },
         { id: 2201, date: "2026-11-22", product: "Ventas del día (libreta)", amount: 43.00, qty: 0, category: "Verduras", method: "Efectivo" },
         { id: 2301, date: "2026-11-23", product: "Ventas en efectivo (libreta hoy)", amount: 62.25, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 2302, date: "2026-11-23", product: "Cobros por transferencia (libreta hoy)", amount: 44.60, qty: 0, category: "Otros", method: "Transferencia" }
+        { id: 2302, date: "2026-11-23", product: "Cobros por transferencia (libreta hoy)", amount: 44.60, qty: 0, category: "Otros", method: "Transferencia" },
+        { id: 2401, date: "2026-11-24", product: "Ventas del día (libreta)", amount: 31.25, qty: 0, category: "Verduras", method: "Efectivo" }
       ],
       expenses: [
         { id: 2399, date: "2026-11-23", description: "Gasto del día (bolsas / insumos)", amount: 10.18, type: "Insumos", method: "Efectivo" }
@@ -484,12 +485,12 @@
           ...(found || {}),
           name: seedItem.name,
           qty: found ? Number(found.qty || 0) : seedItem.qty,
-          salePrice: meta.salePrice || seedItem.salePrice,
-          promoLabel: meta.promoLabel || seedItem.promoLabel,
-          unit: meta.unit || seedItem.unit,
-          category: meta.category || seedItem.category,
-          badge: meta.badge !== undefined ? meta.badge : seedItem.badge,
-          image: meta.image || seedItem.image
+          salePrice: found && Number(found.salePrice) > 0 ? Number(found.salePrice) : (meta.salePrice || seedItem.salePrice),
+          promoLabel: (found && found.promoLabel) ? found.promoLabel : (meta.promoLabel || seedItem.promoLabel),
+          unit: (found && found.unit) ? found.unit : (meta.unit || seedItem.unit),
+          category: (found && found.category) ? found.category : (meta.category || seedItem.category),
+          badge: (found && found.badge !== undefined && found.badge !== "") ? found.badge : (meta.badge !== undefined ? meta.badge : seedItem.badge),
+          image: (found && found.image) ? found.image : (meta.image || seedItem.image)
         };
       });
       const extraInv = rawInv
