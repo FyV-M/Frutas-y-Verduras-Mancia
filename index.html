@@ -50,7 +50,7 @@
         <a
           href="dashboard.html"
           class="inline-flex items-center gap-1 bg-stone-900 hover:bg-stone-800 text-amber-300 font-bold text-xs sm:text-sm px-3 py-2.5 rounded-xl transition cursor-pointer"
-          title="Panel de Inventario y Caja"
+          title="Panel de Control Total y Caja"
         >
           <span>⚙️</span>
           <span>Admin</span>
@@ -256,22 +256,12 @@
 
         <div class="p-3.5 rounded-2xl bg-stone-100 border border-stone-200 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div class="flex items-center gap-2">
-            <label for="localPosMethod" class="font-extrabold text-stone-700">Método:</label>
+            <label for="localPosMethod" class="font-extrabold text-stone-700">Método de pago:</label>
             <select id="localPosMethod" class="px-3 py-1.5 rounded-xl border border-stone-300 bg-white font-bold">
               <option value="Efectivo">Efectivo</option>
               <option value="Transferencia">Transferencia</option>
             </select>
           </div>
-
-          <div class="flex items-center gap-2">
-            <label for="localPosQty" class="font-extrabold text-stone-700">Cant./clic:</label>
-            <input id="localPosQty" type="number" step="0.1" min="0" value="1" class="w-16 px-2.5 py-1.5 rounded-xl border border-stone-300 bg-white font-bold" />
-          </div>
-
-          <label class="inline-flex items-center gap-1.5 font-bold text-stone-700 cursor-pointer">
-            <input id="localPosDeductStock" type="checkbox" checked class="w-4 h-4 accent-emerald-700 rounded" />
-            <span>Descontar stock</span>
-          </label>
         </div>
 
         <div id="localPosFeedback" class="hidden p-3 rounded-xl bg-emerald-100 text-emerald-950 text-xs font-extrabold"></div>
@@ -416,57 +406,49 @@
     };
 
     const CATALOG_META = {
-      "tomate": { salePrice: 1.00, promoLabel: "10 unidades x $1.00", unit: "unidades", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80" },
-      "cebolla blanca": { salePrice: 1.00, promoLabel: "4 unidades x $1.00", unit: "unidades", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80" },
-      "cebolla morada": { salePrice: 1.00, promoLabel: "4 unidades x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80" },
-      "plátano": { salePrice: 1.00, promoLabel: "3 unidades x $1.00", unit: "unidades", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=600&q=80" },
-      "chile verde": { salePrice: 1.00, promoLabel: "6 unidades x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=600&q=80" },
-      "jalapeño": { salePrice: 1.00, promoLabel: "6 unidades x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=600&q=80" },
-      "ajo": { salePrice: 1.00, promoLabel: "2 redes x $1.00", unit: "redes", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=600&q=80" },
-      "lechuga": { salePrice: 1.75, promoLabel: "1 unidad x $1.75", unit: "unidades", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=600&q=80" },
-      "aguacate": { salePrice: 1.00, promoLabel: "2 unidades x $1.00", unit: "unidades", category: "Frutas", badge: "Al punto", image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=600&q=80" },
-      "limón": { salePrice: 1.00, promoLabel: "8 unidades x $1.00", unit: "unidades", category: "Frutas", badge: "Jugoso", image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=600&q=80" },
-      "papa": { salePrice: 1.50, promoLabel: "1 libra x $1.50", unit: "libras", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=600&q=80" },
-      "elote": { salePrice: 0.75, promoLabel: "1 unidad x $0.75", unit: "unidades", category: "Verduras", badge: "Tierno", image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=600&q=80" },
-      "güisquil": { salePrice: 1.00, promoLabel: "4 unidades x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=600&q=80" },
-      "pepino": { salePrice: 1.00, promoLabel: "4 unidades x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=600&q=80" },
-      "rábano": { salePrice: 0.25, promoLabel: "4 unidades x $0.25", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=600&q=80" },
-      "zanahoria": { salePrice: 1.00, promoLabel: "3 unidades x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=600&q=80" }
+      "tomate": { salePrice: 1.00, promoLabel: "12 unidades x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80" },
+      "cebolla": { salePrice: 1.00, promoLabel: "4 unidades x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80" },
+      "chile / jalapeño": { salePrice: 1.00, promoLabel: "6 unidades x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=600&q=80" },
+      "güisquil": { salePrice: 1.00, promoLabel: "4 unidades x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=600&q=80" },
+      "zanahoria": { salePrice: 1.00, promoLabel: "4 unidades x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=600&q=80" },
+      "pepino": { salePrice: 1.00, promoLabel: "4 unidades x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=600&q=80" },
+      "rábano": { salePrice: 1.00, promoLabel: "2 manojos x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=600&q=80" },
+      "aguacate": { salePrice: 1.00, promoLabel: "2 unidades x $1.00", category: "Frutas", badge: "Al punto", image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=600&q=80" },
+      "limones": { salePrice: 1.00, promoLabel: "8 unidades x $1.00", category: "Frutas", badge: "Jugoso", image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=600&q=80" },
+      "plátano": { salePrice: 1.00, promoLabel: "3 unidades x $1.00", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=600&q=80" },
+      "papa": { salePrice: 1.50, promoLabel: "1 libra x $1.50", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=600&q=80" },
+      "ajo": { salePrice: 1.00, promoLabel: "1 malla / porción x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=600&q=80" }
     };
 
     const seedInitialDB = () => ({
       openingCash: 0.00,
-      inventory: [
-        { id: 101, name: "Tomate", category: "Verduras", qty: 50, unitCost: 0.45, salePrice: 1.00, promoLabel: "10 unidades x $1.00", badge: "Fresco hoy", image: CATALOG_META["tomate"].image, unit: "unidades", minStock: 10 },
-        { id: 102, name: "Cebolla Blanca", category: "Verduras", qty: 40, unitCost: 0.50, salePrice: 1.00, promoLabel: "4 unidades x $1.00", badge: "Oferta diaria", image: CATALOG_META["cebolla blanca"].image, unit: "unidades", minStock: 10 },
-        { id: 103, name: "Cebolla Morada", category: "Verduras", qty: 30, unitCost: 0.50, salePrice: 1.00, promoLabel: "4 unidades x $1.00", badge: "", image: CATALOG_META["cebolla morada"].image, unit: "unidades", minStock: 8 },
-        { id: 104, name: "Plátano", category: "Frutas", qty: 24, unitCost: 0.25, salePrice: 1.00, promoLabel: "3 unidades x $1.00", badge: "Dulces", image: CATALOG_META["plátano"].image, unit: "unidades", minStock: 6 },
-        { id: 105, name: "Chile Verde", category: "Verduras", qty: 30, unitCost: 0.40, salePrice: 1.00, promoLabel: "6 unidades x $1.00", badge: "", image: CATALOG_META["chile verde"].image, unit: "unidades", minStock: 6 },
-        { id: 106, name: "Jalapeño", category: "Verduras", qty: 30, unitCost: 0.40, salePrice: 1.00, promoLabel: "6 unidades x $1.00", badge: "", image: CATALOG_META["jalapeño"].image, unit: "unidades", minStock: 6 },
-        { id: 107, name: "Ajo", category: "Verduras", qty: 20, unitCost: 0.40, salePrice: 1.00, promoLabel: "2 redes x $1.00", badge: "", image: CATALOG_META["ajo"].image, unit: "redes", minStock: 4 },
-        { id: 108, name: "Lechuga", category: "Verduras", qty: 15, unitCost: 0.90, salePrice: 1.75, promoLabel: "1 unidad x $1.75", badge: "Fresco", image: CATALOG_META["lechuga"].image, unit: "unidades", minStock: 4 },
-        { id: 109, name: "Aguacate", category: "Frutas", qty: 20, unitCost: 0.45, salePrice: 1.00, promoLabel: "2 unidades x $1.00", badge: "Al punto", image: CATALOG_META["aguacate"].image, unit: "unidades", minStock: 5 },
-        { id: 110, name: "Limón", category: "Frutas", qty: 40, unitCost: 0.10, salePrice: 1.00, promoLabel: "8 unidades x $1.00", badge: "Jugoso", image: CATALOG_META["limón"].image, unit: "unidades", minStock: 8 },
-        { id: 111, name: "Papa", category: "Verduras", qty: 25, unitCost: 0.75, salePrice: 1.50, promoLabel: "1 libra x $1.50", badge: "Fresco", image: CATALOG_META["papa"].image, unit: "libras", minStock: 6 },
-        { id: 112, name: "Elote", category: "Verduras", qty: 20, unitCost: 0.35, salePrice: 0.75, promoLabel: "1 unidad x $0.75", badge: "Tierno", image: CATALOG_META["elote"].image, unit: "unidades", minStock: 5 },
-        { id: 113, name: "Güisquil", category: "Verduras", qty: 24, unitCost: 0.20, salePrice: 1.00, promoLabel: "4 unidades x $1.00", badge: "", image: CATALOG_META["güisquil"].image, unit: "unidades", minStock: 6 },
-        { id: 114, name: "Pepino", category: "Verduras", qty: 24, unitCost: 0.20, salePrice: 1.00, promoLabel: "4 unidades x $1.00", badge: "", image: CATALOG_META["pepino"].image, unit: "unidades", minStock: 6 },
-        { id: 115, name: "Rábano", category: "Verduras", qty: 24, unitCost: 0.05, salePrice: 0.25, promoLabel: "4 unidades x $0.25", badge: "", image: CATALOG_META["rábano"].image, unit: "unidades", minStock: 6 },
-        { id: 116, name: "Zanahoria", category: "Verduras", qty: 24, unitCost: 0.25, salePrice: 1.00, promoLabel: "3 unidades x $1.00", badge: "", image: CATALOG_META["zanahoria"].image, unit: "unidades", minStock: 6 }
+      products: [
+        { id: 101, name: "Tomate", category: "Verduras", salePrice: 1.00, promoLabel: "12 unidades x $1.00", badge: "Fresco hoy", image: CATALOG_META["tomate"].image },
+        { id: 102, name: "Cebolla", category: "Verduras", salePrice: 1.00, promoLabel: "4 unidades x $1.00", badge: "Oferta diaria", image: CATALOG_META["cebolla"].image },
+        { id: 103, name: "Chile / Jalapeño", category: "Verduras", salePrice: 1.00, promoLabel: "6 unidades x $1.00", badge: "", image: CATALOG_META["chile / jalapeño"].image },
+        { id: 104, name: "Güisquil", category: "Verduras", salePrice: 1.00, promoLabel: "4 unidades x $1.00", badge: "", image: CATALOG_META["güisquil"].image },
+        { id: 105, name: "Zanahoria", category: "Verduras", salePrice: 1.00, promoLabel: "4 unidades x $1.00", badge: "", image: CATALOG_META["zanahoria"].image },
+        { id: 106, name: "Pepino", category: "Verduras", salePrice: 1.00, promoLabel: "4 unidades x $1.00", badge: "", image: CATALOG_META["pepino"].image },
+        { id: 107, name: "Rábano", category: "Verduras", salePrice: 1.00, promoLabel: "2 manojos x $1.00", badge: "", image: CATALOG_META["rábano"].image },
+        { id: 108, name: "Aguacate", category: "Frutas", salePrice: 1.00, promoLabel: "2 unidades x $1.00", badge: "Al punto", image: CATALOG_META["aguacate"].image },
+        { id: 109, name: "Limones", category: "Frutas", salePrice: 1.00, promoLabel: "8 unidades x $1.00", badge: "Jugoso", image: CATALOG_META["limones"].image },
+        { id: 110, name: "Plátano", category: "Frutas", salePrice: 1.00, promoLabel: "3 unidades x $1.00", badge: "Dulces", image: CATALOG_META["plátano"].image },
+        { id: 111, name: "Papa", category: "Verduras", salePrice: 1.50, promoLabel: "1 libra x $1.50", badge: "Fresco", image: CATALOG_META["papa"].image },
+        { id: 112, name: "Ajo", category: "Verduras", salePrice: 1.00, promoLabel: "1 malla / porción x $1.00", badge: "", image: CATALOG_META["ajo"].image }
       ],
       weeklyPayments: [
         { id: 501, concept: "Alquiler / Cuota de puesto semanal", amount: 25.00, payDay: "Domingo", method: "Efectivo", paid: false, paidDate: "" },
         { id: 502, concept: "Transporte / Flete semanal", amount: 15.00, payDay: "Miércoles", method: "Efectivo", paid: false, paidDate: "" }
       ],
       sales: [
-        { id: 1801, date: "2026-11-18", product: "Ventas del día (libreta)", amount: 24.00, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 1901, date: "2026-11-19", product: "Ventas del día (libreta)", amount: 13.00, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 2001, date: "2026-11-20", product: "Ventas del día (libreta)", amount: 45.00, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 2101, date: "2026-11-21", product: "Ventas del día (libreta)", amount: 75.00, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 2201, date: "2026-11-22", product: "Ventas del día (libreta)", amount: 43.00, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 2301, date: "2026-11-23", product: "Ventas en efectivo (libreta hoy)", amount: 62.25, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 2302, date: "2026-11-23", product: "Cobros por transferencia (libreta hoy)", amount: 44.60, qty: 0, category: "Otros", method: "Transferencia" },
-        { id: 2401, date: "2026-11-24", product: "Ventas del día (libreta)", amount: 31.25, qty: 0, category: "Verduras", method: "Efectivo" }
+        { id: 1801, date: "2026-11-18", product: "Ventas del día (libreta)", amount: 24.00, category: "Verduras", method: "Efectivo" },
+        { id: 1901, date: "2026-11-19", product: "Ventas del día (libreta)", amount: 13.00, category: "Verduras", method: "Efectivo" },
+        { id: 2001, date: "2026-11-20", product: "Ventas del día (libreta)", amount: 45.00, category: "Verduras", method: "Efectivo" },
+        { id: 2101, date: "2026-11-21", product: "Ventas del día (libreta)", amount: 75.00, category: "Verduras", method: "Efectivo" },
+        { id: 2201, date: "2026-11-22", product: "Ventas del día (libreta)", amount: 43.00, category: "Verduras", method: "Efectivo" },
+        { id: 2301, date: "2026-11-23", product: "Ventas en efectivo (libreta hoy)", amount: 62.25, category: "Verduras", method: "Efectivo" },
+        { id: 2302, date: "2026-11-23", product: "Cobros por transferencia (libreta hoy)", amount: 44.60, category: "Otros", method: "Transferencia" },
+        { id: 2401, date: "2026-11-24", product: "Ventas del día (libreta)", amount: 31.25, category: "Verduras", method: "Efectivo" }
       ],
       expenses: [
         { id: 2399, date: "2026-11-23", description: "Gasto del día (bolsas / insumos)", amount: 10.18, type: "Insumos", method: "Efectivo" }
@@ -476,36 +458,41 @@
     function normalizeStoreDB(parsed) {
       const base = seedInitialDB();
       if (!parsed || typeof parsed !== "object") return base;
-      const rawInv = Array.isArray(parsed.inventory) ? parsed.inventory : [];
-      const inv = base.inventory.map(seedItem => {
-        const found = rawInv.find(i => (i.name || "").toLowerCase().trim() === seedItem.name.toLowerCase().trim());
+      const sourceList = Array.isArray(parsed.products)
+        ? parsed.products
+        : Array.isArray(parsed.inventory)
+          ? parsed.inventory
+          : [];
+
+      const prods = base.products.map(seedItem => {
+        const found = sourceList.find(i => (i.name || "").toLowerCase().trim() === seedItem.name.toLowerCase().trim());
         const meta = CATALOG_META[seedItem.name.toLowerCase().trim()] || {};
         return {
-          ...seedItem,
-          ...(found || {}),
+          id: found && found.id ? found.id : seedItem.id,
           name: seedItem.name,
-          qty: found ? Number(found.qty || 0) : seedItem.qty,
           salePrice: found && Number(found.salePrice) > 0 ? Number(found.salePrice) : (meta.salePrice || seedItem.salePrice),
           promoLabel: (found && found.promoLabel) ? found.promoLabel : (meta.promoLabel || seedItem.promoLabel),
-          unit: (found && found.unit) ? found.unit : (meta.unit || seedItem.unit),
           category: (found && found.category) ? found.category : (meta.category || seedItem.category),
           badge: (found && found.badge !== undefined && found.badge !== "") ? found.badge : (meta.badge !== undefined ? meta.badge : seedItem.badge),
           image: (found && found.image) ? found.image : (meta.image || seedItem.image)
         };
       });
-      const extraInv = rawInv
-        .filter(i => !base.inventory.some(s => s.name.toLowerCase().trim() === (i.name || "").toLowerCase().trim()))
-        .map(item => ({
-          ...item,
-          qty: Number(item.qty || 0),
+
+      const extraProds = sourceList
+        .filter(i => !base.products.some(s => s.name.toLowerCase().trim() === (i.name || "").toLowerCase().trim()))
+        .map((item, idx) => ({
+          id: item.id || (Date.now() + idx),
+          name: item.name,
           salePrice: Number(item.salePrice) > 0 ? Number(item.salePrice) : 1.00,
-          promoLabel: item.promoLabel || `Por ${item.unit || "unidad"}`,
+          promoLabel: item.promoLabel || `Porción x $${Number(item.salePrice || 1).toFixed(2)}`,
+          category: item.category || "Verduras",
           badge: item.badge || "",
           image: item.image || "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80"
         }));
+
       return {
         openingCash: Number(parsed.openingCash || 0),
-        inventory: [...inv, ...extraInv],
+        products: [...prods, ...extraProds],
         weeklyPayments: Array.isArray(parsed.weeklyPayments) ? parsed.weeklyPayments : base.weeklyPayments,
         sales: Array.isArray(parsed.sales) ? parsed.sales : base.sales,
         expenses: Array.isArray(parsed.expenses) ? parsed.expenses : base.expenses
@@ -603,6 +590,8 @@
       if (n.includes("pepino")) return "🥒";
       if (n.includes("lechuga")) return "🥬";
       if (n.includes("elote")) return "🌽";
+      if (n.includes("güisquil")) return "🍐";
+      if (n.includes("rábano")) return "🌱";
       return "🥬";
     }
 
@@ -624,7 +613,7 @@
       const grid = document.getElementById("localOneClickGrid");
       if (!grid) return;
 
-      grid.innerHTML = db.inventory.map(item => {
+      grid.innerHTML = db.products.map(item => {
         const price = Number(item.salePrice || 1.00);
         const emoji = getLocalEmoji(item.name);
         const safeName = String(item.name || "").replace(/'/g, "\\'");
@@ -639,8 +628,8 @@
               <span>${emoji}</span>
               <span class="truncate">${item.name}</span>
             </span>
-            <span class="text-sm font-extrabold text-emerald-800">
-              $${price.toFixed(2)} <span class="text-[11px] font-semibold opacity-80">(${Number(item.qty || 0)} ${item.unit || ""})</span>
+            <span class="text-xs font-extrabold text-emerald-800">
+              ${item.promoLabel || `$${price.toFixed(2)}`}
             </span>
           </button>
         `;
@@ -652,8 +641,6 @@
       if (isNaN(cleanAmount) || cleanAmount <= 0) return;
 
       const method = document.getElementById("localPosMethod")?.value || "Efectivo";
-      const qty = parseFloat(document.getElementById("localPosQty")?.value) || 0;
-      const deductStock = Boolean(document.getElementById("localPosDeductStock")?.checked);
       const today = todaySV();
 
       const db = loadStoreDB();
@@ -662,20 +649,11 @@
         date: today,
         product: productName,
         amount: Number(cleanAmount.toFixed(2)),
-        qty: qty > 0 ? qty : 0,
         category,
         method
       });
 
-      if (deductStock && qty > 0) {
-        const inv = db.inventory.find(i => (i.name || "").toLowerCase() === productName.toLowerCase());
-        if (inv) {
-          inv.qty = Math.max(0, Number((Number(inv.qty || 0) - qty).toFixed(2)));
-        }
-      }
-
       saveStoreDB(db);
-      renderProducts();
       renderLocalPos();
       await syncStoreDBToCloud(db);
 
@@ -789,7 +767,7 @@
       if (clearBtn) clearBtn.classList.toggle("hidden", search.length === 0);
 
       const db = loadStoreDB();
-      const filtered = db.inventory.filter(p => {
+      const filtered = db.products.filter(p => {
         const matchCat = currentCategory === "todos" || (p.category || "").toLowerCase() === currentCategory.toLowerCase();
         const matchSearch = (p.name || "").toLowerCase().includes(search);
         return matchCat && matchSearch;
@@ -807,14 +785,12 @@
       grid.innerHTML = filtered.map(product => {
         const qty = getProductQty(product.name);
         const price = Number(product.salePrice || 1.00);
-        const inStock = Number(product.qty || 0) > 0;
         const safeName = product.name.replace(/'/g, "\\'");
         return `
           <article class="bg-white rounded-3xl border-2 ${qty > 0 ? "border-emerald-600 ring-2 ring-emerald-100" : "border-stone-200"} overflow-hidden shadow-xs transition flex flex-col">
             <div class="relative h-44 bg-stone-100 overflow-hidden">
               <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover" loading="lazy" />
               <span class="absolute top-3 left-3 bg-amber-400 text-stone-950 text-xs font-extrabold px-3 py-1 rounded-full shadow-xs">${product.badge || product.category || 'Fresco'}</span>
-              ${!inStock ? `<span class="absolute top-3 right-3 bg-rose-600 text-white text-xs font-extrabold px-3 py-1 rounded-full">Agotado</span>` : ""}
               ${qty > 0 ? `<span class="absolute top-3 right-3 bg-emerald-700 text-white text-xs font-extrabold px-3 py-1 rounded-full">En bolsa: ${qty}</span>` : ""}
             </div>
             <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-4">
@@ -824,9 +800,7 @@
               </div>
               <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-3">
                 <span class="text-2xl font-extrabold text-emerald-700">$${price.toFixed(2)}</span>
-                ${!inStock ? `
-                  <span class="text-xs font-extrabold text-rose-600 bg-rose-50 px-3 py-2 rounded-xl border border-rose-200">Sin existencia</span>
-                ` : qty === 0 ? `
+                ${qty === 0 ? `
                   <button type="button" onclick="addToCart('${safeName}', ${price})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-base font-extrabold px-5 py-3 rounded-2xl transition cursor-pointer">+ Agregar</button>
                 ` : `
                   <div class="flex items-center gap-2 bg-emerald-50 border-2 border-emerald-600 rounded-2xl p-1">
@@ -912,20 +886,16 @@
       const db = await fetchCloudStoreDB();
       const baseId = Date.now();
       cart.forEach((item, idx) => {
-        const inv = db.inventory.find(i => i.name.toLowerCase() === item.name.toLowerCase());
-        const itemCategory = inv ? inv.category : "Verduras";
+        const prod = db.products.find(i => i.name.toLowerCase() === item.name.toLowerCase());
+        const itemCategory = prod ? prod.category : "Verduras";
         db.sales.unshift({
           id: baseId + idx,
           date: today,
           product: item.name,
           amount: Number((item.price * item.qty).toFixed(2)),
-          qty: item.qty,
           category: itemCategory,
           method: paymentMethod === "Efectivo" ? "Efectivo" : "Transferencia"
         });
-        if (inv) {
-          inv.qty = Math.max(0, Number((Number(inv.qty || 0) - item.qty).toFixed(2)));
-        }
       });
 
       saveStoreDB(db);
