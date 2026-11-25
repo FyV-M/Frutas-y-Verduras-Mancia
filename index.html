@@ -40,9 +40,9 @@
       <div class="flex items-center gap-2 shrink-0">
         <button
           type="button"
-          onclick="toggleLocalPos(true)"
-          aria-label="Caja local"
-          title="Caja local"
+          onclick="requestLocalPosAccess()"
+          aria-label="Caja local protegida"
+          title="Caja local (protegida con contraseña)"
           class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-stone-100 hover:bg-emerald-50 text-stone-500 hover:text-emerald-700 border border-stone-200 hover:border-emerald-300 flex items-center justify-center text-base transition cursor-pointer"
         >
           <span>⚡</span>
@@ -50,7 +50,7 @@
         <a
           href="dashboard.html"
           class="inline-flex items-center gap-1 bg-stone-900 hover:bg-stone-800 text-amber-300 font-bold text-xs sm:text-sm px-3 py-2.5 rounded-xl transition cursor-pointer"
-          title="Panel de Inventario y Caja"
+          title="Panel de Caja y Reportes"
         >
           <span>⚙️</span>
           <span>Admin</span>
@@ -73,7 +73,7 @@
           Elige tus verduras y pasa recogiéndolas listas sin hacer fila.
         </h2>
         <p class="text-emerald-100 text-base sm:text-lg">
-          Lleva <strong>por unidad</strong> o <strong>por el dólar</strong> (ej. $0.25 c/u o 4x $1.00) y envía tu lista por WhatsApp.
+          Lleva <strong>por unidad</strong> o <strong>por porción/dólar</strong> y envía tu lista por WhatsApp.
         </p>
       </div>
 
@@ -99,7 +99,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
       <div>
         <h3 class="text-xl sm:text-2xl font-extrabold text-stone-900">¿Qué vas a llevar hoy?</h3>
-        <p class="text-sm sm:text-base text-stone-600">Elige <strong>Unitario</strong> o <strong>Por el dólar</strong> en cada producto.</p>
+        <p class="text-sm sm:text-base text-stone-600">Elige <strong>Unitario</strong> o <strong>Porción de venta</strong> en cada producto.</p>
       </div>
 
       <div class="relative w-full sm:w-80">
@@ -224,18 +224,68 @@
     </div>
   </footer>
 
+  <!-- MODAL DE CONTRASEÑA PARA CAJA LOCAL (RAYITO) -->
+  <div id="localPosAuthModal" class="fixed inset-0 z-50 hidden">
+    <div onclick="closeLocalPosAuthModal()" class="absolute inset-0 bg-stone-950/75 backdrop-blur-xs"></div>
+    <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
+      <div class="w-full max-w-sm bg-white rounded-3xl p-6 space-y-4 pointer-events-auto shadow-2xl border-2 border-emerald-700">
+        <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🔐</span>
+            <h4 class="font-extrabold text-base text-stone-900">Acceso a Caja Local</h4>
+          </div>
+          <button type="button" onclick="closeLocalPosAuthModal()" class="px-2.5 py-1 rounded-xl bg-stone-100 text-stone-600 font-bold text-xs cursor-pointer">
+            ✕
+          </button>
+        </div>
+
+        <form onsubmit="submitLocalPosPassword(event)" class="space-y-3">
+          <div>
+            <label for="localPosPasswordInput" class="block text-xs font-extrabold uppercase tracking-wider text-stone-600 mb-1.5">
+              Contraseña de caja local
+            </label>
+            <input
+              type="password"
+              id="localPosPasswordInput"
+              required
+              autocomplete="off"
+              placeholder="Ingrese contraseña"
+              class="w-full px-4 py-3 rounded-2xl border-2 border-stone-300 bg-stone-50 text-stone-900 font-extrabold text-sm focus:outline-none focus:border-emerald-700 focus:bg-white"
+            />
+          </div>
+
+          <p id="localPosAuthError" class="hidden text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+            Contraseña incorrecta. Intente de nuevo.
+          </p>
+
+          <button
+            type="submit"
+            class="w-full py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm shadow-md transition cursor-pointer"
+          >
+            Desbloquear Caja Local
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- CAJÓN PRIVADO DE VENTAS DEL LOCAL (1 CLIC) -->
   <div id="localPosDrawer" class="fixed inset-0 z-50 hidden">
     <div onclick="toggleLocalPos(false)" class="absolute inset-0 bg-stone-950/75 backdrop-blur-xs"></div>
     <aside class="absolute right-0 top-0 h-full w-full max-w-xl bg-white shadow-2xl flex flex-col">
-      <div class="p-4 sm:p-5 border-b border-stone-200 flex items-center justify-between bg-stone-900 text-white">
+      <div class="p-4 sm:p-5 border-b border-stone-200 flex items-center justify-between gap-2 bg-stone-900 text-white">
         <div class="flex items-center gap-2">
           <span class="text-lg">⚡</span>
           <h4 class="font-extrabold text-xl">Caja Local</h4>
         </div>
-        <button type="button" onclick="toggleLocalPos(false)" class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 font-extrabold text-sm cursor-pointer">
-          ✕ Cerrar
-        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="lockLocalPos()" class="px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-extrabold text-xs cursor-pointer">
+            🔒 Bloquear
+          </button>
+          <button type="button" onclick="toggleLocalPos(false)" class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 font-extrabold text-sm cursor-pointer">
+            ✕ Cerrar
+          </button>
+        </div>
       </div>
 
       <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5">
@@ -254,26 +304,22 @@
           </div>
         </div>
 
-        <div class="p-3.5 rounded-2xl bg-stone-100 border border-stone-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="p-3.5 rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-between gap-3 text-xs">
           <div class="flex items-center gap-2">
-            <label for="localPosMethod" class="font-extrabold text-stone-700">Método:</label>
+            <label for="localPosMethod" class="font-extrabold text-stone-700">Método de cobro:</label>
             <select id="localPosMethod" class="px-3 py-1.5 rounded-xl border border-stone-300 bg-white font-bold">
               <option value="Efectivo">Efectivo</option>
               <option value="Transferencia">Transferencia</option>
             </select>
           </div>
-
-          <label class="inline-flex items-center gap-1.5 font-bold text-stone-700 cursor-pointer">
-            <input id="localPosDeductStock" type="checkbox" checked class="w-4 h-4 accent-emerald-700 rounded" />
-            <span>Descontar stock</span>
-          </label>
+          <span class="text-[11px] font-semibold text-stone-500">Control de stock aparte</span>
         </div>
 
         <div id="localPosFeedback" class="hidden p-3 rounded-xl bg-emerald-100 text-emerald-950 text-xs font-extrabold"></div>
 
         <div class="space-y-2">
           <p class="text-xs font-extrabold uppercase tracking-wider text-stone-600">
-            1 clic para registrar (Unitario o Promo/Dólar):
+            1 clic para registrar (Unitario o Porción):
           </p>
           <div id="localOneClickGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
         </div>
@@ -393,10 +439,11 @@
 
   <script>
     const WHATSAPP_ORDERS = "50368271549";
+    const LOCAL_POS_PIN = "FYVM2026";
     const SUPABASE_URL = "https://vgvkjhfkpyhvapzbyvwn.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cSCLRLMk06I-T0EKAODTGw_W0uVQJja";
     const CLOUD_ROW_ID = "frutas_y_verduras_mancia_v1";
-    const STORAGE_KEY = "biz_control_total_v6";
+    const STORAGE_KEY = "biz_control_total_v7";
 
     const supabaseClient =
       typeof window.supabase !== "undefined" &&
@@ -420,43 +467,44 @@
     };
 
     const CATALOG_META = {
-      "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", unit: "unidades", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80" },
-      "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", unit: "unidades", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80" },
-      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80" },
-      "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", unit: "unidades", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=600&q=80" },
-      "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=600&q=80" },
-      "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=600&q=80" },
-      "ajo": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00", unit: "redes", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=600&q=80" },
-      "lechuga": { unitPrice: 1.75, promoQty: 1, promoPrice: 1.75, promoLabel: "1 x $1.75", unit: "unidades", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=600&q=80" },
-      "aguacate": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", unit: "unidades", category: "Frutas", badge: "Al punto", image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=600&q=80" },
-      "limón": { unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, promoLabel: "8 x $1.00", unit: "unidades", category: "Frutas", badge: "Jugoso", image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=600&q=80" },
-      "papa": { unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, promoLabel: "1 lb x $1.50", unit: "libras", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=600&q=80" },
-      "elote": { unitPrice: 0.75, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", unit: "unidades", category: "Verduras", badge: "Tierno", image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=600&q=80" },
-      "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=600&q=80" },
-      "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=600&q=80" },
-      "rábano": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=600&q=80" },
-      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", unit: "unidades", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=600&q=80" }
+      "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80" },
+      "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80" },
+      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80" },
+      "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=600&q=80" },
+      "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=600&q=80" },
+      "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=600&q=80" },
+      "ajo": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=600&q=80" },
+      "lechuga": { unitPrice: 1.75, promoQty: 1, promoPrice: 1.75, promoLabel: "1 x $1.75", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=600&q=80" },
+      "aguacate": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", category: "Frutas", badge: "Al punto", image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=600&q=80" },
+      "limón": { unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, promoLabel: "8 x $1.00", category: "Frutas", badge: "Jugoso", image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=600&q=80" },
+      "papa": { unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, promoLabel: "1 libra x $1.50", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=600&q=80" },
+      "elote": { unitPrice: 0.75, promoQty: 1, promoPrice: 0.75, promoLabel: "1 x $0.75", category: "Verduras", badge: "Tierno", image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=600&q=80" },
+      "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=600&q=80" },
+      "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=600&q=80" },
+      "rábano": { unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=600&q=80" },
+      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=600&q=80" }
     };
 
     const seedInitialDB = () => ({
       openingCash: 0.00,
       inventory: Object.entries(CATALOG_META).map(([key, meta], idx) => {
-        const displayName = key.replace(/\b\w/g, c => c.toUpperCase()).replace("Güisquil", "Güisquil").replace("Plátano", "Plátano").replace("Limón", "Limón").replace("Rábano", "Rábano");
+        const displayName = key
+          .replace(/\b\w/g, c => c.toUpperCase())
+          .replace("Güisquil", "Güisquil")
+          .replace("Plátano", "Plátano")
+          .replace("Limón", "Limón")
+          .replace("Rábano", "Rábano");
         return {
           id: 101 + idx,
           name: displayName,
           category: meta.category,
-          qty: 30,
-          unitCost: 0.15,
           unitPrice: meta.unitPrice,
           promoQty: meta.promoQty,
           promoPrice: meta.promoPrice,
           salePrice: meta.promoPrice,
           promoLabel: meta.promoLabel,
           badge: meta.badge,
-          image: meta.image,
-          unit: meta.unit,
-          minStock: 6
+          image: meta.image
         };
       }),
       weeklyPayments: [
@@ -464,14 +512,14 @@
         { id: 502, concept: "Transporte / Flete semanal", amount: 15.00, payDay: "Miércoles", method: "Efectivo", paid: false, paidDate: "" }
       ],
       sales: [
-        { id: 1801, date: "2026-11-18", product: "Ventas del día (libreta)", amount: 24.00, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 1901, date: "2026-11-19", product: "Ventas del día (libreta)", amount: 13.00, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 2001, date: "2026-11-20", product: "Ventas del día (libreta)", amount: 45.00, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 2101, date: "2026-11-21", product: "Ventas del día (libreta)", amount: 75.00, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 2201, date: "2026-11-22", product: "Ventas del día (libreta)", amount: 43.00, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 2301, date: "2026-11-23", product: "Ventas en efectivo (libreta hoy)", amount: 62.25, qty: 0, category: "Verduras", method: "Efectivo" },
-        { id: 2302, date: "2026-11-23", product: "Cobros por transferencia (libreta hoy)", amount: 44.60, qty: 0, category: "Otros", method: "Transferencia" },
-        { id: 2401, date: "2026-11-24", product: "Ventas del día (libreta)", amount: 31.25, qty: 0, category: "Verduras", method: "Efectivo" }
+        { id: 1801, date: "2026-11-18", product: "Ventas del día (libreta)", amount: 24.00, category: "Verduras", method: "Efectivo" },
+        { id: 1901, date: "2026-11-19", product: "Ventas del día (libreta)", amount: 13.00, category: "Verduras", method: "Efectivo" },
+        { id: 2001, date: "2026-11-20", product: "Ventas del día (libreta)", amount: 45.00, category: "Verduras", method: "Efectivo" },
+        { id: 2101, date: "2026-11-21", product: "Ventas del día (libreta)", amount: 75.00, category: "Verduras", method: "Efectivo" },
+        { id: 2201, date: "2026-11-22", product: "Ventas del día (libreta)", amount: 43.00, category: "Verduras", method: "Efectivo" },
+        { id: 2301, date: "2026-11-23", product: "Ventas en efectivo (libreta hoy)", amount: 62.25, category: "Verduras", method: "Efectivo" },
+        { id: 2302, date: "2026-11-23", product: "Cobros por transferencia (libreta hoy)", amount: 44.60, category: "Otros", method: "Transferencia" },
+        { id: 2401, date: "2026-11-24", product: "Ventas del día (libreta)", amount: 31.25, category: "Verduras", method: "Efectivo" }
       ],
       expenses: [
         { id: 2399, date: "2026-11-23", description: "Gasto del día (bolsas / insumos)", amount: 10.18, type: "Insumos", method: "Efectivo" }
@@ -484,46 +532,46 @@
       const unitPrice = Number(item.unitPrice || meta.unitPrice || (promoPrice / promoQty) || 0.25);
       const promoLabel = item.promoLabel || meta.promoLabel || (promoQty > 1 ? `${promoQty} x $${promoPrice.toFixed(2)}` : `1 x $${promoPrice.toFixed(2)}`);
       return {
-        ...item,
+        id: item.id,
+        name: item.name,
+        category: item.category || meta.category || "Verduras",
         unitPrice: Number(unitPrice.toFixed(2)),
         promoQty,
         promoPrice: Number(promoPrice.toFixed(2)),
         salePrice: Number(promoPrice.toFixed(2)),
-        promoLabel
+        promoLabel,
+        badge: item.badge !== undefined && item.badge !== "" ? item.badge : (meta.badge || ""),
+        image: item.image || meta.image || "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80"
       };
     }
 
     function normalizeStoreDB(parsed) {
       const base = seedInitialDB();
       if (!parsed || typeof parsed !== "object") return base;
-      const rawInv = Array.isArray(parsed.inventory) ? parsed.inventory : [];
+      const rawInv = Array.isArray(parsed.inventory)
+        ? parsed.inventory
+        : Array.isArray(parsed.products)
+          ? parsed.products
+          : [];
+
       const inv = base.inventory.map(seedItem => {
         const found = rawInv.find(i => (i.name || "").toLowerCase().trim() === seedItem.name.toLowerCase().trim());
         const meta = CATALOG_META[seedItem.name.toLowerCase().trim()] || {};
         return enrichProductPricing({
           ...seedItem,
           ...(found || {}),
-          name: seedItem.name,
-          qty: found ? Number(found.qty || 0) : seedItem.qty,
-          unit: (found && found.unit) ? found.unit : (meta.unit || seedItem.unit),
-          category: (found && found.category) ? found.category : (meta.category || seedItem.category),
-          badge: (found && found.badge !== undefined && found.badge !== "") ? found.badge : (meta.badge !== undefined ? meta.badge : seedItem.badge),
-          image: (found && found.image) ? found.image : (meta.image || seedItem.image)
+          name: seedItem.name
         }, meta);
       });
+
       const extraInv = rawInv
         .filter(i => !base.inventory.some(s => s.name.toLowerCase().trim() === (i.name || "").toLowerCase().trim()))
-        .map(item => enrichProductPricing({
-          ...item,
-          qty: Number(item.qty || 0),
-          badge: item.badge || "",
-          image: item.image || "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80"
-        }));
+        .map(item => enrichProductPricing(item));
 
       const salesList = Array.isArray(parsed.sales) ? [...parsed.sales] : [...base.sales];
       const hasNov24Sale = salesList.some(s => s && s.date === "2026-11-24" && Math.abs(Number(s.amount || 0) - 31.25) < 0.001);
       if (!hasNov24Sale) {
-        salesList.push({ id: 2401, date: "2026-11-24", product: "Ventas del día (libreta)", amount: 31.25, qty: 0, category: "Verduras", method: "Efectivo" });
+        salesList.push({ id: 2401, date: "2026-11-24", product: "Ventas del día (libreta)", amount: 31.25, category: "Verduras", method: "Efectivo" });
       }
 
       return {
@@ -576,22 +624,18 @@
           .maybeSingle();
 
         if (!error && data && data.data) {
-          const hadNov24 = Array.isArray(data.data.sales) && data.data.sales.some(s => s && s.date === "2026-11-24" && Math.abs(Number(s.amount || 0) - 31.25) < 0.001);
           const normalized = normalizeStoreDB(data.data);
           saveStoreDB(normalized);
-          if (!hadNov24) {
-            await syncStoreDBToCloud(normalized);
-          }
           return normalized;
         }
       } catch (e) {}
       return loadStoreDB();
     }
 
-    // Cada item en cart: { key, name, mode: 'unit' | 'promo', modeLabel, price, packSize, qty }
     let cart = [];
     let currentCategory = "todos";
     let activeLocalDay = todaySV();
+    let isLocalPosUnlocked = false;
 
     document.addEventListener("DOMContentLoaded", async () => {
       renderCategoryFilters();
@@ -620,7 +664,53 @@
       }
     });
 
+    function requestLocalPosAccess() {
+      if (isLocalPosUnlocked) {
+        toggleLocalPos(true);
+        return;
+      }
+      const errEl = document.getElementById("localPosAuthError");
+      const inputEl = document.getElementById("localPosPasswordInput");
+      if (errEl) errEl.classList.add("hidden");
+      if (inputEl) inputEl.value = "";
+      document.getElementById("localPosAuthModal").classList.remove("hidden");
+      setTimeout(() => inputEl && inputEl.focus(), 50);
+    }
+
+    function closeLocalPosAuthModal() {
+      document.getElementById("localPosAuthModal").classList.add("hidden");
+    }
+
+    function submitLocalPosPassword(e) {
+      e.preventDefault();
+      const inputEl = document.getElementById("localPosPasswordInput");
+      const errEl = document.getElementById("localPosAuthError");
+      const entered = (inputEl?.value || "").trim();
+
+      if (entered === LOCAL_POS_PIN) {
+        isLocalPosUnlocked = true;
+        if (errEl) errEl.classList.add("hidden");
+        closeLocalPosAuthModal();
+        toggleLocalPos(true);
+      } else {
+        if (errEl) errEl.classList.remove("hidden");
+        if (inputEl) {
+          inputEl.value = "";
+          inputEl.focus();
+        }
+      }
+    }
+
+    function lockLocalPos() {
+      isLocalPosUnlocked = false;
+      toggleLocalPos(false);
+    }
+
     function toggleLocalPos(open) {
+      if (open && !isLocalPosUnlocked) {
+        requestLocalPosAccess();
+        return;
+      }
       document.getElementById("localPosDrawer").classList.toggle("hidden", !open);
       if (open) renderLocalPos();
     }
@@ -639,6 +729,7 @@
       if (n.includes("pepino")) return "🥒";
       if (n.includes("lechuga")) return "🥬";
       if (n.includes("elote")) return "🌽";
+      if (n.includes("rábano") || n.includes("rabano")) return "🌱";
       return "🥬";
     }
 
@@ -664,30 +755,26 @@
       grid.innerHTML = db.inventory.map(item => {
         const unitPrice = Number(item.unitPrice || 0.25);
         const promoPrice = Number(item.promoPrice || item.salePrice || 1.00);
-        const promoQty = Math.max(1, Number(item.promoQty || 1));
         const emoji = getLocalEmoji(item.name);
         const safeName = String(item.name || "").replace(/'/g, "\\'");
         const safeCat = String(item.category || "Verduras").replace(/'/g, "\\'");
         return `
           <div class="p-3 rounded-2xl bg-emerald-50/80 border-2 border-emerald-200 flex flex-col justify-between gap-2">
-            <div class="flex items-center justify-between gap-1">
-              <span class="text-sm font-extrabold text-emerald-950 flex items-center gap-1.5 truncate">
-                <span>${emoji}</span>
-                <span class="truncate">${item.name}</span>
-              </span>
-              <span class="text-[11px] font-bold text-stone-500 shrink-0">${Number(item.qty || 0)} ${item.unit || ""}</span>
-            </div>
+            <span class="text-sm font-extrabold text-emerald-950 flex items-center gap-1.5 truncate">
+              <span>${emoji}</span>
+              <span class="truncate">${item.name}</span>
+            </span>
             <div class="grid grid-cols-2 gap-1.5">
               <button
                 type="button"
-                onclick="recordLocalSale('${safeName} (Unitario)', ${unitPrice}, 1, '${safeCat}')"
+                onclick="recordLocalSale('${safeName} (Unitario)', ${unitPrice}, '${safeCat}')"
                 class="py-2 px-2 rounded-xl bg-white hover:bg-emerald-700 text-emerald-950 hover:text-white border border-emerald-300 text-xs font-extrabold transition cursor-pointer active:scale-95 text-center"
               >
                 1 u • $${unitPrice.toFixed(2)}
               </button>
               <button
                 type="button"
-                onclick="recordLocalSale('${safeName} (${item.promoLabel})', ${promoPrice}, ${promoQty}, '${safeCat}')"
+                onclick="recordLocalSale('${safeName} (${item.promoLabel})', ${promoPrice}, '${safeCat}')"
                 class="py-2 px-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 text-xs font-extrabold transition cursor-pointer active:scale-95 text-center truncate"
               >
                 ${item.promoLabel}
@@ -698,12 +785,15 @@
       }).join("");
     }
 
-    async function recordLocalSale(productName, amount, stockQty = 1, category = "Verduras") {
+    async function recordLocalSale(productName, amount, category = "Verduras") {
+      if (!isLocalPosUnlocked) {
+        requestLocalPosAccess();
+        return;
+      }
       const cleanAmount = Number(amount);
       if (isNaN(cleanAmount) || cleanAmount <= 0) return;
 
       const method = document.getElementById("localPosMethod")?.value || "Efectivo";
-      const deductStock = Boolean(document.getElementById("localPosDeductStock")?.checked);
       const today = todaySV();
 
       const db = await fetchCloudStoreDB();
@@ -712,21 +802,11 @@
         date: today,
         product: productName,
         amount: Number(cleanAmount.toFixed(2)),
-        qty: stockQty > 0 ? stockQty : 0,
         category,
         method
       });
 
-      if (deductStock && stockQty > 0) {
-        const baseName = productName.split(" (")[0].trim().toLowerCase();
-        const inv = db.inventory.find(i => (i.name || "").toLowerCase() === baseName);
-        if (inv) {
-          inv.qty = Math.max(0, Number((Number(inv.qty || 0) - stockQty).toFixed(2)));
-        }
-      }
-
       saveStoreDB(db);
-      renderProducts();
       renderLocalPos();
       await syncStoreDBToCloud(db);
 
@@ -739,13 +819,17 @@
 
     function submitCustomLocalSale(e) {
       e.preventDefault();
+      if (!isLocalPosUnlocked) {
+        requestLocalPosAccess();
+        return;
+      }
       const nameInput = document.getElementById("customLocalProduct");
       const amtInput = document.getElementById("customLocalAmount");
       const name = (nameInput?.value || "").trim();
       const amount = parseFloat(amtInput?.value);
       if (!name || isNaN(amount) || amount <= 0) return;
 
-      recordLocalSale(name, amount, 1, "Verduras");
+      recordLocalSale(name, amount, "Verduras");
       if (nameInput) nameInput.value = "";
       if (amtInput) amtInput.value = "";
     }
@@ -865,7 +949,6 @@
         const promoPrice = Number(product.promoPrice || product.salePrice || 1.00);
         const promoQty = Math.max(1, Number(product.promoQty || 1));
         const promoLabel = product.promoLabel || `${promoQty} x $${promoPrice.toFixed(2)}`;
-        const inStock = Number(product.qty || 0) > 0;
         const safeName = product.name.replace(/'/g, "\\'");
         const safePromoLabel = promoLabel.replace(/'/g, "\\'");
 
@@ -880,61 +963,54 @@
             <div class="relative h-40 bg-stone-100 overflow-hidden">
               <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover" loading="lazy" />
               <span class="absolute top-3 left-3 bg-amber-400 text-stone-950 text-xs font-extrabold px-3 py-1 rounded-full shadow-xs">${product.badge || product.category || 'Fresco'}</span>
-              ${!inStock ? `<span class="absolute top-3 right-3 bg-rose-600 text-white text-xs font-extrabold px-3 py-1 rounded-full">Agotado</span>` : ""}
               ${totalInBag > 0 ? `<span class="absolute top-3 right-3 bg-emerald-700 text-white text-xs font-extrabold px-3 py-1 rounded-full">En bolsa: ${totalInBag}</span>` : ""}
             </div>
 
             <div class="p-4 flex-1 flex flex-col justify-between gap-3.5">
               <div>
                 <h4 class="font-extrabold text-stone-900 text-lg">${product.name}</h4>
-                <p class="text-xs font-bold text-stone-500 mt-0.5">Elige compra individual o porción del dólar</p>
+                <p class="text-xs font-bold text-stone-500 mt-0.5">Elige compra individual o porción de venta</p>
               </div>
 
-              ${!inStock ? `
-                <div class="pt-2 border-t border-stone-100 flex justify-end">
-                  <span class="text-xs font-extrabold text-rose-600 bg-rose-50 px-3 py-2 rounded-xl border border-rose-200">Sin existencia</span>
-                </div>
-              ` : `
-                <div class="space-y-2 pt-2 border-t border-stone-100">
-                  <!-- Opción Unitario -->
-                  <div class="flex items-center justify-between gap-2 bg-stone-50 px-3 py-2 rounded-2xl border border-stone-200">
-                    <div>
-                      <span class="block text-[11px] font-extrabold uppercase text-stone-500">Individual</span>
-                      <span class="text-base font-extrabold text-stone-900">$${unitPrice.toFixed(2)} <span class="text-xs font-bold text-stone-500">c/u</span></span>
-                    </div>
-                    ${!unitCart ? `
-                      <button type="button" onclick="addTypedToCart('${safeName}', 'unit', 'Unitario', ${unitPrice}, 1)" class="bg-stone-900 hover:bg-stone-800 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl transition cursor-pointer">
-                        + 1 u
-                      </button>
-                    ` : `
-                      <div class="flex items-center gap-1.5 bg-white border border-stone-300 rounded-xl p-0.5">
-                        <button type="button" onclick="changeTypedQty('${unitKey}', -1)" class="w-7 h-7 rounded-lg bg-stone-100 font-extrabold text-sm cursor-pointer">−</button>
-                        <span class="w-5 text-center font-extrabold text-xs">${unitCart.qty}</span>
-                        <button type="button" onclick="changeTypedQty('${unitKey}', 1)" class="w-7 h-7 rounded-lg bg-stone-900 text-white font-extrabold text-sm cursor-pointer">+</button>
-                      </div>
-                    `}
+              <div class="space-y-2 pt-2 border-t border-stone-100">
+                <!-- Opción Unitario -->
+                <div class="flex items-center justify-between gap-2 bg-stone-50 px-3 py-2 rounded-2xl border border-stone-200">
+                  <div>
+                    <span class="block text-[11px] font-extrabold uppercase text-stone-500">Individual</span>
+                    <span class="text-base font-extrabold text-stone-900">$${unitPrice.toFixed(2)} <span class="text-xs font-bold text-stone-500">c/u</span></span>
                   </div>
+                  ${!unitCart ? `
+                    <button type="button" onclick="addTypedToCart('${safeName}', 'unit', 'Unitario', ${unitPrice}, 1)" class="bg-stone-900 hover:bg-stone-800 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl transition cursor-pointer">
+                      + 1 u
+                    </button>
+                  ` : `
+                    <div class="flex items-center gap-1.5 bg-white border border-stone-300 rounded-xl p-0.5">
+                      <button type="button" onclick="changeTypedQty('${unitKey}', -1)" class="w-7 h-7 rounded-lg bg-stone-100 font-extrabold text-sm cursor-pointer">−</button>
+                      <span class="w-5 text-center font-extrabold text-xs">${unitCart.qty}</span>
+                      <button type="button" onclick="changeTypedQty('${unitKey}', 1)" class="w-7 h-7 rounded-lg bg-stone-900 text-white font-extrabold text-sm cursor-pointer">+</button>
+                    </div>
+                  `}
+                </div>
 
-                  <!-- Opción Promo / Dólar -->
-                  <div class="flex items-center justify-between gap-2 bg-emerald-50/80 px-3 py-2 rounded-2xl border border-emerald-200">
-                    <div>
-                      <span class="block text-[11px] font-extrabold uppercase text-emerald-800">Promo / Dólar</span>
-                      <span class="text-base font-extrabold text-emerald-800">${promoLabel}</span>
-                    </div>
-                    ${!promoCart ? `
-                      <button type="button" onclick="addTypedToCart('${safeName}', 'promo', '${safePromoLabel}', ${promoPrice}, ${promoQty})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl transition cursor-pointer">
-                        + Promo
-                      </button>
-                    ` : `
-                      <div class="flex items-center gap-1.5 bg-white border border-emerald-500 rounded-xl p-0.5">
-                        <button type="button" onclick="changeTypedQty('${promoKey}', -1)" class="w-7 h-7 rounded-lg bg-emerald-50 font-extrabold text-sm cursor-pointer">−</button>
-                        <span class="w-5 text-center font-extrabold text-xs text-emerald-950">${promoCart.qty}</span>
-                        <button type="button" onclick="changeTypedQty('${promoKey}', 1)" class="w-7 h-7 rounded-lg bg-emerald-600 text-white font-extrabold text-sm cursor-pointer">+</button>
-                      </div>
-                    `}
+                <!-- Opción Promo / Porción -->
+                <div class="flex items-center justify-between gap-2 bg-emerald-50/80 px-3 py-2 rounded-2xl border border-emerald-200">
+                  <div>
+                    <span class="block text-[11px] font-extrabold uppercase text-emerald-800">Porción / Promo</span>
+                    <span class="text-base font-extrabold text-emerald-800">${promoLabel}</span>
                   </div>
+                  ${!promoCart ? `
+                    <button type="button" onclick="addTypedToCart('${safeName}', 'promo', '${safePromoLabel}', ${promoPrice}, ${promoQty})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl transition cursor-pointer">
+                      + Promo
+                    </button>
+                  ` : `
+                    <div class="flex items-center gap-1.5 bg-white border border-emerald-500 rounded-xl p-0.5">
+                      <button type="button" onclick="changeTypedQty('${promoKey}', -1)" class="w-7 h-7 rounded-lg bg-emerald-50 font-extrabold text-sm cursor-pointer">−</button>
+                      <span class="w-5 text-center font-extrabold text-xs text-emerald-950">${promoCart.qty}</span>
+                      <button type="button" onclick="changeTypedQty('${promoKey}', 1)" class="w-7 h-7 rounded-lg bg-emerald-600 text-white font-extrabold text-sm cursor-pointer">+</button>
+                    </div>
+                  `}
                 </div>
-              `}
+              </div>
             </div>
           </article>`;
       }).join("");
@@ -1023,7 +1099,6 @@
       cart.forEach((item, idx) => {
         const inv = db.inventory.find(i => i.name.toLowerCase() === item.name.toLowerCase());
         const itemCategory = inv ? inv.category : "Verduras";
-        const totalUnitsSold = Number((item.qty * (item.packSize || 1)).toFixed(2));
         const label = item.mode === "unit" ? `${item.name} (Unitario)` : `${item.name} (${item.modeLabel})`;
 
         db.sales.unshift({
@@ -1031,13 +1106,9 @@
           date: today,
           product: label,
           amount: Number((item.price * item.qty).toFixed(2)),
-          qty: totalUnitsSold,
           category: itemCategory,
           method: paymentMethod === "Efectivo" ? "Efectivo" : "Transferencia"
         });
-        if (inv) {
-          inv.qty = Math.max(0, Number((Number(inv.qty || 0) - totalUnitsSold).toFixed(2)));
-        }
       });
 
       saveStoreDB(db);
