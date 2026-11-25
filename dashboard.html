@@ -21,7 +21,7 @@
     .bar-fill { transition: width 380ms ease; }
   </style>
 </head>
-<body class="antialiased pb-16">
+<body class="antialiased pb-20">
 
   <!-- ACCESO ÚNICO POR SUPABASE -->
   <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-emerald-950 via-emerald-900 to-slate-900">
@@ -88,6 +88,7 @@
             <div class="flex items-center gap-2 flex-wrap">
               <h1 class="text-base sm:text-lg font-extrabold tracking-tight truncate">Control Total</h1>
               <span id="todayBadgeHeader" class="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[11px] font-extrabold"></span>
+              <span id="cloudSyncBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-800 border border-emerald-600 text-emerald-100 text-[11px] font-bold">Nube: lista</span>
             </div>
             <p class="text-xs text-emerald-100/80 truncate">Soyapango • Pedidos, caja, precios, pagos semanales y Excel</p>
           </div>
@@ -95,14 +96,14 @@
           <div class="flex items-center gap-1.5 shrink-0">
             <a
               href="index.html"
-              class="min-h-[40px] inline-flex items-center px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-extrabold text-xs transition"
+              class="min-h-[42px] inline-flex items-center px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-extrabold text-xs transition"
             >
               🛒 Tienda
             </a>
             <button
               type="button"
               onclick="logout()"
-              class="min-h-[40px] px-3 py-2 rounded-xl bg-slate-950/50 hover:bg-slate-950 text-emerald-100 font-bold text-xs transition cursor-pointer"
+              class="min-h-[42px] px-3 py-2 rounded-xl bg-slate-950/50 hover:bg-slate-950 text-emerald-100 font-bold text-xs transition cursor-pointer"
             >
               Salir
             </button>
@@ -113,35 +114,35 @@
           <button
             type="button"
             onclick="openModal('ventaModal')"
-            class="min-h-[42px] px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs shadow-xs cursor-pointer transition"
+            class="min-h-[44px] px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs shadow-xs cursor-pointer transition"
           >
             + Venta / Entrada
           </button>
           <button
             type="button"
             onclick="openModal('gastoModal')"
-            class="min-h-[42px] px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow-xs cursor-pointer transition"
+            class="min-h-[44px] px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow-xs cursor-pointer transition"
           >
             + Gasto / Salida
           </button>
           <button
             type="button"
             onclick="openNewProductModal()"
-            class="min-h-[42px] px-3 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-extrabold text-xs shadow-xs cursor-pointer transition"
+            class="min-h-[44px] px-3 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-extrabold text-xs shadow-xs cursor-pointer transition"
           >
             + Producto / Precio
           </button>
           <button
             type="button"
             onclick="openModal('weeklyModal')"
-            class="min-h-[42px] px-3 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs shadow-xs cursor-pointer transition"
+            class="min-h-[44px] px-3 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs shadow-xs cursor-pointer transition"
           >
             + Pago semanal
           </button>
           <button
             type="button"
             onclick="openCloseDayModal()"
-            class="col-span-2 sm:col-span-1 min-h-[42px] px-3 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs shadow-xs cursor-pointer transition"
+            class="col-span-2 sm:col-span-1 min-h-[44px] px-3 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs shadow-xs cursor-pointer transition"
           >
             📊 Cierre Día
           </button>
@@ -195,7 +196,7 @@
               type="button"
               id="baseCashBtn"
               onclick="editOpeningCash()"
-              class="text-xs font-extrabold text-emerald-800 hover:underline cursor-pointer"
+              class="min-h-[32px] px-2 text-xs font-extrabold text-emerald-800 hover:underline cursor-pointer"
             >
               Base ($0.00)
             </button>
@@ -224,7 +225,7 @@
             <button
               type="button"
               onclick="openNewProductModal()"
-              class="min-h-[38px] px-3.5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-xs cursor-pointer transition"
+              class="min-h-[40px] px-3.5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-xs cursor-pointer transition"
             >
               + Nuevo / Editar
             </button>
@@ -246,7 +247,7 @@
             <button
               type="button"
               onclick="openModal('weeklyModal')"
-              class="min-h-[38px] px-3.5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs cursor-pointer transition"
+              class="min-h-[40px] px-3.5 py-2 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-xs cursor-pointer transition"
             >
               + Agregar pago
             </button>
@@ -267,14 +268,14 @@
             <button
               type="button"
               onclick="selectToday()"
-              class="min-h-[38px] px-3.5 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-xs cursor-pointer transition"
+              class="min-h-[40px] px-3.5 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-xs cursor-pointer transition"
             >
               Ver Hoy
             </button>
             <button
               type="button"
               onclick="selectDay('ALL')"
-              class="min-h-[38px] px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs cursor-pointer transition"
+              class="min-h-[40px] px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs cursor-pointer transition"
             >
               Todos los días
             </button>
@@ -296,7 +297,7 @@
             <select
               id="daySelector"
               onchange="onDaySelectorChange()"
-              class="min-h-[40px] px-3 py-2 rounded-xl border-2 border-emerald-200 bg-emerald-50/60 text-xs font-extrabold text-emerald-900 focus:outline-none focus:border-emerald-800 cursor-pointer"
+              class="min-h-[42px] px-3 py-2 rounded-xl border-2 border-emerald-200 bg-emerald-50/60 text-xs font-extrabold text-emerald-900 focus:outline-none focus:border-emerald-800 cursor-pointer"
             >
               <option value="ALL">Todos los días</option>
             </select>
@@ -305,7 +306,7 @@
               type="button"
               id="sortToggleBtn"
               onclick="toggleSort()"
-              class="min-h-[40px] px-3.5 py-2 rounded-xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 text-xs font-extrabold text-amber-950 cursor-pointer transition"
+              class="min-h-[42px] px-3.5 py-2 rounded-xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 text-xs font-extrabold text-amber-950 cursor-pointer transition"
             >
               Mayor a menor ↓
             </button>
@@ -349,17 +350,17 @@
       <footer class="bg-white rounded-3xl border border-slate-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
         <span class="font-medium text-center sm:text-left">Sincronizado con Supabase y respaldo local.</span>
         <div class="flex items-center gap-2 flex-wrap justify-center">
-          <button type="button" onclick="openCloseDayModal()" class="min-h-[38px] px-3.5 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold cursor-pointer">
+          <button type="button" onclick="openCloseDayModal()" class="min-h-[40px] px-3.5 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold cursor-pointer">
             📊 Exportar Excel
           </button>
-          <button type="button" onclick="downloadBackup()" class="min-h-[38px] px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold cursor-pointer">
+          <button type="button" onclick="downloadBackup()" class="min-h-[40px] px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold cursor-pointer">
             Descargar .json
           </button>
-          <button type="button" onclick="document.getElementById('importFileInput').click()" class="min-h-[38px] px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold cursor-pointer">
+          <button type="button" onclick="document.getElementById('importFileInput').click()" class="min-h-[40px] px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold cursor-pointer">
             Importar JSON
           </button>
           <input type="file" id="importFileInput" accept=".json,application/json" onchange="importBackup(event)" class="hidden" />
-          <button type="button" onclick="restoreSeed()" class="min-h-[38px] px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold cursor-pointer">
+          <button type="button" onclick="restoreSeed()" class="min-h-[40px] px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold cursor-pointer">
             Reiniciar base limpia
           </button>
         </div>
@@ -375,18 +376,18 @@
       <div class="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border-2 border-emerald-500">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <h3 id="closeDayTitle" class="text-base font-extrabold text-emerald-900">📊 Cierre del día y envío</h3>
-          <button type="button" onclick="closeModal('closeDayModal')" class="min-h-[36px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
+          <button type="button" onclick="closeModal('closeDayModal')" class="min-h-[38px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
         </div>
 
         <div class="space-y-3">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label for="closeReportDate" class="block text-xs font-bold text-slate-600 mb-1">Jornada</label>
-              <input type="date" id="closeReportDate" onchange="updateCloseDayPreview()" class="w-full min-h-[42px] px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold" />
+              <input type="date" id="closeReportDate" onchange="updateCloseDayPreview()" class="w-full min-h-[44px] px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold" />
             </div>
             <div>
               <label for="bossWhatsappInput" class="block text-xs font-bold text-slate-600 mb-1">WhatsApp destino</label>
-              <input type="text" id="bossWhatsappInput" value="50379698478" class="w-full min-h-[42px] px-3 py-2 rounded-xl border border-slate-300 text-xs font-extrabold" />
+              <input type="text" id="bossWhatsappInput" value="50379698478" class="w-full min-h-[44px] px-3 py-2 rounded-xl border border-slate-300 text-xs font-extrabold" />
             </div>
           </div>
 
@@ -420,7 +421,7 @@
       <div class="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border border-emerald-200">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <h3 id="ventaModalTitle" class="text-base font-extrabold text-emerald-900">Registrar venta / entrada</h3>
-          <button type="button" onclick="closeModal('ventaModal')" class="min-h-[36px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
+          <button type="button" onclick="closeModal('ventaModal')" class="min-h-[38px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
         </div>
 
         <form onsubmit="addSale(event)" class="space-y-3">
@@ -475,7 +476,7 @@
       <div class="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border border-rose-200">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <h3 id="gastoModalTitle" class="text-base font-extrabold text-rose-700">Registrar gasto diario</h3>
-          <button type="button" onclick="closeModal('gastoModal')" class="min-h-[36px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
+          <button type="button" onclick="closeModal('gastoModal')" class="min-h-[38px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
         </div>
 
         <form onsubmit="addExpense(event)" class="space-y-3">
@@ -530,7 +531,7 @@
       <div class="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border border-teal-200">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <h3 id="productModalTitle" class="text-base font-extrabold text-teal-900">Producto: unitario y porción</h3>
-          <button type="button" onclick="closeModal('productModal')" class="min-h-[36px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
+          <button type="button" onclick="closeModal('productModal')" class="min-h-[38px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
         </div>
 
         <form onsubmit="saveProductItem(event)" class="space-y-3">
@@ -589,7 +590,7 @@
       <div class="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border border-amber-200">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <h3 id="weeklyModalTitle" class="text-base font-extrabold text-amber-900">Nuevo pago semanal</h3>
-          <button type="button" onclick="closeModal('weeklyModal')" class="min-h-[36px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
+          <button type="button" onclick="closeModal('weeklyModal')" class="min-h-[38px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
         </div>
 
         <form onsubmit="addWeeklyPayment(event)" class="space-y-3">
@@ -658,7 +659,7 @@
       : null;
 
     const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, ch => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      "&": "&", "<": "<", ">": ">", '"': """, "'": "'"
     }[ch]));
 
     const jsArg = value => "'" + String(value ?? "")
@@ -686,22 +687,86 @@
     }
 
     const CATALOG_META = {
-      "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85" },
-      "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=85" },
-      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&fit=crop&w=900&q=85" },
-      "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=85" },
-      "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=900&q=85" },
-      "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=85" },
-      "ajo": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=900&q=85" },
-      "lechuga": { unitPrice: 1.75, promoQty: 1, promoPrice: 1.75, promoLabel: "1 x $1.75", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=900&q=85" },
-      "aguacate": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", category: "Frutas", badge: "Al punto", image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=900&q=85" },
-      "limón": { unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, promoLabel: "8 x $1.00", category: "Frutas", badge: "Jugoso", image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=900&q=85" },
-      "papa": { unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, promoLabel: "1 libra x $1.50", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=900&q=85" },
-      "elote": { unitPrice: 0.75, promoQty: 1, promoPrice: 0.75, promoLabel: "1 x $0.75", category: "Verduras", badge: "Tierno", image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=900&q=85" },
-      "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=900&q=85" },
-      "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=900&q=85" },
-      "rábano": { unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=900&q=85" },
-      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=900&q=85" }
+      "tomate": {
+        unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00",
+        category: "Verduras", badge: "Fresco hoy",
+        image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85"
+      },
+      "cebolla blanca": {
+        unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00",
+        category: "Verduras", badge: "Oferta diaria",
+        image: "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=85"
+      },
+      "cebolla morada": {
+        unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00",
+        category: "Verduras", badge: "Morada fresca",
+        image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa82e?auto=format&fit=crop&w=900&q=85"
+      },
+      "plátano": {
+        unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00",
+        category: "Frutas", badge: "Dulces",
+        image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=85"
+      },
+      "chile verde": {
+        unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00",
+        category: "Verduras", badge: "Crujiente",
+        image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=85"
+      },
+      "jalapeño": {
+        unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00",
+        category: "Verduras", badge: "Picante",
+        image: "https://images.unsplash.com/photo-1583119022894-919a68a3d0e3?auto=format&fit=crop&w=900&q=85"
+      },
+      "ajo": {
+        unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00",
+        category: "Verduras", badge: "Ristra fresca",
+        image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=900&q=85"
+      },
+      "lechuga": {
+        unitPrice: 1.75, promoQty: 1, promoPrice: 1.75, promoLabel: "1 x $1.75",
+        category: "Verduras", badge: "Fresco",
+        image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=900&q=85"
+      },
+      "aguacate": {
+        unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00",
+        category: "Frutas", badge: "Al punto",
+        image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=900&q=85"
+      },
+      "limón": {
+        unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, promoLabel: "8 x $1.00",
+        category: "Frutas", badge: "Jugoso",
+        image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=900&q=85"
+      },
+      "papa": {
+        unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, promoLabel: "1 libra x $1.50",
+        category: "Verduras", badge: "Fresco",
+        image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=900&q=85"
+      },
+      "elote": {
+        unitPrice: 0.75, promoQty: 1, promoPrice: 0.75, promoLabel: "1 x $0.75",
+        category: "Verduras", badge: "Tierno",
+        image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=900&q=85"
+      },
+      "güisquil": {
+        unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00",
+        category: "Verduras", badge: "Tierno",
+        image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=900&q=85"
+      },
+      "pepino": {
+        unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00",
+        category: "Verduras", badge: "Fresco",
+        image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=900&q=85"
+      },
+      "rábano": {
+        unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25",
+        category: "Verduras", badge: "Crujiente",
+        image: "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?auto=format&fit=crop&w=900&q=85"
+      },
+      "zanahoria": {
+        unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00",
+        category: "Verduras", badge: "Firme",
+        image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=900&q=85"
+      }
     };
 
     const seedData = () => ({
@@ -744,6 +809,10 @@
         const promoPrice = Number(item.promoPrice ?? item.salePrice ?? meta.promoPrice ?? 1.00);
         const promoQty = Math.max(1, Number(item.promoQty ?? meta.promoQty ?? 1));
         const unitPrice = Number(item.unitPrice ?? meta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
+        const imageUrl = (typeof item.image === "string" && item.image.trim().startsWith("http"))
+          ? item.image.trim()
+          : (meta.image || FALLBACK_IMAGE);
+
         return {
           id: item.id,
           name: item.name,
@@ -754,7 +823,7 @@
           salePrice: Number(promoPrice.toFixed(2)),
           promoLabel: item.promoLabel || meta.promoLabel || `${promoQty} x ${fmt(promoPrice)}`,
           badge: item.badge ?? meta.badge ?? "",
-          image: item.image || meta.image || FALLBACK_IMAGE
+          image: imageUrl
         };
       });
 
@@ -774,7 +843,7 @@
             salePrice: Number(promoPrice.toFixed(2)),
             promoLabel: item.promoLabel || `${promoQty} x ${fmt(promoPrice)}`,
             badge: item.badge || "",
-            image: item.image || FALLBACK_IMAGE
+            image: (typeof item.image === "string" && item.image.trim().startsWith("http")) ? item.image.trim() : FALLBACK_IMAGE
           };
         });
 
@@ -827,21 +896,40 @@
     let sortDesc = true;
     let toastTimer = null;
     let activeDayTracker = todayISO();
+    let isApplyingRemoteUpdate = false;
+    let realtimeChannel = null;
+
+    function setCloudBadge(text, tone = "ok") {
+      const badge = document.getElementById("cloudSyncBadge");
+      if (!badge) return;
+      badge.textContent = text;
+      badge.className = tone === "warn"
+        ? "px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[11px] font-extrabold"
+        : "px-2.5 py-0.5 rounded-full bg-emerald-800 border border-emerald-600 text-emerald-100 text-[11px] font-bold";
+    }
 
     async function syncToCloud() {
-      if (!supabaseClient) return;
+      if (!supabaseClient) {
+        setCloudBadge("Solo local", "warn");
+        return;
+      }
       try {
         const { error } = await supabaseClient
           .from("store_control")
           .upsert({
             id: CLOUD_ROW_ID,
-            data: db,
-            updated_at: new Date().toISOString()
-          });
+            data: db
+          }, { onConflict: "id" });
+
         if (error) {
-          showToast("Guardado local; verifica la conexión o permisos con Supabase.", "danger");
+          setCloudBadge("Error nube", "warn");
+          showToast("Guardado local; verifica conexión o permisos en Supabase.", "danger");
+        } else {
+          setCloudBadge("Nube sincronizada", "ok");
         }
-      } catch {}
+      } catch {
+        setCloudBadge("Sin red", "warn");
+      }
     }
 
     const saveDB = () => {
@@ -861,14 +949,40 @@
             .maybeSingle();
 
           if (!error && data?.data) {
+            isApplyingRemoteUpdate = true;
             db = normalizeDB(data.data);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+            isApplyingRemoteUpdate = false;
+            setCloudBadge("Nube sincronizada", "ok");
           } else if (!error && !data) {
             await syncToCloud();
           }
-        } catch {}
+        } catch {
+          setCloudBadge("Caché local", "warn");
+        }
       }
       render();
+    }
+
+    function subscribeRealtime() {
+      if (!supabaseClient || realtimeChannel) return;
+      realtimeChannel = supabaseClient
+        .channel("dashboard_store_control_sync")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "store_control", filter: `id=eq.${CLOUD_ROW_ID}` },
+          (payload) => {
+            const incoming = payload?.new?.data;
+            if (!incoming) return;
+            isApplyingRemoteUpdate = true;
+            db = normalizeDB(incoming);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+            isApplyingRemoteUpdate = false;
+            setCloudBadge("Nube sincronizada", "ok");
+            render();
+          }
+        )
+        .subscribe();
     }
 
     function checkMidnightRollover() {
@@ -885,15 +999,56 @@
     }
 
     setInterval(checkMidnightRollover, 30000);
+    setInterval(() => {
+      if (!document.getElementById("appScreen").classList.contains("hidden")) {
+        loadFromCloudAndRender();
+      }
+    }, 25000);
+
+    window.addEventListener("focus", () => {
+      if (!document.getElementById("appScreen").classList.contains("hidden")) {
+        loadFromCloudAndRender();
+      }
+    });
 
     window.addEventListener("storage", (e) => {
-      if (e.key === STORAGE_KEY && e.newValue) {
+      if (e.key === STORAGE_KEY && e.newValue && !isApplyingRemoteUpdate) {
         try {
           db = normalizeDB(JSON.parse(e.newValue));
           render();
           showToast("Datos actualizados.");
         } catch {}
       }
+    });
+
+    async function enterAppSession() {
+      document.getElementById("authScreen").classList.add("hidden");
+      document.getElementById("appScreen").classList.remove("hidden");
+      document.getElementById("saleDate").value = todayISO();
+      document.getElementById("expDt").value = todayISO();
+      subscribeRealtime();
+      await loadFromCloudAndRender();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (!supabaseClient) return;
+      try {
+        const { data } = await supabaseClient.auth.getSession();
+        if (data?.session) {
+          await enterAppSession();
+        }
+      } catch {}
+
+      supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
+          if (!document.getElementById("appScreen").classList.contains("hidden")) {
+            await loadFromCloudAndRender();
+          }
+        } else if (event === "SIGNED_OUT") {
+          document.getElementById("appScreen").classList.add("hidden");
+          document.getElementById("authScreen").classList.remove("hidden");
+        }
+      });
     });
 
     function showToast(msg, tone = "success") {
@@ -903,7 +1058,7 @@
         ? "bg-rose-50 text-rose-800 border-rose-200"
         : "bg-emerald-50 text-emerald-900 border-emerald-200";
       el.className = `rounded-2xl px-4 py-3 text-xs font-bold border flex items-center justify-between gap-2 ${styles}`;
-      el.innerHTML = `<span>${escapeHTML(msg)}</span><button type="button" onclick="hideToast()" class="text-[11px] underline cursor-pointer">Cerrar</button>`;
+      el.innerHTML = `<span>${escapeHTML(msg)}</span><button type="button" onclick="hideToast()" class="min-h-[32px] px-2 text-[11px] underline cursor-pointer">Cerrar</button>`;
       el.classList.remove("hidden");
       clearTimeout(toastTimer);
       toastTimer = setTimeout(hideToast, 4200);
@@ -942,11 +1097,7 @@
       }
 
       errorEl.classList.add("hidden");
-      document.getElementById("authScreen").classList.add("hidden");
-      document.getElementById("appScreen").classList.remove("hidden");
-      document.getElementById("saleDate").value = todayISO();
-      document.getElementById("expDt").value = todayISO();
-      await loadFromCloudAndRender();
+      await enterAppSession();
     }
 
     async function logout() {
@@ -992,8 +1143,11 @@
       const idx = db.orders.findIndex(o => String(o.id) === String(orderId));
       if (idx === -1) return;
       const order = db.orders[idx];
+
+      const selectEl = document.getElementById(`confirmMethod_${CSS.escape(String(orderId))}`);
+      const chosenMethod = selectEl ? selectEl.value : (order.payment === "Transferencia" ? "Transferencia" : "Efectivo");
+      const method = ["Efectivo", "Transferencia", "Tarjeta"].includes(chosenMethod) ? chosenMethod : "Efectivo";
       const saleDate = todayISO();
-      const method = order.payment === "Transferencia" ? "Transferencia" : "Efectivo";
 
       const items = Array.isArray(order.items) ? order.items : [];
       if (items.length) {
@@ -1003,7 +1157,7 @@
             ? `${item.name} (${item.qty} u)`
             : `${item.name} (${item.qty}x ${item.modeLabel || "Porción"})`;
           db.sales.unshift({
-            id: `${Date.now()}-${i}`,
+            id: `${Date.now()}-${i}-${Math.random().toString(36).slice(2, 6)}`,
             date: saleDate,
             product: `${label} — ${order.customer || "Cliente"}`,
             amount: Number((Number(item.price || 0) * Number(item.qty || 1)).toFixed(2)),
@@ -1013,7 +1167,7 @@
         });
       } else {
         db.sales.unshift({
-          id: String(Date.now()),
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
           date: saleDate,
           product: `Pedido ${order.customer || "Cliente"}`,
           amount: Number(order.estimatedTotal || 0),
@@ -1461,17 +1615,18 @@
 
       syncProductSuggestions();
 
-      // Pedidos pendientes
+      // Pedidos pendientes (nunca entran a ventas hasta confirmarse)
       const pendingOrders = Array.isArray(db.orders) ? db.orders : [];
       document.getElementById("pendingOrdersBadge").textContent = `${pendingOrders.length} ${pendingOrders.length === 1 ? "pendiente" : "pendientes"}`;
       document.getElementById("pendingOrdersList").innerHTML = pendingOrders.length
         ? pendingOrders.map(order => {
             const customer = escapeHTML(order.customer || "Cliente");
             const pickup = escapeHTML(order.pickup || "Retiro en local");
-            const payment = escapeHTML(order.payment || "Efectivo");
+            const defaultMethod = order.payment === "Transferencia" ? "Transferencia" : "Efectivo";
             const itemsSummary = Array.isArray(order.items) && order.items.length
               ? escapeHTML(order.items.map(i => `${i.name} (${i.qty}x ${i.modeLabel || "Unidad"})`).join(", "))
               : "Detalle en WhatsApp";
+            const methodSelectId = `confirmMethod_${escapeHTML(String(order.id))}`;
 
             return `
               <div class="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 flex flex-col justify-between gap-3">
@@ -1480,22 +1635,31 @@
                     <p class="text-sm font-extrabold text-slate-900">${customer}</p>
                     <span class="text-sm font-extrabold text-emerald-900">${fmt(order.estimatedTotal)}</span>
                   </div>
-                  <p class="text-xs text-slate-600">${pickup} • <strong>${payment}</strong> • ${escapeHTML(order.date || t)}</p>
+                  <p class="text-xs text-slate-600">${pickup} • Solicitó: <strong>${escapeHTML(defaultMethod)}</strong> • ${escapeHTML(order.date || t)}</p>
                   <p class="text-xs text-slate-700 bg-white rounded-xl p-2 border border-amber-100">${itemsSummary}</p>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2">
+                  <select
+                    id="${methodSelectId}"
+                    aria-label="Método de cobro al confirmar"
+                    class="min-h-[42px] px-2.5 py-2 rounded-xl border border-amber-300 bg-white text-xs font-extrabold text-slate-800 cursor-pointer"
+                  >
+                    <option value="Efectivo" ${defaultMethod === "Efectivo" ? "selected" : ""}>Efectivo</option>
+                    <option value="Transferencia" ${defaultMethod === "Transferencia" ? "selected" : ""}>Transferencia</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                  </select>
                   <button
                     type="button"
                     onclick="confirmPendingOrder(${jsArg(order.id)})"
-                    class="flex-1 min-h-[40px] px-3 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-xs cursor-pointer transition"
+                    class="flex-1 min-h-[42px] px-3 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-xs cursor-pointer transition"
                   >
                     ✓ Confirmar venta
                   </button>
                   <button
                     type="button"
                     onclick="cancelPendingOrder(${jsArg(order.id)})"
-                    class="min-h-[40px] px-3 py-2 rounded-xl bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 font-bold text-xs cursor-pointer transition"
+                    class="min-h-[42px] px-3 py-2 rounded-xl bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 font-bold text-xs cursor-pointer transition"
                   >
                     Descartar
                   </button>
@@ -1581,8 +1745,8 @@
             </p>
           </div>
           <div class="flex items-center gap-1 shrink-0">
-            <button type="button" onclick="openEditProduct(${jsArg(item.id)})" class="min-h-[34px] px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:bg-teal-50 hover:text-teal-800 font-bold text-[11px] cursor-pointer">Editar</button>
-            <button type="button" onclick="deleteProductItem(${jsArg(item.id)})" aria-label="Eliminar ${escapeHTML(item.name)}" class="min-h-[34px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer">✕</button>
+            <button type="button" onclick="openEditProduct(${jsArg(item.id)})" class="min-h-[38px] px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:bg-teal-50 hover:text-teal-800 font-bold text-[11px] cursor-pointer">Editar</button>
+            <button type="button" onclick="deleteProductItem(${jsArg(item.id)})" aria-label="Eliminar ${escapeHTML(item.name)}" class="min-h-[38px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer">✕</button>
           </div>
         </div>
       `).join("");
@@ -1607,7 +1771,7 @@
               <button
                 type="button"
                 onclick="toggleWeeklyPaid(${jsArg(wk.id)})"
-                class="min-h-[38px] px-3 py-1.5 rounded-xl font-extrabold text-xs cursor-pointer transition ${
+                class="min-h-[40px] px-3 py-1.5 rounded-xl font-extrabold text-xs cursor-pointer transition ${
                   wk.paid
                     ? "bg-slate-200 hover:bg-slate-300 text-slate-800"
                     : "bg-emerald-800 hover:bg-emerald-900 text-white"
@@ -1618,7 +1782,7 @@
               <button
                 type="button"
                 onclick="deleteWeeklyPayment(${jsArg(wk.id)})"
-                class="min-h-[38px] px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-xs cursor-pointer"
+                class="min-h-[40px] px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-xs cursor-pointer"
               >
                 ✕
               </button>
@@ -1728,7 +1892,7 @@
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <span class="px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-900 font-extrabold">${fmt(s.amount)}</span>
-              <button type="button" onclick="deleteSale(${jsArg(s.id)})" aria-label="Eliminar venta" class="min-h-[34px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer">✕</button>
+              <button type="button" onclick="deleteSale(${jsArg(s.id)})" aria-label="Eliminar venta" class="min-h-[36px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer">✕</button>
             </div>
           </div>
         `).join("")
@@ -1745,7 +1909,7 @@
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <span class="px-2.5 py-1 rounded-xl bg-rose-50 text-rose-600 font-extrabold">${fmt(g.amount)}</span>
-              <button type="button" onclick="deleteExpense(${jsArg(g.id)})" aria-label="Eliminar gasto" class="min-h-[34px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer">✕</button>
+              <button type="button" onclick="deleteExpense(${jsArg(g.id)})" aria-label="Eliminar gasto" class="min-h-[36px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-500 font-bold text-[11px] cursor-pointer">✕</button>
             </div>
           </div>
         `).join("")
