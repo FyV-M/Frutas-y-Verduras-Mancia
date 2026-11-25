@@ -519,11 +519,18 @@
           badge: item.badge || "",
           image: item.image || "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80"
         }));
+
+      const salesList = Array.isArray(parsed.sales) ? [...parsed.sales] : [...base.sales];
+      const hasNov24Sale = salesList.some(s => s && s.date === "2026-11-24" && Math.abs(Number(s.amount || 0) - 31.25) < 0.001);
+      if (!hasNov24Sale) {
+        salesList.push({ id: 2401, date: "2026-11-24", product: "Ventas del día (libreta)", amount: 31.25, qty: 0, category: "Verduras", method: "Efectivo" });
+      }
+
       return {
         openingCash: Number(parsed.openingCash || 0),
         inventory: [...inv, ...extraInv],
         weeklyPayments: Array.isArray(parsed.weeklyPayments) ? parsed.weeklyPayments : base.weeklyPayments,
-        sales: Array.isArray(parsed.sales) ? parsed.sales : base.sales,
+        sales: salesList,
         expenses: Array.isArray(parsed.expenses) ? parsed.expenses : base.expenses
       };
     }
@@ -569,8 +576,12 @@
           .maybeSingle();
 
         if (!error && data && data.data) {
+          const hadNov24 = Array.isArray(data.data.sales) && data.data.sales.some(s => s && s.date === "2026-11-24" && Math.abs(Number(s.amount || 0) - 31.25) < 0.001);
           const normalized = normalizeStoreDB(data.data);
           saveStoreDB(normalized);
+          if (!hadNov24) {
+            await syncStoreDBToCloud(normalized);
+          }
           return normalized;
         }
       } catch (e) {}
@@ -580,6 +591,7 @@
     // Cada item en cart: { key, name, mode: 'unit' | 'promo', modeLabel, price, packSize, qty }
     let cart = [];
     let currentCategory = "todos";
+    let activeLocalDay = todaySV();
 
     document.addEventListener("DOMContentLoaded", async () => {
       renderCategoryFilters();
@@ -587,7 +599,14 @@
       renderLocalPos();
       initManciaMap();
       updateOpenStatus();
-      setInterval(updateOpenStatus, 60000);
+      setInterval(() => {
+        updateOpenStatus();
+        const currentDay = todaySV();
+        if (currentDay !== activeLocalDay) {
+          activeLocalDay = currentDay;
+          renderLocalPos();
+        }
+      }, 30000);
       await fetchCloudStoreDB();
       renderProducts();
       renderLocalPos();
@@ -626,6 +645,7 @@
     function renderLocalPos() {
       const db = loadStoreDB();
       const today = todaySV();
+      activeLocalDay = today;
       const todaySales = db.sales.filter(s => s.date === today);
       const total = todaySales.reduce((acc, s) => acc + Number(s.amount || 0), 0);
       const cash = todaySales.filter(s => s.method === "Efectivo").reduce((acc, s) => acc + Number(s.amount || 0), 0);
@@ -686,7 +706,7 @@
       const deductStock = Boolean(document.getElementById("localPosDeductStock")?.checked);
       const today = todaySV();
 
-      const db = loadStoreDB();
+      const db = await fetchCloudStoreDB();
       db.sales.unshift({
         id: Date.now(),
         date: today,
