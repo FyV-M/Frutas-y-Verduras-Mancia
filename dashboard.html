@@ -197,7 +197,7 @@
               onclick="editOpeningCash()"
               class="text-xs font-extrabold text-emerald-800 hover:underline cursor-pointer"
             >
-              Base ($0.00)
+              Base ($146.45)
             </button>
           </div>
         </div>
@@ -207,16 +207,16 @@
       <section class="bg-white rounded-3xl border border-slate-200 shadow-xs p-4 sm:p-5">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
           <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Flujo por método de pago (neto acumulado)</h2>
-          <span id="baseCashHeaderLabel" class="text-[11px] text-slate-500 font-semibold">Base inicial: $0.00</span>
+          <span id="baseCashHeaderLabel" class="text-[11px] text-slate-500 font-semibold">Base inicial: $146.45</span>
         </div>
         <div id="methodBreakdown" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
       </section>
 
-      <!-- CATÁLOGO DE 16 PRODUCTOS -->
+      <!-- CATÁLOGO DE PRODUCTOS -->
       <section class="bg-white rounded-3xl border border-teal-200 shadow-xs p-4 sm:p-5 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div>
-            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Precios por unidad y porción</h2>
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Precios, fotos y stock del catálogo</h2>
             <p class="text-xs text-slate-500">Sincronizado con la tienda y la caja local.</p>
           </div>
           <div class="flex items-center gap-2">
@@ -529,14 +529,15 @@
     <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
       <div class="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 space-y-4 pointer-events-auto shadow-2xl border border-teal-200">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 id="productModalTitle" class="text-base font-extrabold text-teal-900">Producto: unitario y porción</h3>
+          <h3 id="productModalTitle" class="text-base font-extrabold text-teal-900">Editar / Nuevo Producto</h3>
           <button type="button" onclick="closeModal('productModal')" class="min-h-[36px] px-3 py-1 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer">✕</button>
         </div>
 
         <form onsubmit="saveProductItem(event)" class="space-y-3">
+          <input type="hidden" id="prodEditId" value="" />
           <div>
             <label for="prodName" class="block text-xs font-bold text-slate-600 mb-1">Nombre del producto</label>
-            <input type="text" id="prodName" list="productSuggestions" required placeholder="Ej. Tomate" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold" />
+            <input type="text" id="prodName" required placeholder="Ej. Tomate" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold" />
           </div>
 
           <div class="grid grid-cols-3 gap-2">
@@ -550,7 +551,7 @@
             </div>
             <div>
               <label for="prodPromoPrice" class="block text-xs font-bold text-slate-600 mb-1">Precio ($)</label>
-              <input type="number" step="0.01" min="0.01" id="prodPromoPrice" value="1.00" required class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold" />
+              <input type="number" step="0.01" min="0.01" id="prodPromoPrice" value="1.00" required class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-extrabold" />
             </div>
           </div>
 
@@ -569,9 +570,23 @@
             </div>
           </div>
 
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="prodBadge" class="block text-xs font-bold text-slate-600 mb-1">Etiqueta (opcional)</label>
+              <input type="text" id="prodBadge" placeholder="Ej. Fresco hoy" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold" />
+            </div>
+            <div>
+              <label for="prodStatus" class="block text-xs font-bold text-slate-600 mb-1">Disponibilidad</label>
+              <select id="prodStatus" class="w-full min-h-[44px] px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold">
+                <option value="available">Disponible en tienda</option>
+                <option value="out">Agotado hoy</option>
+              </select>
+            </div>
+          </div>
+
           <div>
-            <label for="prodBadge" class="block text-xs font-bold text-slate-600 mb-1">Etiqueta (opcional)</label>
-            <input type="text" id="prodBadge" placeholder="Ej. Fresco hoy" class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold" />
+            <label for="prodImage" class="block text-xs font-bold text-slate-600 mb-1">Enlace de imagen (URL)</label>
+            <input type="url" id="prodImage" placeholder="https://..." class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold" />
           </div>
 
           <button type="submit" class="w-full min-h-[46px] py-3 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white font-extrabold text-sm shadow-md cursor-pointer">
@@ -705,7 +720,7 @@
     };
 
     const seedData = () => ({
-      openingCash: 0.00,
+      openingCash: 146.45,
       products: Object.entries(CATALOG_META).map(([name, meta], idx) => ({
         id: 101 + idx,
         name: name.replace(/\b\p{L}/gu, c => c.toLocaleUpperCase("es")),
@@ -716,14 +731,351 @@
         salePrice: meta.promoPrice,
         promoLabel: meta.promoLabel,
         badge: meta.badge,
-        image: meta.image
+        image: meta.image,
+        outOfStock: false
       })),
       weeklyPayments: [
-        { id: 501, concept: "Alquiler / Cuota de puesto semanal", amount: 25.00, payDay: "Domingo", method: "Efectivo", paid: false, paidDate: "" },
+        { id: 501, concept: "Alquiler / Cuota de puesto semanal", amount: 25.00, payDay: "Domingo", method: "Efectivo", paid: true, paidDate: "2026-11-21" },
         { id: 502, concept: "Transporte / Flete semanal", amount: 15.00, payDay: "Miércoles", method: "Efectivo", paid: false, paidDate: "" }
       ],
-      sales: [],
-      expenses: [],
+      sales: [
+        // 18/Nov/26
+        { id: "s-18-1", date: "2026-11-18", product: "Jalapeño", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-2", date: "2026-11-18", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-3", date: "2026-11-18", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-4", date: "2026-11-18", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-5", date: "2026-11-18", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-6", date: "2026-11-18", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-7", date: "2026-11-18", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-8", date: "2026-11-18", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-9", date: "2026-11-18", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-10", date: "2026-11-18", product: "Cebolla", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-11", date: "2026-11-18", product: "Jalapeño", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-12", date: "2026-11-18", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-13", date: "2026-11-18", product: "Zanahoria", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-14", date: "2026-11-18", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-15", date: "2026-11-18", product: "Cebolla Morada", amount: 3.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-16", date: "2026-11-18", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-17", date: "2026-11-18", product: "Zanahoria", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-18", date: "2026-11-18", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-19", date: "2026-11-18", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-18-20", date: "2026-11-18", product: "Cebolla", amount: 1.00, category: "Verduras", method: "Efectivo" },
+
+        // 19/Nov/26
+        { id: "s-19-1", date: "2026-11-19", product: "Cebolla Blanca", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-19-2", date: "2026-11-19", product: "Zanahoria", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-19-3", date: "2026-11-19", product: "Cebolla Blanca", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-19-4", date: "2026-11-19", product: "Zanahoria", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-19-5", date: "2026-11-19", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-19-6", date: "2026-11-19", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-19-7", date: "2026-11-19", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-19-8", date: "2026-11-19", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-19-9", date: "2026-11-19", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-19-10", date: "2026-11-19", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-19-11", date: "2026-11-19", product: "Rábano", amount: 1.00, category: "Verduras", method: "Efectivo" },
+
+        // 20/Nov/26
+        { id: "s-20-1", date: "2026-11-20", product: "Rábano", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-2", date: "2026-11-20", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-3", date: "2026-11-20", product: "Cebolla Blanca", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-4", date: "2026-11-20", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-5", date: "2026-11-20", product: "Aguacate", amount: 2.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-20-6", date: "2026-11-20", product: "Rábano", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-7", date: "2026-11-20", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-8", date: "2026-11-20", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-9", date: "2026-11-20", product: "Cebolla Blanca", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-10", date: "2026-11-20", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-11", date: "2026-11-20", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-12", date: "2026-11-20", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-13", date: "2026-11-20", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-14", date: "2026-11-20", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-15", date: "2026-11-20", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-16", date: "2026-11-20", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-17", date: "2026-11-20", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-18", date: "2026-11-20", product: "Aguacate", amount: 2.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-20-19", date: "2026-11-20", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-20", date: "2026-11-20", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-21", date: "2026-11-20", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-22", date: "2026-11-20", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-23", date: "2026-11-20", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-20-24", date: "2026-11-20", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-25", date: "2026-11-20", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-26", date: "2026-11-20", product: "Rábano", amount: 0.80, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-27", date: "2026-11-20", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-28", date: "2026-11-20", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-29", date: "2026-11-20", product: "Rábano", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-30", date: "2026-11-20", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-31", date: "2026-11-20", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-20-32", date: "2026-11-20", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-33", date: "2026-11-20", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-34", date: "2026-11-20", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-35", date: "2026-11-20", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-36", date: "2026-11-20", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-20-37", date: "2026-11-20", product: "Rábano", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-38", date: "2026-11-20", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-39", date: "2026-11-20", product: "Chile jalapeño", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-40", date: "2026-11-20", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-20-41", date: "2026-11-20", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+
+        // 21/Nov/26
+        { id: "s-21-1", date: "2026-11-21", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-2", date: "2026-11-21", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-3", date: "2026-11-21", product: "Chile jalapeño", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-4", date: "2026-11-21", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-5", date: "2026-11-21", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-6", date: "2026-11-21", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-7", date: "2026-11-21", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-8", date: "2026-11-21", product: "Rábano", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-9", date: "2026-11-21", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-10", date: "2026-11-21", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-11", date: "2026-11-21", product: "Güisquil", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-12", date: "2026-11-21", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-13", date: "2026-11-21", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-14", date: "2026-11-21", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-21-15", date: "2026-11-21", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-16", date: "2026-11-21", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-17", date: "2026-11-21", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-18", date: "2026-11-21", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-21-19", date: "2026-11-21", product: "Rábano", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-20", date: "2026-11-21", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-21", date: "2026-11-21", product: "Jalapeño", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-22", date: "2026-11-21", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-23", date: "2026-11-21", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-24", date: "2026-11-21", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-25", date: "2026-11-21", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-26", date: "2026-11-21", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-27", date: "2026-11-21", product: "Rábano", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-28", date: "2026-11-21", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-29", date: "2026-11-21", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-30", date: "2026-11-21", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-31", date: "2026-11-21", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-32", date: "2026-11-21", product: "Cebolla Morada", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-33", date: "2026-11-21", product: "Güisquil", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-34", date: "2026-11-21", product: "Pepino", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-35", date: "2026-11-21", product: "Chile verde", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-36", date: "2026-11-21", product: "Aguacate", amount: 2.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-21-37", date: "2026-11-21", product: "Rábano", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-38", date: "2026-11-21", product: "Limón", amount: 0.75, category: "Frutas", method: "Efectivo" },
+        { id: "s-21-39", date: "2026-11-21", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-40", date: "2026-11-21", product: "Pepino", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-41", date: "2026-11-21", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-42", date: "2026-11-21", product: "Aguacate", amount: 2.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-21-43", date: "2026-11-21", product: "Rábano", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-44", date: "2026-11-21", product: "Cebolla Morada", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-45", date: "2026-11-21", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-46", date: "2026-11-21", product: "Cebolla Blanca", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-47", date: "2026-11-21", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-48", date: "2026-11-21", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-49", date: "2026-11-21", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-50", date: "2026-11-21", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-51", date: "2026-11-21", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-52", date: "2026-11-21", product: "Güisquil", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-53", date: "2026-11-21", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-54", date: "2026-11-21", product: "Güisquil", amount: 5.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-21-55", date: "2026-11-21", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+
+        // 22/Nov/26
+        { id: "s-22-1", date: "2026-11-22", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-2", date: "2026-11-22", product: "Cebolla", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-3", date: "2026-11-22", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-4", date: "2026-11-22", product: "Rábano", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-5", date: "2026-11-22", product: "Cebolla", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-6", date: "2026-11-22", product: "Caja de tomate", amount: 20.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-7", date: "2026-11-22", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-8", date: "2026-11-22", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-9", date: "2026-11-22", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-10", date: "2026-11-22", product: "Pepino", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-11", date: "2026-11-22", product: "Chile verde", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-12", date: "2026-11-22", product: "Limón", amount: 0.50, category: "Frutas", method: "Efectivo" },
+        { id: "s-22-13", date: "2026-11-22", product: "Limón", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-22-14", date: "2026-11-22", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-15", date: "2026-11-22", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-16", date: "2026-11-22", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-17", date: "2026-11-22", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-18", date: "2026-11-22", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-19", date: "2026-11-22", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-20", date: "2026-11-22", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-21", date: "2026-11-22", product: "Cebolla", amount: 3.95, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-22", date: "2026-11-22", product: "Cebolla", amount: 4.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-23", date: "2026-11-22", product: "Pepino", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-24", date: "2026-11-22", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-25", date: "2026-11-22", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-26", date: "2026-11-22", product: "Tomate", amount: 1.35, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-27", date: "2026-11-22", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-28", date: "2026-11-22", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-22-29", date: "2026-11-22", product: "Limón", amount: 0.50, category: "Frutas", method: "Efectivo" },
+
+        // 23/Nov/26
+        { id: "s-23-1", date: "2026-11-23", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-2", date: "2026-11-23", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-3", date: "2026-11-23", product: "Limón", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-23-4", date: "2026-11-23", product: "Caja de tomate", amount: 35.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-5", date: "2026-11-23", product: "Pepino", amount: 4.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-6", date: "2026-11-23", product: "Chile verde", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-7", date: "2026-11-23", product: "Güisquil", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-8", date: "2026-11-23", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-9", date: "2026-11-23", product: "Plátano", amount: 1.35, category: "Frutas", method: "Efectivo" },
+        { id: "s-23-10", date: "2026-11-23", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-11", date: "2026-11-23", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-12", date: "2026-11-23", product: "Limón", amount: 0.50, category: "Frutas", method: "Efectivo" },
+        { id: "s-23-13", date: "2026-11-23", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-23-14", date: "2026-11-23", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-23-15", date: "2026-11-23", product: "Zanahoria", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-16", date: "2026-11-23", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-17", date: "2026-11-23", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-18", date: "2026-11-23", product: "Limón", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-23-19", date: "2026-11-23", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-20", date: "2026-11-23", product: "Papa", amount: 3.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-21", date: "2026-11-23", product: "Rábano", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-22", date: "2026-11-23", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-23", date: "2026-11-23", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-24", date: "2026-11-23", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-25", date: "2026-11-23", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-26", date: "2026-11-23", product: "Aguacate", amount: 2.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-23-27", date: "2026-11-23", product: "Rábano", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-28", date: "2026-11-23", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-29", date: "2026-11-23", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-30", date: "2026-11-23", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-31", date: "2026-11-23", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-32", date: "2026-11-23", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-33", date: "2026-11-23", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-34", date: "2026-11-23", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-23-35", date: "2026-11-23", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-36", date: "2026-11-23", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-37", date: "2026-11-23", product: "Pepino", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-38", date: "2026-11-23", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-39", date: "2026-11-23", product: "Aguacate", amount: 2.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-23-40", date: "2026-11-23", product: "Rábano", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-41", date: "2026-11-23", product: "Cebolla Morada", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-42", date: "2026-11-23", product: "Jalapeño", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-43", date: "2026-11-23", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-44", date: "2026-11-23", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-45", date: "2026-11-23", product: "Cebolla Morada", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-46", date: "2026-11-23", product: "Plátano", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-23-47", date: "2026-11-23", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-48", date: "2026-11-23", product: "Jalapeño", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-49", date: "2026-11-23", product: "Ajo", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-23-50", date: "2026-11-23", product: "Aguacate", amount: 4.00, category: "Frutas", method: "Efectivo" },
+
+        // 24/Nov/26
+        { id: "s-24-1", date: "2026-11-24", product: "Limón", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-24-2", date: "2026-11-24", product: "Papa", amount: 6.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-3", date: "2026-11-24", product: "Pepino", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-4", date: "2026-11-24", product: "Rábano", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-5", date: "2026-11-24", product: "Zanahoria", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-6", date: "2026-11-24", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-7", date: "2026-11-24", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-8", date: "2026-11-24", product: "Limón", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-24-9", date: "2026-11-24", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-10", date: "2026-11-24", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-11", date: "2026-11-24", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-12", date: "2026-11-24", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-24-13", date: "2026-11-24", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-24-14", date: "2026-11-24", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-15", date: "2026-11-24", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-16", date: "2026-11-24", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-17", date: "2026-11-24", product: "Aguacate", amount: 0.50, category: "Frutas", method: "Efectivo" },
+        { id: "s-24-18", date: "2026-11-24", product: "Ajo", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-19", date: "2026-11-24", product: "Plátano", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-24-20", date: "2026-11-24", product: "Plátano", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-24-21", date: "2026-11-24", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-24-22", date: "2026-11-24", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-23", date: "2026-11-24", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-24", date: "2026-11-24", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-24-25", date: "2026-11-24", product: "Cebolla", amount: 1.00, category: "Verduras", method: "Efectivo" },
+
+        // 25/Nov/26
+        { id: "s-25-1", date: "2026-11-25", product: "Pepino", amount: 1.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-2", date: "2026-11-25", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-3", date: "2026-11-25", product: "Plátano", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-25-4", date: "2026-11-25", product: "Pepino", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-5", date: "2026-11-25", product: "Rábano", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-6", date: "2026-11-25", product: "Cebolla", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-7", date: "2026-11-25", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-8", date: "2026-11-25", product: "Aguacate", amount: 2.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-25-9", date: "2026-11-25", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-10", date: "2026-11-25", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-11", date: "2026-11-25", product: "Güisquil", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-12", date: "2026-11-25", product: "Pepino", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-13", date: "2026-11-25", product: "Limón", amount: 0.50, category: "Frutas", method: "Efectivo" },
+        { id: "s-25-14", date: "2026-11-25", product: "Lechuga", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-15", date: "2026-11-25", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-16", date: "2026-11-25", product: "Ajo", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-17", date: "2026-11-25", product: "Pepino", amount: 3.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-18", date: "2026-11-25", product: "Güisquil", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-19", date: "2026-11-25", product: "Limón", amount: 0.25, category: "Frutas", method: "Efectivo" },
+        { id: "s-25-20", date: "2026-11-25", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-21", date: "2026-11-25", product: "Pepino", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-22", date: "2026-11-25", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-25-23", date: "2026-11-25", product: "Pepino", amount: 0.25, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-24", date: "2026-11-25", product: "Rábano", amount: 0.25, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-25", date: "2026-11-25", product: "Aguacate", amount: 2.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-25-26", date: "2026-11-25", product: "Lechuga", amount: 1.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-27", date: "2026-11-25", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-28", date: "2026-11-25", product: "Plátano", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-25-29", date: "2026-11-25", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-25-30", date: "2026-11-25", product: "Plátano", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-25-31", date: "2026-11-25", product: "Elote", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-32", date: "2026-11-25", product: "Güisquil", amount: 3.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-25-33", date: "2026-11-25", product: "Aguacate", amount: 3.00, category: "Frutas", method: "Efectivo" },
+
+        // 26/Nov/26
+        { id: "s-26-1", date: "2026-11-26", product: "Repollo", amount: 12.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-2", date: "2026-11-26", product: "Lechuga", amount: 5.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-3", date: "2026-11-26", product: "Pepino", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-4", date: "2026-11-26", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-5", date: "2026-11-26", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-6", date: "2026-11-26", product: "Chile jalapeño", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-7", date: "2026-11-26", product: "Zanahoria", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-8", date: "2026-11-26", product: "Tomate", amount: 3.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-9", date: "2026-11-26", product: "Cebolla", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-10", date: "2026-11-26", product: "Repollo", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-11", date: "2026-11-26", product: "Limón", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-26-12", date: "2026-11-26", product: "Güisquil", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-13", date: "2026-11-26", product: "Repollo", amount: 2.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-14", date: "2026-11-26", product: "Repollo", amount: 2.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-15", date: "2026-11-26", product: "Limón", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-26-16", date: "2026-11-26", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-17", date: "2026-11-26", product: "Aguacate", amount: 0.50, category: "Frutas", method: "Efectivo" },
+        { id: "s-26-18", date: "2026-11-26", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-19", date: "2026-11-26", product: "Aguacate", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-26-20", date: "2026-11-26", product: "Cebolla", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-21", date: "2026-11-26", product: "Tomate", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-22", date: "2026-11-26", product: "Aguacate", amount: 2.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-26-23", date: "2026-11-26", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-24", date: "2026-11-26", product: "Pepino", amount: 4.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-25", date: "2026-11-26", product: "Chile verde", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-26", date: "2026-11-26", product: "Plátano", amount: 1.00, category: "Frutas", method: "Efectivo" },
+        { id: "s-26-27", date: "2026-11-26", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-28", date: "2026-11-26", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-26-29", date: "2026-11-26", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+
+        // 27/Nov/26
+        { id: "s-27-1", date: "2026-11-27", product: "Chile verde", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-2", date: "2026-11-27", product: "Cebolla Blanca", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-3", date: "2026-11-27", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-4", date: "2026-11-27", product: "Pepino", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-5", date: "2026-11-27", product: "Chile verde", amount: 2.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-6", date: "2026-11-27", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-7", date: "2026-11-27", product: "Pepino", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-8", date: "2026-11-27", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-9", date: "2026-11-27", product: "Cebolla Blanca", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-10", date: "2026-11-27", product: "Chile verde", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-11", date: "2026-11-27", product: "Limón", amount: 0.40, category: "Frutas", method: "Efectivo" },
+        { id: "s-27-12", date: "2026-11-27", product: "Papa", amount: 0.75, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-13", date: "2026-11-27", product: "Chile verde", amount: 0.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-14", date: "2026-11-27", product: "Papa", amount: 0.75, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-15", date: "2026-11-27", product: "Chile verde", amount: 1.50, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-16", date: "2026-11-27", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-17", date: "2026-11-27", product: "Cebolla", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-18", date: "2026-11-27", product: "Tomate", amount: 1.00, category: "Verduras", method: "Efectivo" },
+        { id: "s-27-19", date: "2026-11-27", product: "Limón", amount: 0.25, category: "Frutas", method: "Efectivo" },
+        { id: "s-27-20", date: "2026-11-27", product: "Aguacate", amount: 0.50, category: "Frutas", method: "Efectivo" }
+      ],
+      expenses: [
+        { id: "e-1", date: "2026-11-23", description: "Bolsa mini, #2, #3 y ½ jardín", amount: 10.18, type: "Insumos", method: "Efectivo" },
+        { id: "e-2", date: "2026-11-26", description: "10 páginas blancas", amount: 0.50, type: "Operativo", method: "Efectivo" }
+      ],
       orders: []
     });
 
@@ -738,14 +1090,14 @@
           : [];
 
       const prods = base.products.map(seed => {
-        const found = sourceList.find(p => String(p.name || "").trim().toLowerCase() === seed.name.toLowerCase());
+        const found = sourceList.find(p => String(p.id) === String(seed.id) || String(p.name || "").trim().toLowerCase() === seed.name.toLowerCase());
         const meta = CATALOG_META[seed.name.toLowerCase()] || {};
-        const item = { ...seed, ...(found || {}), name: seed.name };
+        const item = { ...seed, ...(found || {}), name: found?.name || seed.name };
         const promoPrice = Number(item.promoPrice ?? item.salePrice ?? meta.promoPrice ?? 1.00);
         const promoQty = Math.max(1, Number(item.promoQty ?? meta.promoQty ?? 1));
         const unitPrice = Number(item.unitPrice ?? meta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
         return {
-          id: item.id,
+          id: item.id || seed.id,
           name: item.name,
           category: item.category || meta.category || "Verduras",
           unitPrice: Number(unitPrice.toFixed(2)),
@@ -754,12 +1106,13 @@
           salePrice: Number(promoPrice.toFixed(2)),
           promoLabel: item.promoLabel || meta.promoLabel || `${promoQty} x ${fmt(promoPrice)}`,
           badge: item.badge ?? meta.badge ?? "",
-          image: item.image || meta.image || FALLBACK_IMAGE
+          image: item.image || meta.image || FALLBACK_IMAGE,
+          outOfStock: Boolean(item.outOfStock)
         };
       });
 
       const extraProds = sourceList
-        .filter(p => !base.products.some(s => s.name.toLowerCase() === String(p.name || "").trim().toLowerCase()))
+        .filter(p => !base.products.some(s => String(s.id) === String(p.id) || s.name.toLowerCase() === String(p.name || "").trim().toLowerCase()))
         .map((item, idx) => {
           const promoPrice = Number(item.promoPrice ?? item.salePrice ?? 1.00);
           const promoQty = Math.max(1, Number(item.promoQty ?? 1));
@@ -774,11 +1127,12 @@
             salePrice: Number(promoPrice.toFixed(2)),
             promoLabel: item.promoLabel || `${promoQty} x ${fmt(promoPrice)}`,
             badge: item.badge || "",
-            image: item.image || FALLBACK_IMAGE
+            image: item.image || FALLBACK_IMAGE,
+            outOfStock: Boolean(item.outOfStock)
           };
         });
 
-      const cleanSales = (Array.isArray(raw.sales) ? raw.sales : [])
+      const cleanSales = (Array.isArray(raw.sales) && raw.sales.length ? raw.sales : base.sales)
         .filter(s => s && typeof s.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.date.trim()))
         .map(s => ({
           id: s.id || (crypto.randomUUID?.() || String(Date.now() + Math.random())),
@@ -789,7 +1143,7 @@
           method: s.method || "Efectivo"
         }));
 
-      const cleanExpenses = (Array.isArray(raw.expenses) ? raw.expenses : [])
+      const cleanExpenses = (Array.isArray(raw.expenses) && raw.expenses.length ? raw.expenses : base.expenses)
         .filter(g => g && typeof g.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(g.date.trim()))
         .map(g => ({
           id: g.id || (crypto.randomUUID?.() || String(Date.now() + Math.random())),
@@ -803,9 +1157,9 @@
       const cleanOrders = Array.isArray(raw.orders) ? raw.orders : [];
 
       return {
-        openingCash: Number.isFinite(Number(raw.openingCash)) ? Number(raw.openingCash) : 0,
+        openingCash: Number.isFinite(Number(raw.openingCash)) ? Number(raw.openingCash) : 146.45,
         products: [...prods, ...extraProds],
-        weeklyPayments: Array.isArray(raw.weeklyPayments) ? raw.weeklyPayments : base.weeklyPayments,
+        weeklyPayments: Array.isArray(raw.weeklyPayments) && raw.weeklyPayments.length ? raw.weeklyPayments : base.weeklyPayments,
         sales: cleanSales,
         expenses: cleanExpenses,
         orders: cleanOrders
@@ -1111,6 +1465,7 @@
     }
 
     function openNewProductModal() {
+      document.getElementById("prodEditId").value = "";
       document.getElementById("prodName").value = "";
       document.getElementById("prodUnitPrice").value = "0.25";
       document.getElementById("prodPromoQty").value = "4";
@@ -1118,12 +1473,15 @@
       document.getElementById("prodPromoLabel").value = "4 x $1.00";
       document.getElementById("prodCategory").value = "Verduras";
       document.getElementById("prodBadge").value = "";
+      document.getElementById("prodStatus").value = "available";
+      document.getElementById("prodImage").value = "";
       openModal("productModal");
     }
 
     function openEditProduct(id) {
       const item = db.products.find(x => String(x.id) === String(id));
       if (!item) return;
+      document.getElementById("prodEditId").value = item.id;
       document.getElementById("prodName").value = item.name;
       document.getElementById("prodUnitPrice").value = Number(item.unitPrice || 0.25).toFixed(2);
       document.getElementById("prodPromoQty").value = Number(item.promoQty || 1);
@@ -1131,11 +1489,14 @@
       document.getElementById("prodPromoLabel").value = item.promoLabel || "";
       document.getElementById("prodCategory").value = item.category || "Verduras";
       document.getElementById("prodBadge").value = item.badge || "";
+      document.getElementById("prodStatus").value = item.outOfStock ? "out" : "available";
+      document.getElementById("prodImage").value = item.image || "";
       openModal("productModal");
     }
 
     function saveProductItem(e) {
       e.preventDefault();
+      const editId = document.getElementById("prodEditId").value;
       const name = document.getElementById("prodName").value.trim();
       const unitPrice = parseFloat(document.getElementById("prodUnitPrice").value) || 0.25;
       const promoQty = Math.max(1, parseInt(document.getElementById("prodPromoQty").value, 10) || 1);
@@ -1143,10 +1504,11 @@
       const category = document.getElementById("prodCategory").value;
       const promoLabel = document.getElementById("prodPromoLabel").value.trim() || `${promoQty} x ${fmt(promoPrice)}`;
       const badge = document.getElementById("prodBadge").value.trim();
+      const outOfStock = document.getElementById("prodStatus").value === "out";
+      const image = document.getElementById("prodImage").value.trim() || FALLBACK_IMAGE;
+
       if (!name || promoPrice <= 0 || unitPrice <= 0) return;
 
-      const meta = CATALOG_META[name.toLowerCase()] || {};
-      const existing = db.products.find(x => x.name.toLowerCase() === name.toLowerCase());
       const payload = {
         name,
         unitPrice,
@@ -1155,17 +1517,22 @@
         salePrice: promoPrice,
         promoLabel,
         category,
-        badge
+        badge,
+        outOfStock,
+        image
       };
 
-      if (existing) {
-        Object.assign(existing, payload);
+      if (editId) {
+        const existing = db.products.find(x => String(x.id) === String(editId));
+        if (existing) {
+          Object.assign(existing, payload);
+        } else {
+          db.products.push({ id: Number(editId) || Date.now(), ...payload });
+        }
       } else {
         db.products.push({
           id: Date.now(),
-          ...payload,
-          badge: badge || meta.badge || "",
-          image: meta.image || FALLBACK_IMAGE
+          ...payload
         });
       }
 
@@ -1173,7 +1540,7 @@
       e.target.reset();
       closeModal("productModal");
       render();
-      showToast(`Guardado: ${name} • ${fmt(unitPrice)} c/u o ${promoLabel}`);
+      showToast(`Guardado: ${name} • ${fmt(unitPrice)} c/u`);
     }
 
     function deleteProductItem(id) {
@@ -1384,7 +1751,7 @@
     }
 
     function restoreSeed() {
-      if (!confirm("¿Reiniciar los movimientos y dejar el catálogo limpio de 16 productos?")) return;
+      if (!confirm("¿Reiniciar los movimientos y dejar el catálogo limpio?")) return;
       db = seedData();
       selectedDay = "ALL";
       saveDB();
@@ -1571,14 +1938,18 @@
       document.getElementById("productsCountBadge").textContent = `${db.products.length} productos`;
       document.getElementById("productsCatalogGrid").innerHTML = db.products.map(item => `
         <div class="rounded-2xl border bg-slate-50/80 border-slate-200 p-3.5 flex items-center justify-between gap-2">
-          <div class="min-w-0">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <p class="text-sm font-extrabold text-slate-900 truncate">${escapeHTML(item.name)}</p>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white border border-slate-200 text-slate-600">${escapeHTML(item.category)}</span>
+          <div class="flex items-center gap-3 min-w-0">
+            <img src="${escapeHTML(item.image || FALLBACK_IMAGE)}" alt="" class="w-12 h-12 rounded-xl object-cover shrink-0 bg-stone-200" onerror="this.src='${FALLBACK_IMAGE}'">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <p class="text-sm font-extrabold text-slate-900 truncate">${escapeHTML(item.name)}</p>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white border border-slate-200 text-slate-600">${escapeHTML(item.category)}</span>
+                ${item.outOfStock ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-700">Agotado</span>' : ''}
+              </div>
+              <p class="text-xs font-bold text-slate-700 mt-0.5">
+                ${fmt(item.unitPrice)} c/u • <span class="text-emerald-800 font-extrabold">${escapeHTML(item.promoLabel || fmt(item.promoPrice))}</span>
+              </p>
             </div>
-            <p class="text-xs font-bold text-slate-700 mt-1">
-              ${fmt(item.unitPrice)} c/u • <span class="text-emerald-800 font-extrabold">${escapeHTML(item.promoLabel || fmt(item.promoPrice))}</span>
-            </p>
           </div>
           <div class="flex items-center gap-1 shrink-0">
             <button type="button" onclick="openEditProduct(${jsArg(item.id)})" class="min-h-[34px] px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:bg-teal-50 hover:text-teal-800 font-bold text-[11px] cursor-pointer">Editar</button>
