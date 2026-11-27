@@ -432,12 +432,15 @@
           <div>
             <label for="pickupTime" class="block text-xs font-extrabold uppercase text-stone-600 mb-1">2. ¿Cuándo pasarás a recoger?</label>
             <select id="pickupTime" class="w-full min-h-[46px] px-4 py-3 bg-white border-2 border-stone-200 rounded-xl text-base font-medium focus:outline-none focus:border-emerald-700">
-              <option value="En 15–20 minutos">En 15–20 minutos</option>
+              <option value="En 15–20 minutos" id="optInstantPickup">En 15–20 minutos</option>
               <option value="En 30–45 minutos">En 30–45 minutos</option>
               <option value="Turno mañana L–S (desde 6:00 a. m.)">Turno mañana L–S (desde 6:00 a. m.)</option>
               <option value="Turno tarde L–V (2:30 p. m. – 6:00 p. m.)">Turno tarde L–V (2:30 p. m. – 6:00 p. m.)</option>
               <option value="Sábado (6:00 a. m. – 11:00 a. m.)">Sábado (6:00 a. m. – 11:00 a. m.)</option>
             </select>
+            <p id="closedPickupWarning" class="hidden text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-2 mt-1.5">
+              ⚠️ El local está cerrado en este momento. Tu pedido quedará programado para el próximo turno de atención.
+            </p>
           </div>
 
           <div>
@@ -524,7 +527,7 @@
 
     function makeInitialDB() {
       return {
-        openingCash: 0,
+        openingCash: 146.45,
         inventory: Object.entries(CATALOG_META).map(([name, meta], idx) => ({
           id: 101 + idx,
           name: name.replace(/\b\p{L}/gu, c => c.toLocaleUpperCase("es")),
@@ -535,10 +538,11 @@
           salePrice: meta.promoPrice,
           promoLabel: meta.promoLabel,
           badge: meta.badge,
-          image: meta.image
+          image: meta.image,
+          outOfStock: false
         })),
         weeklyPayments: [
-          { id: 501, concept: "Alquiler / Cuota de puesto semanal", amount: 25.00, payDay: "Domingo", method: "Efectivo", paid: false, paidDate: "" },
+          { id: 501, concept: "Alquiler / Cuota de puesto semanal", amount: 25.00, payDay: "Domingo", method: "Efectivo", paid: true, paidDate: "2026-11-21" },
           { id: 502, concept: "Transporte / Flete semanal", amount: 15.00, payDay: "Miércoles", method: "Efectivo", paid: false, paidDate: "" }
         ],
         sales: [],
@@ -561,7 +565,8 @@
         salePrice: Number(promoPrice.toFixed(2)),
         promoLabel: item.promoLabel || meta.promoLabel || (promoQty > 1 ? `${promoQty} x ${money(promoPrice)}` : `1 x ${money(promoPrice)}`),
         badge: item.badge ?? meta.badge ?? "",
-        image: item.image || meta.image || FALLBACK_IMAGE
+        image: item.image || meta.image || FALLBACK_IMAGE,
+        outOfStock: Boolean(item.outOfStock)
       };
     }
 
@@ -575,16 +580,16 @@
           : [];
 
       const inventory = base.inventory.map(seed => {
-        const found = rawList.find(p => String(p.name || "").trim().toLowerCase() === seed.name.toLowerCase());
-        return enrichProduct({ ...seed, ...(found || {}), name: seed.name }, CATALOG_META[seed.name.toLowerCase()] || {});
+        const found = rawList.find(p => String(p.id) === String(seed.id) || String(p.name || "").trim().toLowerCase() === seed.name.toLowerCase());
+        return enrichProduct({ ...seed, ...(found || {}), name: found?.name || seed.name }, CATALOG_META[seed.name.toLowerCase()] || {});
       });
 
       const extras = rawList
-        .filter(p => !base.inventory.some(s => s.name.toLowerCase() === String(p.name || "").trim().toLowerCase()))
+        .filter(p => !base.inventory.some(s => String(s.id) === String(p.id) || s.name.toLowerCase() === String(p.name || "").trim().toLowerCase()))
         .map(p => enrichProduct(p));
 
       return {
-        openingCash: Number(parsed.openingCash || 0),
+        openingCash: Number(parsed.openingCash || 146.45),
         inventory: [...inventory, ...extras],
         weeklyPayments: Array.isArray(parsed.weeklyPayments) ? parsed.weeklyPayments : base.weeklyPayments,
         sales: Array.isArray(parsed.sales) ? parsed.sales : [],
@@ -840,6 +845,10 @@
 
     function updateOpenStatus() {
       const badge = document.getElementById("openStatusBadge");
+      const instantOpt = document.getElementById("optInstantPickup");
+      const warningBox = document.getElementById("closedPickupWarning");
+      const pickupSelect = document.getElementById("pickupTime");
+
       try {
         const parts = new Intl.DateTimeFormat("en-US", {
           timeZone: "America/El_Salvador",
@@ -862,6 +871,17 @@
         badge.className = open
           ? "mt-0.5 inline-block text-[11px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900"
           : "mt-0.5 inline-block text-[11px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-stone-200 text-stone-800";
+
+        if (instantOpt) {
+          instantOpt.disabled = !open;
+          instantOpt.textContent = open ? "En 15–20 minutos" : "En 15–20 minutos (Local Cerrado)";
+        }
+        if (warningBox) {
+          warningBox.classList.toggle("hidden", open);
+        }
+        if (!open && pickupSelect && pickupSelect.value === "En 15–20 minutos") {
+          pickupSelect.value = "En 30–45 minutos";
+        }
       } catch (e) {
         badge.textContent = "🟢 L–V: 6AM–1PM / 2:30PM–6PM • Sáb: 6AM–11AM";
       }
@@ -942,6 +962,7 @@
         const promoQty = Math.max(1, Number(product.promoQty || 1));
         const promoLabel = escapeHTML(product.promoLabel || `${promoQty} x ${money(promoPrice)}`);
         const image = escapeHTML(product.image || FALLBACK_IMAGE);
+        const outOfStock = Boolean(product.outOfStock);
 
         const unitKey = cartKey(product.name, "unit");
         const promoKey = cartKey(product.name, "promo");
@@ -949,27 +970,36 @@
         const promoCart = getCartItem(promoKey);
         const count = (unitCart?.qty || 0) + (promoCart?.qty || 0);
 
-        const unitControl = unitCart
-          ? `<div class="flex items-center gap-1 rounded-xl border border-stone-300 bg-white p-0.5">
-               <button type="button" aria-label="Quitar unidad de ${name}" onclick="changeTypedQty(${jsArg(unitKey)}, -1)" class="w-9 h-9 rounded-lg bg-stone-100 font-extrabold text-base cursor-pointer">−</button>
-               <span class="w-6 text-center text-xs font-extrabold">${unitCart.qty}</span>
-               <button type="button" aria-label="Agregar unidad de ${name}" onclick="changeTypedQty(${jsArg(unitKey)}, 1)" class="w-9 h-9 rounded-lg bg-stone-900 font-extrabold text-base text-white cursor-pointer">+</button>
-             </div>`
-          : `<button type="button" onclick="addTypedToCart(${jsArg(product.name)}, 'unit', 'Por unidad', ${unitPrice}, 1)" class="min-h-[40px] rounded-xl bg-stone-900 hover:bg-stone-800 px-3.5 py-2 text-xs font-extrabold text-white transition cursor-pointer">+ 1 u</button>`;
+        let unitControl = "";
+        let promoControl = "";
 
-        const promoControl = promoCart
-          ? `<div class="flex items-center gap-1 rounded-xl border border-emerald-500 bg-white p-0.5">
-               <button type="button" aria-label="Quitar porción de ${name}" onclick="changeTypedQty(${jsArg(promoKey)}, -1)" class="w-9 h-9 rounded-lg bg-emerald-50 font-extrabold text-base cursor-pointer">−</button>
-               <span class="w-6 text-center text-xs font-extrabold text-emerald-950">${promoCart.qty}</span>
-               <button type="button" aria-label="Agregar porción de ${name}" onclick="changeTypedQty(${jsArg(promoKey)}, 1)" class="w-9 h-9 rounded-lg bg-emerald-700 font-extrabold text-base text-white cursor-pointer">+</button>
-             </div>`
-          : `<button type="button" onclick="addTypedToCart(${jsArg(product.name)}, 'promo', ${jsArg(product.promoLabel || "Porción")}, ${promoPrice}, ${promoQty})" class="min-h-[40px] rounded-xl bg-emerald-700 hover:bg-emerald-800 px-3.5 py-2 text-xs font-extrabold text-white transition cursor-pointer">+ Porción</button>`;
+        if (outOfStock) {
+          unitControl = `<span class="text-xs font-extrabold text-rose-600">Agotado</span>`;
+          promoControl = `<span class="text-xs font-extrabold text-rose-600">Agotado</span>`;
+        } else {
+          unitControl = unitCart
+            ? `<div class="flex items-center gap-1 rounded-xl border border-stone-300 bg-white p-0.5">
+                 <button type="button" aria-label="Quitar unidad de ${name}" onclick="changeTypedQty(${jsArg(unitKey)}, -1)" class="w-9 h-9 rounded-lg bg-stone-100 font-extrabold text-base cursor-pointer">−</button>
+                 <span class="w-6 text-center text-xs font-extrabold">${unitCart.qty}</span>
+                 <button type="button" aria-label="Agregar unidad de ${name}" onclick="changeTypedQty(${jsArg(unitKey)}, 1)" class="w-9 h-9 rounded-lg bg-stone-900 font-extrabold text-base text-white cursor-pointer">+</button>
+               </div>`
+            : `<button type="button" onclick="addTypedToCart(${jsArg(product.name)}, 'unit', 'Por unidad', ${unitPrice}, 1)" class="min-h-[40px] rounded-xl bg-stone-900 hover:bg-stone-800 px-3.5 py-2 text-xs font-extrabold text-white transition cursor-pointer">+ 1 u</button>`;
+
+          promoControl = promoCart
+            ? `<div class="flex items-center gap-1 rounded-xl border border-emerald-500 bg-white p-0.5">
+                 <button type="button" aria-label="Quitar porción de ${name}" onclick="changeTypedQty(${jsArg(promoKey)}, -1)" class="w-9 h-9 rounded-lg bg-emerald-50 font-extrabold text-base cursor-pointer">−</button>
+                 <span class="w-6 text-center text-xs font-extrabold text-emerald-950">${promoCart.qty}</span>
+                 <button type="button" aria-label="Agregar porción de ${name}" onclick="changeTypedQty(${jsArg(promoKey)}, 1)" class="w-9 h-9 rounded-lg bg-emerald-700 font-extrabold text-base text-white cursor-pointer">+</button>
+               </div>`
+            : `<button type="button" onclick="addTypedToCart(${jsArg(product.name)}, 'promo', ${jsArg(product.promoLabel || "Porción")}, ${promoPrice}, ${promoQty})" class="min-h-[40px] rounded-xl bg-emerald-700 hover:bg-emerald-800 px-3.5 py-2 text-xs font-extrabold text-white transition cursor-pointer">+ Porción</button>`;
+        }
 
         return `
-          <article class="flex flex-col overflow-hidden rounded-3xl border-2 ${count ? "border-emerald-700 ring-2 ring-emerald-100" : "border-stone-200"} bg-white shadow-xs transition">
+          <article class="flex flex-col overflow-hidden rounded-3xl border-2 ${count ? "border-emerald-700 ring-2 ring-emerald-100" : "border-stone-200"} bg-white shadow-xs transition ${outOfStock ? 'opacity-75' : ''}">
             <div class="relative overflow-hidden bg-stone-100">
               <img src="${image}" alt="${name}" class="product-img" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}'">
               <span class="absolute left-3 top-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-extrabold text-stone-950 shadow-xs">${badge}</span>
+              ${outOfStock ? '<span class="absolute inset-0 bg-stone-950/40 flex items-center justify-center text-white font-extrabold text-lg tracking-wider">AGOTADO HOY</span>' : ''}
               ${count ? `<span class="absolute right-3 top-3 rounded-full bg-emerald-800 px-3 py-1 text-xs font-extrabold text-white">En pedido: ${count}</span>` : ""}
             </div>
 
@@ -1086,7 +1116,6 @@
       const message = `Hola *Frutas y Verduras Mancía*, quiero solicitar este pedido para retiro:\n\n*Nombre:* ${name}\n*Retiro:* ${pickup}\n*Pago:* ${payment}\n\n*Productos:*\n${lines}\n\n*Total estimado:* ${money(total)}`;
       const url = `https://wa.me/${WHATSAPP_ORDERS}?text=${encodeURIComponent(message)}`;
 
-      // Se guarda como pedido pendiente, nunca como venta confirmada.
       const db = await fetchCloudStoreDB();
       db.orders.unshift({
         id: crypto.randomUUID?.() || String(Date.now()),
