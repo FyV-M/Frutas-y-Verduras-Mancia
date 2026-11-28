@@ -252,7 +252,7 @@
     </div>
   </footer>
 
-  <!-- MODAL CONTRASEÑA CAJA LOCAL -->
+  <!-- MODAL SESIÓN CAJA LOCAL (SUPABASE AUTH) -->
   <div id="localPosAuthModal" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true" aria-labelledby="localPosAuthTitle">
     <button type="button" onclick="closeLocalPosAuthModal()" aria-label="Cerrar ventana" class="absolute inset-0 w-full h-full bg-stone-950/75 backdrop-blur-xs cursor-pointer"></button>
     <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
@@ -264,30 +264,45 @@
           </button>
         </div>
 
-        <form onsubmit="submitLocalPosPassword(event)" class="space-y-3">
+        <form onsubmit="submitLocalPosLogin(event)" class="space-y-3">
           <div>
-            <label for="localPosPasswordInput" class="block text-xs font-extrabold uppercase tracking-wider text-stone-600 mb-1.5">
-              Contraseña de caja local
+            <label for="localPosEmail" class="block text-xs font-extrabold uppercase tracking-wider text-stone-600 mb-1">
+              Correo administrador
+            </label>
+            <input
+              type="email"
+              id="localPosEmail"
+              required
+              autocomplete="username"
+              placeholder="correo@ejemplo.com"
+              class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border-2 border-stone-300 bg-stone-50 text-stone-900 font-bold text-sm focus:outline-none focus:border-emerald-700 focus:bg-white"
+            />
+          </div>
+
+          <div>
+            <label for="localPosPassword" class="block text-xs font-extrabold uppercase tracking-wider text-stone-600 mb-1">
+              Contraseña
             </label>
             <input
               type="password"
-              id="localPosPasswordInput"
+              id="localPosPassword"
               required
               autocomplete="current-password"
-              placeholder="Ingrese contraseña"
-              class="w-full min-h-[46px] px-4 py-3 rounded-2xl border-2 border-stone-300 bg-stone-50 text-stone-900 font-extrabold text-sm focus:outline-none focus:border-emerald-700 focus:bg-white"
+              placeholder="••••••••"
+              class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border-2 border-stone-300 bg-stone-50 text-stone-900 font-bold text-sm focus:outline-none focus:border-emerald-700 focus:bg-white"
             />
           </div>
 
           <p id="localPosAuthError" class="hidden text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
-            Contraseña incorrecta. Intente de nuevo.
+            Credencial no válida. Verifica tu correo y contraseña.
           </p>
 
           <button
             type="submit"
+            id="localPosAuthBtn"
             class="w-full min-h-[46px] py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm shadow-md transition cursor-pointer"
           >
-            Desbloquear caja local
+            Iniciar sesión en caja
           </button>
         </form>
       </div>
@@ -467,7 +482,6 @@
     "use strict";
 
     const WHATSAPP_ORDERS = "50368271549";
-    const LOCAL_POS_PIN = "FYVM2026";
     const SUPABASE_URL = "https://vgvkjhfkpyhvapzbyvwn.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cSCLRLMk06I-T0EKAODTGw_W0uVQJja";
     const CLOUD_ROW_ID = "frutas_y_verduras_mancia_v1";
@@ -659,6 +673,13 @@
       renderLocalPos();
       initManciaMap();
       updateOpenStatus();
+
+      // Verificar si ya hay una sesión activa de Supabase
+      if (supabaseClient) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) isLocalPosUnlocked = true;
+      }
+
       setInterval(() => {
         updateOpenStatus();
         if (todaySV() !== activeLocalDay) {
@@ -679,37 +700,67 @@
       }
     });
 
-    function requestLocalPosAccess() {
+    async function requestLocalPosAccess() {
       if (isLocalPosUnlocked) {
         toggleLocalPos(true);
         return;
       }
+      if (supabaseClient) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+          isLocalPosUnlocked = true;
+          toggleLocalPos(true);
+          return;
+        }
+      }
       document.getElementById("localPosAuthError").classList.add("hidden");
-      document.getElementById("localPosPasswordInput").value = "";
+      document.getElementById("localPosEmail").value = "";
+      document.getElementById("localPosPassword").value = "";
       document.getElementById("localPosAuthModal").classList.remove("hidden");
-      setTimeout(() => document.getElementById("localPosPasswordInput").focus(), 40);
+      setTimeout(() => document.getElementById("localPosEmail").focus(), 40);
     }
 
     function closeLocalPosAuthModal() {
       document.getElementById("localPosAuthModal").classList.add("hidden");
     }
 
-    function submitLocalPosPassword(event) {
+    async function submitLocalPosLogin(event) {
       event.preventDefault();
-      const input = document.getElementById("localPosPasswordInput");
-      if (input.value === LOCAL_POS_PIN) {
-        isLocalPosUnlocked = true;
-        closeLocalPosAuthModal();
-        toggleLocalPos(true);
-      } else {
-        document.getElementById("localPosAuthError").classList.remove("hidden");
-        input.value = "";
-        input.focus();
+      const email = document.getElementById("localPosEmail").value.trim();
+      const password = document.getElementById("localPosPassword").value;
+      const errorEl = document.getElementById("localPosAuthError");
+      const btnEl = document.getElementById("localPosAuthBtn");
+
+      if (!supabaseClient) {
+        errorEl.textContent = "Supabase no está configurado.";
+        errorEl.classList.remove("hidden");
+        return;
       }
+
+      btnEl.disabled = true;
+      btnEl.textContent = "Verificando…";
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+      btnEl.disabled = false;
+      btnEl.textContent = "Iniciar sesión en caja";
+
+      if (error || !data.session) {
+        errorEl.textContent = "Credencial no válida. Verifica tu correo y contraseña.";
+        errorEl.classList.remove("hidden");
+        return;
+      }
+
+      isLocalPosUnlocked = true;
+      closeLocalPosAuthModal();
+      toggleLocalPos(true);
     }
 
     function lockLocalPos() {
       isLocalPosUnlocked = false;
+      if (supabaseClient) {
+        supabaseClient.auth.signOut();
+      }
       toggleLocalPos(false);
     }
 
@@ -1140,7 +1191,7 @@
       updateCartUI();
       renderProducts();
       toggleCart(false);
-      document.getElementById("customerName").value = "";
+      document.getElementById("customerName" ).value = "";
     }
 
     document.addEventListener("keydown", event => {
