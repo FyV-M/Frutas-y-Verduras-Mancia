@@ -21,6 +21,7 @@
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .product-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
     .drawer-scroll { overscroll-behavior: contain; }
   </style>
 </head>
@@ -251,7 +252,7 @@
     </div>
   </footer>
 
-  <!-- MODAL SESIÓN CAJA LOCAL (SUPABASE AUTH) -->
+  <!-- MODAL CONTRASEÑA CAJA LOCAL -->
   <div id="localPosAuthModal" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true" aria-labelledby="localPosAuthTitle">
     <button type="button" onclick="closeLocalPosAuthModal()" aria-label="Cerrar ventana" class="absolute inset-0 w-full h-full bg-stone-950/75 backdrop-blur-xs cursor-pointer"></button>
     <div class="relative min-h-screen flex items-center justify-center p-4 pointer-events-none">
@@ -263,45 +264,30 @@
           </button>
         </div>
 
-        <form onsubmit="submitLocalPosLogin(event)" class="space-y-3">
+        <form onsubmit="submitLocalPosPassword(event)" class="space-y-3">
           <div>
-            <label for="localPosEmail" class="block text-xs font-extrabold uppercase tracking-wider text-stone-600 mb-1">
-              Correo administrador
-            </label>
-            <input
-              type="email"
-              id="localPosEmail"
-              required
-              autocomplete="username"
-              placeholder="correo@ejemplo.com"
-              class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border-2 border-stone-300 bg-stone-50 text-stone-900 font-bold text-sm focus:outline-none focus:border-emerald-700 focus:bg-white"
-            />
-          </div>
-
-          <div>
-            <label for="localPosPassword" class="block text-xs font-extrabold uppercase tracking-wider text-stone-600 mb-1">
-              Contraseña
+            <label for="localPosPasswordInput" class="block text-xs font-extrabold uppercase tracking-wider text-stone-600 mb-1.5">
+              Contraseña de caja local
             </label>
             <input
               type="password"
-              id="localPosPassword"
+              id="localPosPasswordInput"
               required
               autocomplete="current-password"
-              placeholder="••••••••"
-              class="w-full min-h-[44px] px-3.5 py-2.5 rounded-xl border-2 border-stone-300 bg-stone-50 text-stone-900 font-bold text-sm focus:outline-none focus:border-emerald-700 focus:bg-white"
+              placeholder="Ingrese contraseña"
+              class="w-full min-h-[46px] px-4 py-3 rounded-2xl border-2 border-stone-300 bg-stone-50 text-stone-900 font-extrabold text-sm focus:outline-none focus:border-emerald-700 focus:bg-white"
             />
           </div>
 
           <p id="localPosAuthError" class="hidden text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
-            Credencial no válida. Verifica tu correo y contraseña.
+            Contraseña incorrecta. Intente de nuevo.
           </p>
 
           <button
             type="submit"
-            id="localPosAuthBtn"
             class="w-full min-h-[46px] py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm shadow-md transition cursor-pointer"
           >
-            Iniciar sesión en caja
+            Desbloquear caja local
           </button>
         </form>
       </div>
@@ -468,7 +454,6 @@
 
         <button
           type="button"
-          id="sendOrderBtn"
           onclick="sendWhatsAppOrder()"
           class="w-full min-h-[50px] bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-base sm:text-lg py-3.5 px-5 rounded-2xl shadow-lg transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
         >
@@ -482,36 +467,34 @@
     "use strict";
 
     const WHATSAPP_ORDERS = "50368271549";
+    const LOCAL_POS_PIN = "FYVM2026";
     const SUPABASE_URL = "https://vgvkjhfkpyhvapzbyvwn.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cSCLRLMk06I-T0EKAODTGw_W0uVQJja";
     const CLOUD_ROW_ID = "frutas_y_verduras_mancia_v1";
-    const STORAGE_KEY = "biz_control_total_v12"; // Versión nueva para limpiar caché
+    const STORAGE_KEY = "biz_control_total_v7";
+    const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=85";
 
     const supabaseClient = window.supabase?.createClient
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
       : null;
 
-    let isSubmittingOrder = false;
-
-    // CATÁLOGO MAESTRO CON EMOJIS DIRECTOS (Cero errores de fotos externas)
     const CATALOG_META = {
-      "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", emoji: "🍅", bg: "bg-red-50" },
-      "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", emoji: "🧅", bg: "bg-amber-50" },
-      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", emoji: "🟣", bg: "bg-purple-50" },
-      "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", emoji: "🍌", bg: "bg-yellow-50" },
-      "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", emoji: "🫑", bg: "bg-emerald-50" },
-      "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", emoji: "🌶️", bg: "bg-green-50" },
-      "ajo": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00", category: "Verduras", badge: "", emoji: "🧄", bg: "bg-stone-100" },
-      "lechuga": { unitPrice: 1.75, promoQty: 1, promoPrice: 1.75, promoLabel: "1 x $1.75", category: "Verduras", badge: "Fresco", emoji: "🥬", bg: "bg-green-50" },
-      "aguacate": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", category: "Frutas", badge: "Al punto", emoji: "🥑", bg: "bg-lime-50" },
-      "limón": { unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, promoLabel: "8 x $1.00", category: "Frutas", badge: "Jugoso", emoji: "🍋", bg: "bg-yellow-50" },
-      "papa": { unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, promoLabel: "1 libra x $1.50", category: "Verduras", badge: "Fresco", emoji: "🥔", bg: "bg-amber-100" },
-      "elote": { unitPrice: 0.75, promoQty: 1, promoPrice: 0.75, promoLabel: "1 x $0.75", category: "Verduras", badge: "Tierno", emoji: "🌽", bg: "bg-yellow-100" },
-      "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", emoji: "🍐", bg: "bg-emerald-50" },
-      "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", emoji: "🥒", bg: "bg-green-50" },
-      "rábano": { unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25", category: "Verduras", badge: "", emoji: "🌱", bg: "bg-rose-50" },
-      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", emoji: "🥕", bg: "bg-orange-50" },
-      "repollo": { unitPrice: 2.50, promoQty: 2, promoPrice: 5.00, promoLabel: "2 x $5.00", category: "Verduras", badge: "Fresco", emoji: "🟢", bg: "bg-green-100" }
+      "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85" },
+      "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=85" },
+      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&fit=crop&w=900&q=85" },
+      "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=85" },
+      "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=900&q=85" },
+      "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=85" },
+      "ajo": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=900&q=85" },
+      "lechuga": { unitPrice: 1.75, promoQty: 1, promoPrice: 1.75, promoLabel: "1 x $1.75", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=900&q=85" },
+      "aguacate": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", category: "Frutas", badge: "Al punto", image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=900&q=85" },
+      "limón": { unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, promoLabel: "8 x $1.00", category: "Frutas", badge: "Jugoso", image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=900&q=85" },
+      "papa": { unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, promoLabel: "1 libra x $1.50", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=900&q=85" },
+      "elote": { unitPrice: 0.75, promoQty: 1, promoPrice: 0.75, promoLabel: "1 x $0.75", category: "Verduras", badge: "Tierno", image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=900&q=85" },
+      "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=900&q=85" },
+      "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=900&q=85" },
+      "rábano": { unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=900&q=85" },
+      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=900&q=85" }
     };
 
     const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, ch => ({
@@ -542,42 +525,12 @@
       }
     };
 
-    function formatProperName(name = "") {
-      const raw = String(name).trim().toLowerCase();
-      const properMap = {
-        "tomate": "Tomate",
-        "cebolla blanca": "Cebolla Blanca",
-        "cebolla morada": "Cebolla Morada",
-        "platano": "Plátano",
-        "plátano": "Plátano",
-        "chile verde": "Chile Verde",
-        "jalapeno": "Jalapeño",
-        "jalapeño": "Jalapeño",
-        "ajo": "Ajo",
-        "lechuga": "Lechuga",
-        "aguacate": "Aguacate",
-        "limon": "Limón",
-        "limón": "Limón",
-        "papa": "Papa",
-        "elote": "Elote",
-        "guisquil": "Güisquil",
-        "güisquil": "Güisquil",
-        "pepino": "Pepino",
-        "rabano": "Rábano",
-        "rábano": "Rábano",
-        "zanahoria": "Zanahoria",
-        "repollo": "Repollo"
-      };
-      if (properMap[raw]) return properMap[raw];
-      return raw.replace(/\b\p{L}/gu, c => c.toLocaleUpperCase("es"));
-    }
-
     function makeInitialDB() {
       return {
         openingCash: 146.45,
-        inventory: Object.entries(CATALOG_META).map(([key, meta], idx) => ({
+        inventory: Object.entries(CATALOG_META).map(([name, meta], idx) => ({
           id: 101 + idx,
-          name: formatProperName(key),
+          name: name.replace(/\b\p{L}/gu, c => c.toLocaleUpperCase("es")),
           category: meta.category,
           unitPrice: meta.unitPrice,
           promoQty: meta.promoQty,
@@ -585,8 +538,7 @@
           salePrice: meta.promoPrice,
           promoLabel: meta.promoLabel,
           badge: meta.badge,
-          emoji: meta.emoji,
-          bg: meta.bg,
+          image: meta.image,
           outOfStock: false
         })),
         weeklyPayments: [
@@ -600,25 +552,20 @@
     }
 
     function enrichProduct(item, meta = {}) {
-      const cleanNameKey = String(item.name || "Producto").trim().toLowerCase();
-      const matchedMeta = CATALOG_META[cleanNameKey] || meta || {};
-
-      const promoQty = Math.max(1, Number(item.promoQty ?? matchedMeta.promoQty ?? 1));
-      const promoPrice = Number(item.promoPrice ?? item.salePrice ?? matchedMeta.promoPrice ?? 1.00);
-      const unitPrice = Number(item.unitPrice ?? matchedMeta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
-
+      const promoQty = Math.max(1, Number(item.promoQty ?? meta.promoQty ?? 1));
+      const promoPrice = Number(item.promoPrice ?? item.salePrice ?? meta.promoPrice ?? 1.00);
+      const unitPrice = Number(item.unitPrice ?? meta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
       return {
         id: item.id,
-        name: formatProperName(item.name),
-        category: item.category || matchedMeta.category || "Verduras",
+        name: String(item.name || "Producto").trim(),
+        category: item.category || meta.category || "Verduras",
         unitPrice: Number(unitPrice.toFixed(2)),
         promoQty,
         promoPrice: Number(promoPrice.toFixed(2)),
         salePrice: Number(promoPrice.toFixed(2)),
-        promoLabel: item.promoLabel || matchedMeta.promoLabel || (promoQty > 1 ? `${promoQty} x ${money(promoPrice)}` : `1 x ${money(promoPrice)}`),
-        badge: item.badge ?? matchedMeta.badge ?? "",
-        emoji: matchedMeta.emoji || "🥬",
-        bg: matchedMeta.bg || "bg-emerald-50",
+        promoLabel: item.promoLabel || meta.promoLabel || (promoQty > 1 ? `${promoQty} x ${money(promoPrice)}` : `1 x ${money(promoPrice)}`),
+        badge: item.badge ?? meta.badge ?? "",
+        image: item.image || meta.image || FALLBACK_IMAGE,
         outOfStock: Boolean(item.outOfStock)
       };
     }
@@ -634,7 +581,7 @@
 
       const inventory = base.inventory.map(seed => {
         const found = rawList.find(p => String(p.id) === String(seed.id) || String(p.name || "").trim().toLowerCase() === seed.name.toLowerCase());
-        return enrichProduct({ ...seed, ...(found || {}), name: seed.name }, CATALOG_META[seed.name.toLowerCase()] || {});
+        return enrichProduct({ ...seed, ...(found || {}), name: found?.name || seed.name }, CATALOG_META[seed.name.toLowerCase()] || {});
       });
 
       const extras = rawList
@@ -667,7 +614,23 @@
       } catch (e) {}
     }
 
-    async function fetchCloudCatalog() {
+    async function syncStoreDBToCloud(db) {
+      if (!supabaseClient) return { ok: false };
+      try {
+        const { error } = await supabaseClient
+          .from("store_control")
+          .upsert({
+            id: CLOUD_ROW_ID,
+            data: db,
+            updated_at: new Date().toISOString()
+          });
+        return { ok: !error };
+      } catch {
+        return { ok: false };
+      }
+    }
+
+    async function fetchCloudStoreDB() {
       if (!supabaseClient) return loadStoreDB();
       try {
         const { data, error } = await supabaseClient
@@ -696,12 +659,6 @@
       renderLocalPos();
       initManciaMap();
       updateOpenStatus();
-
-      if (supabaseClient) {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) isLocalPosUnlocked = true;
-      }
-
       setInterval(() => {
         updateOpenStatus();
         if (todaySV() !== activeLocalDay) {
@@ -709,7 +666,7 @@
           renderLocalPos();
         }
       }, 30000);
-      await fetchCloudCatalog();
+      await fetchCloudStoreDB();
       renderProducts();
       renderLocalPos();
     });
@@ -722,67 +679,37 @@
       }
     });
 
-    async function requestLocalPosAccess() {
+    function requestLocalPosAccess() {
       if (isLocalPosUnlocked) {
         toggleLocalPos(true);
         return;
       }
-      if (supabaseClient) {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-          isLocalPosUnlocked = true;
-          toggleLocalPos(true);
-          return;
-        }
-      }
       document.getElementById("localPosAuthError").classList.add("hidden");
-      document.getElementById("localPosEmail").value = "";
-      document.getElementById("localPosPassword").value = "";
+      document.getElementById("localPosPasswordInput").value = "";
       document.getElementById("localPosAuthModal").classList.remove("hidden");
-      setTimeout(() => document.getElementById("localPosEmail").focus(), 40);
+      setTimeout(() => document.getElementById("localPosPasswordInput").focus(), 40);
     }
 
     function closeLocalPosAuthModal() {
       document.getElementById("localPosAuthModal").classList.add("hidden");
     }
 
-    async function submitLocalPosLogin(event) {
+    function submitLocalPosPassword(event) {
       event.preventDefault();
-      const email = document.getElementById("localPosEmail").value.trim();
-      const password = document.getElementById("localPosPassword").value;
-      const errorEl = document.getElementById("localPosAuthError");
-      const btnEl = document.getElementById("localPosAuthBtn");
-
-      if (!supabaseClient) {
-        errorEl.textContent = "Supabase no está configurado.";
-        errorEl.classList.remove("hidden");
-        return;
+      const input = document.getElementById("localPosPasswordInput");
+      if (input.value === LOCAL_POS_PIN) {
+        isLocalPosUnlocked = true;
+        closeLocalPosAuthModal();
+        toggleLocalPos(true);
+      } else {
+        document.getElementById("localPosAuthError").classList.remove("hidden");
+        input.value = "";
+        input.focus();
       }
-
-      btnEl.disabled = true;
-      btnEl.textContent = "Verificando…";
-
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-      btnEl.disabled = false;
-      btnEl.textContent = "Iniciar sesión en caja";
-
-      if (error || !data.session) {
-        errorEl.textContent = "Credencial no válida. Verifica tu correo y contraseña.";
-        errorEl.classList.remove("hidden");
-        return;
-      }
-
-      isLocalPosUnlocked = true;
-      closeLocalPosAuthModal();
-      toggleLocalPos(true);
     }
 
     function lockLocalPos() {
       isLocalPosUnlocked = false;
-      if (supabaseClient) {
-        supabaseClient.auth.signOut();
-      }
       toggleLocalPos(false);
     }
 
@@ -793,6 +720,24 @@
       }
       document.getElementById("localPosDrawer").classList.toggle("hidden", !open);
       if (open) renderLocalPos();
+    }
+
+    function getEmoji(name = "") {
+      const n = name.toLowerCase();
+      if (n.includes("tomate")) return "🍅";
+      if (n.includes("cebolla")) return "🧅";
+      if (n.includes("chile") || n.includes("jalapeño")) return "🌶️";
+      if (n.includes("aguacate")) return "🥑";
+      if (n.includes("limón")) return "🍋";
+      if (n.includes("plátano")) return "🍌";
+      if (n.includes("papa")) return "🥔";
+      if (n.includes("ajo")) return "🧄";
+      if (n.includes("zanahoria")) return "🥕";
+      if (n.includes("pepino")) return "🥒";
+      if (n.includes("lechuga")) return "🥬";
+      if (n.includes("elote")) return "🌽";
+      if (n.includes("rábano")) return "🌱";
+      return "🥬";
     }
 
     function renderLocalPos() {
@@ -816,7 +761,7 @@
         return `
           <div class="p-3 rounded-2xl bg-emerald-50/80 border-2 border-emerald-200 flex flex-col justify-between gap-2">
             <span class="flex items-center gap-1.5 truncate text-sm font-extrabold text-emerald-950">
-              <span>${item.emoji || '🥬'}</span>
+              <span>${getEmoji(item.name)}</span>
               <span class="truncate">${safeName}</span>
             </span>
             <div class="grid grid-cols-2 gap-1.5">
@@ -849,7 +794,7 @@
       if (!Number.isFinite(value) || value <= 0) return;
       const method = document.getElementById("localPosMethod").value || "Efectivo";
 
-      const db = await fetchCloudCatalog();
+      const db = await fetchCloudStoreDB();
       db.sales.unshift({
         id: crypto.randomUUID?.() || String(Date.now()),
         date: todaySV(),
@@ -861,21 +806,12 @@
 
       saveStoreDB(db);
       renderLocalPos();
-
-      if (supabaseClient) {
-        try {
-          await supabaseClient
-            .from("store_control")
-            .upsert({
-              id: CLOUD_ROW_ID,
-              data: db,
-              updated_at: new Date().toISOString()
-            });
-        } catch {}
-      }
+      const syncResult = await syncStoreDBToCloud(db);
 
       const feedback = document.getElementById("localPosFeedback");
-      feedback.textContent = `✓ Venta registrada: ${productName} • ${money(value)} (${method})`;
+      feedback.textContent = syncResult.ok
+        ? `✓ Venta registrada: ${productName} • ${money(value)} (${method})`
+        : `✓ Guardado localmente: ${productName} • ${money(value)} (${method})`;
       feedback.classList.remove("hidden");
     }
 
@@ -1025,8 +961,7 @@
         const promoPrice = Number(product.promoPrice || product.salePrice || 0);
         const promoQty = Math.max(1, Number(product.promoQty || 1));
         const promoLabel = escapeHTML(product.promoLabel || `${promoQty} x ${money(promoPrice)}`);
-        const emoji = product.emoji || "🥬";
-        const bgClass = product.bg || "bg-emerald-50";
+        const image = escapeHTML(product.image || FALLBACK_IMAGE);
         const outOfStock = Boolean(product.outOfStock);
 
         const unitKey = cartKey(product.name, "unit");
@@ -1061,8 +996,8 @@
 
         return `
           <article class="flex flex-col overflow-hidden rounded-3xl border-2 ${count ? "border-emerald-700 ring-2 ring-emerald-100" : "border-stone-200"} bg-white shadow-xs transition ${outOfStock ? 'opacity-75' : ''}">
-            <div class="relative overflow-hidden ${bgClass} h-40 flex items-center justify-center">
-              <span class="text-7xl select-none drop-shadow-sm">${emoji}</span>
+            <div class="relative overflow-hidden bg-stone-100">
+              <img src="${image}" alt="${name}" class="product-img" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}'">
               <span class="absolute left-3 top-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-extrabold text-stone-950 shadow-xs">${badge}</span>
               ${outOfStock ? '<span class="absolute inset-0 bg-stone-950/40 flex items-center justify-center text-white font-extrabold text-lg tracking-wider">AGOTADO HOY</span>' : ''}
               ${count ? `<span class="absolute right-3 top-3 rounded-full bg-emerald-800 px-3 py-1 text-xs font-extrabold text-white">En pedido: ${count}</span>` : ""}
@@ -1164,8 +1099,10 @@
     }
 
     async function sendWhatsAppOrder() {
-      if (!cart.length || isSubmittingOrder) return;
-      
+      if (!cart.length) {
+        alert("Agrega al menos un producto a tu pedido.");
+        return;
+      }
       const name = document.getElementById("customerName").value.trim() || "Cliente";
       const pickup = document.getElementById("pickupTime").value;
       const payment = document.getElementById("paymentMethod").value;
@@ -1179,29 +1116,25 @@
       const message = `Hola *Frutas y Verduras Mancía*, quiero solicitar este pedido para retiro:\n\n*Nombre:* ${name}\n*Retiro:* ${pickup}\n*Pago:* ${payment}\n\n*Productos:*\n${lines}\n\n*Total estimado:* ${money(total)}`;
       const url = `https://wa.me/${WHATSAPP_ORDERS}?text=${encodeURIComponent(message)}`;
 
+      const db = await fetchCloudStoreDB();
+      db.orders.unshift({
+        id: crypto.randomUUID?.() || String(Date.now()),
+        createdAt: new Date().toISOString(),
+        date: todaySV(),
+        customer: name,
+        pickup,
+        payment,
+        items: cart.map(item => ({ ...item })),
+        estimatedTotal: Number(total.toFixed(2)),
+        status: "Pendiente"
+      });
+      saveStoreDB(db);
+      await syncStoreDBToCloud(db);
+
       const opened = window.open(url, "_blank", "noopener,noreferrer");
-
-      isSubmittingOrder = true;
-      const btn = document.getElementById("sendOrderBtn");
-      if (btn) btn.disabled = true;
-
-      try {
-        if (supabaseClient) {
-          await supabaseClient.from("orders").insert({
-            id: crypto.randomUUID?.() || String(Date.now()),
-            date: todaySV(),
-            customer: name,
-            pickup,
-            payment,
-            items: cart.map(item => ({ ...item })),
-            estimated_total: Number(total.toFixed(2)),
-            status: "Pendiente"
-          });
-        }
-      } catch (e) {}
-
-      isSubmittingOrder = false;
-      if (btn) btn.disabled = false;
+      if (!opened) {
+        alert("Tu pedido quedó guardado como pendiente. Permite ventanas emergentes para abrir WhatsApp.");
+      }
 
       cart = [];
       updateCartUI();
