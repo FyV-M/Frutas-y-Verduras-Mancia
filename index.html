@@ -495,6 +495,7 @@
 
     let isSubmittingOrder = false;
 
+    // Imágenes optimizadas y 100% coherentes con cada producto real
     const CATALOG_META = {
       "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85" },
       "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=85" },
@@ -511,7 +512,8 @@
       "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=900&q=85" },
       "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=900&q=85" },
       "rábano": { unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=900&q=85" },
-      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=900&q=85" }
+      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=900&q=85" },
+      "repollo": { unitPrice: 2.50, promoQty: 2, promoPrice: 5.00, promoLabel: "2 x $5.00", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1592417817098-8f3d692a465b?auto=format&fit=crop&w=900&q=85" }
     };
 
     const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, ch => ({
@@ -569,20 +571,25 @@
     }
 
     function enrichProduct(item, meta = {}) {
-      const promoQty = Math.max(1, Number(item.promoQty ?? meta.promoQty ?? 1));
-      const promoPrice = Number(item.promoPrice ?? item.salePrice ?? meta.promoPrice ?? 1.00);
-      const unitPrice = Number(item.unitPrice ?? meta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
+      const cleanName = String(item.name || "Producto").trim();
+      const lookupKey = cleanName.toLowerCase();
+      const matchedMeta = CATALOG_META[lookupKey] || meta || {};
+
+      const promoQty = Math.max(1, Number(item.promoQty ?? matchedMeta.promoQty ?? 1));
+      const promoPrice = Number(item.promoPrice ?? item.salePrice ?? matchedMeta.promoPrice ?? 1.00);
+      const unitPrice = Number(item.unitPrice ?? matchedMeta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
+      
       return {
         id: item.id,
-        name: String(item.name || "Producto").trim(),
-        category: item.category || meta.category || "Verduras",
+        name: cleanName,
+        category: item.category || matchedMeta.category || "Verduras",
         unitPrice: Number(unitPrice.toFixed(2)),
         promoQty,
         promoPrice: Number(promoPrice.toFixed(2)),
         salePrice: Number(promoPrice.toFixed(2)),
-        promoLabel: item.promoLabel || meta.promoLabel || (promoQty > 1 ? `${promoQty} x ${money(promoPrice)}` : `1 x ${money(promoPrice)}`),
-        badge: item.badge ?? meta.badge ?? "",
-        image: item.image || meta.image || FALLBACK_IMAGE,
+        promoLabel: item.promoLabel || matchedMeta.promoLabel || (promoQty > 1 ? `${promoQty} x ${money(promoPrice)}` : `1 x ${money(promoPrice)}`),
+        badge: item.badge ?? matchedMeta.badge ?? "",
+        image: item.image || matchedMeta.image || FALLBACK_IMAGE,
         outOfStock: Boolean(item.outOfStock)
       };
     }
@@ -1160,7 +1167,6 @@
       const message = `Hola *Frutas y Verduras Mancía*, quiero solicitar este pedido para retiro:\n\n*Nombre:* ${name}\n*Retiro:* ${pickup}\n*Pago:* ${payment}\n\n*Productos:*\n${lines}\n\n*Total estimado:* ${money(total)}`;
       const url = `https://wa.me/${WHATSAPP_ORDERS}?text=${encodeURIComponent(message)}`;
 
-      // Abrir WhatsApp inmediatamente dentro del toque del usuario (compatible con iPhone/Safari)
       const opened = window.open(url, "_blank", "noopener,noreferrer");
 
       isSubmittingOrder = true;
