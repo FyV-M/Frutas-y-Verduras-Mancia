@@ -21,7 +21,6 @@
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .product-img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
     .drawer-scroll { overscroll-behavior: contain; }
   </style>
 </head>
@@ -486,8 +485,7 @@
     const SUPABASE_URL = "https://vgvkjhfkpyhvapzbyvwn.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cSCLRLMk06I-T0EKAODTGw_W0uVQJja";
     const CLOUD_ROW_ID = "frutas_y_verduras_mancia_v1";
-    const STORAGE_KEY = "biz_control_total_v11"; // Limpieza total de caché anterior
-    const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=85";
+    const STORAGE_KEY = "biz_control_total_v12"; // Versión nueva para limpiar caché
 
     const supabaseClient = window.supabase?.createClient
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
@@ -495,25 +493,25 @@
 
     let isSubmittingOrder = false;
 
-    // CATÁLOGO MAESTRO ESTRICTO Y VERIFICADO (Cada imagen corresponde exactamente al producto real)
+    // CATÁLOGO MAESTRO CON EMOJIS DIRECTOS (Cero errores de fotos externas)
     const CATALOG_META = {
-      "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85" },
-      "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=85" },
-      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1618512499448-f952f4c832e5?auto=format&fit=crop&w=900&q=85" },
-      "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=85" },
-      "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=85" },
-      "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1588854337236-6889d631faa8?auto=format&fit=crop&w=900&q=85" },
-      "ajo": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=900&q=85" },
-      "lechuga": { unitPrice: 1.75, promoQty: 1, promoPrice: 1.75, promoLabel: "1 x $1.75", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=900&q=85" },
-      "aguacate": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", category: "Frutas", badge: "Al punto", image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=900&q=85" },
-      "limón": { unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, promoLabel: "8 x $1.00", category: "Frutas", badge: "Jugoso", image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=900&q=85" },
-      "papa": { unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, promoLabel: "1 libra x $1.50", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=900&q=85" },
-      "elote": { unitPrice: 0.75, promoQty: 1, promoPrice: 0.75, promoLabel: "1 x $0.75", category: "Verduras", badge: "Tierno", image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=900&q=85" },
-      "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=900&q=85" },
-      "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=900&q=85" },
-      "rábano": { unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=900&q=85" }, // Rábano fresco
-      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=900&q=85" },
-      "repollo": { unitPrice: 2.50, promoQty: 2, promoPrice: 5.00, promoLabel: "2 x $5.00", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1592417817098-8f3d692a465b?auto=format&fit=crop&w=900&q=85" }
+      "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", emoji: "🍅", bg: "bg-red-50" },
+      "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", emoji: "🧅", bg: "bg-amber-50" },
+      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", emoji: "🟣", bg: "bg-purple-50" },
+      "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", emoji: "🍌", bg: "bg-yellow-50" },
+      "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", emoji: "🫑", bg: "bg-emerald-50" },
+      "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", emoji: "🌶️", bg: "bg-green-50" },
+      "ajo": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00", category: "Verduras", badge: "", emoji: "🧄", bg: "bg-stone-100" },
+      "lechuga": { unitPrice: 1.75, promoQty: 1, promoPrice: 1.75, promoLabel: "1 x $1.75", category: "Verduras", badge: "Fresco", emoji: "🥬", bg: "bg-green-50" },
+      "aguacate": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", category: "Frutas", badge: "Al punto", emoji: "🥑", bg: "bg-lime-50" },
+      "limón": { unitPrice: 0.15, promoQty: 8, promoPrice: 1.00, promoLabel: "8 x $1.00", category: "Frutas", badge: "Jugoso", emoji: "🍋", bg: "bg-yellow-50" },
+      "papa": { unitPrice: 1.50, promoQty: 1, promoPrice: 1.50, promoLabel: "1 libra x $1.50", category: "Verduras", badge: "Fresco", emoji: "🥔", bg: "bg-amber-100" },
+      "elote": { unitPrice: 0.75, promoQty: 1, promoPrice: 0.75, promoLabel: "1 x $0.75", category: "Verduras", badge: "Tierno", emoji: "🌽", bg: "bg-yellow-100" },
+      "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", emoji: "🍐", bg: "bg-emerald-50" },
+      "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", emoji: "🥒", bg: "bg-green-50" },
+      "rábano": { unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25", category: "Verduras", badge: "", emoji: "🌱", bg: "bg-rose-50" },
+      "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", emoji: "🥕", bg: "bg-orange-50" },
+      "repollo": { unitPrice: 2.50, promoQty: 2, promoPrice: 5.00, promoLabel: "2 x $5.00", category: "Verduras", badge: "Fresco", emoji: "🟢", bg: "bg-green-100" }
     };
 
     const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, ch => ({
@@ -587,7 +585,8 @@
           salePrice: meta.promoPrice,
           promoLabel: meta.promoLabel,
           badge: meta.badge,
-          image: meta.image,
+          emoji: meta.emoji,
+          bg: meta.bg,
           outOfStock: false
         })),
         weeklyPayments: [
@@ -607,9 +606,6 @@
       const promoQty = Math.max(1, Number(item.promoQty ?? matchedMeta.promoQty ?? 1));
       const promoPrice = Number(item.promoPrice ?? item.salePrice ?? matchedMeta.promoPrice ?? 1.00);
       const unitPrice = Number(item.unitPrice ?? matchedMeta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
-      
-      // PRIORIDAD ABSOLUTA AL CATALOG_META OFICIAL
-      const finalImage = matchedMeta.image || item.image || FALLBACK_IMAGE;
 
       return {
         id: item.id,
@@ -621,7 +617,8 @@
         salePrice: Number(promoPrice.toFixed(2)),
         promoLabel: item.promoLabel || matchedMeta.promoLabel || (promoQty > 1 ? `${promoQty} x ${money(promoPrice)}` : `1 x ${money(promoPrice)}`),
         badge: item.badge ?? matchedMeta.badge ?? "",
-        image: finalImage,
+        emoji: matchedMeta.emoji || "🥬",
+        bg: matchedMeta.bg || "bg-emerald-50",
         outOfStock: Boolean(item.outOfStock)
       };
     }
@@ -798,24 +795,6 @@
       if (open) renderLocalPos();
     }
 
-    function getEmoji(name = "") {
-      const n = name.toLowerCase();
-      if (n.includes("tomate")) return "🍅";
-      if (n.includes("cebolla")) return "🧅";
-      if (n.includes("chile") || n.includes("jalapeño")) return "🌶️";
-      if (n.includes("aguacate")) return "🥑";
-      if (n.includes("limón")) return "🍋";
-      if (n.includes("plátano")) return "🍌";
-      if (n.includes("papa")) return "🥔";
-      if (n.includes("ajo")) return "🧄";
-      if (n.includes("zanahoria")) return "🥕";
-      if (n.includes("pepino")) return "🥒";
-      if (n.includes("lechuga")) return "🥬";
-      if (n.includes("elote")) return "🌽";
-      if (n.includes("rábano")) return "🌱";
-      return "🥬";
-    }
-
     function renderLocalPos() {
       const db = loadStoreDB();
       const today = todaySV();
@@ -837,7 +816,7 @@
         return `
           <div class="p-3 rounded-2xl bg-emerald-50/80 border-2 border-emerald-200 flex flex-col justify-between gap-2">
             <span class="flex items-center gap-1.5 truncate text-sm font-extrabold text-emerald-950">
-              <span>${getEmoji(item.name)}</span>
+              <span>${item.emoji || '🥬'}</span>
               <span class="truncate">${safeName}</span>
             </span>
             <div class="grid grid-cols-2 gap-1.5">
@@ -1046,7 +1025,8 @@
         const promoPrice = Number(product.promoPrice || product.salePrice || 0);
         const promoQty = Math.max(1, Number(product.promoQty || 1));
         const promoLabel = escapeHTML(product.promoLabel || `${promoQty} x ${money(promoPrice)}`);
-        const image = escapeHTML(product.image || FALLBACK_IMAGE);
+        const emoji = product.emoji || "🥬";
+        const bgClass = product.bg || "bg-emerald-50";
         const outOfStock = Boolean(product.outOfStock);
 
         const unitKey = cartKey(product.name, "unit");
@@ -1081,8 +1061,8 @@
 
         return `
           <article class="flex flex-col overflow-hidden rounded-3xl border-2 ${count ? "border-emerald-700 ring-2 ring-emerald-100" : "border-stone-200"} bg-white shadow-xs transition ${outOfStock ? 'opacity-75' : ''}">
-            <div class="relative overflow-hidden bg-stone-100">
-              <img src="${image}" alt="${name}" class="product-img" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMAGE}'">
+            <div class="relative overflow-hidden ${bgClass} h-40 flex items-center justify-center">
+              <span class="text-7xl select-none drop-shadow-sm">${emoji}</span>
               <span class="absolute left-3 top-3 rounded-full bg-amber-400 px-3 py-1 text-xs font-extrabold text-stone-950 shadow-xs">${badge}</span>
               ${outOfStock ? '<span class="absolute inset-0 bg-stone-950/40 flex items-center justify-center text-white font-extrabold text-lg tracking-wider">AGOTADO HOY</span>' : ''}
               ${count ? `<span class="absolute right-3 top-3 rounded-full bg-emerald-800 px-3 py-1 text-xs font-extrabold text-white">En pedido: ${count}</span>` : ""}
