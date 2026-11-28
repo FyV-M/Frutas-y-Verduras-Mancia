@@ -495,11 +495,11 @@
 
     let isSubmittingOrder = false;
 
-    // Imágenes optimizadas y 100% coherentes con cada producto real
+    // Catálogo con imágenes 100% minuciosas, cuidadas y coherentes por producto
     const CATALOG_META = {
       "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85" },
       "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=85" },
-      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&fit=crop&w=900&q=85" },
+      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1618512499448-f952f4c832e5?auto=format&fit=crop&w=900&q=85" },
       "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=85" },
       "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=900&q=85" },
       "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=85" },
@@ -579,6 +579,11 @@
       const promoPrice = Number(item.promoPrice ?? item.salePrice ?? matchedMeta.promoPrice ?? 1.00);
       const unitPrice = Number(item.unitPrice ?? matchedMeta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
       
+      // Permitir cambio manual: Si el admin guardó una imagen personalizada en Supabase, se respeta; si no, usa la coherente del catálogo o fallback
+      const finalImage = item.image && item.image.trim() !== "" 
+        ? item.image 
+        : (matchedMeta.image || FALLBACK_IMAGE);
+
       return {
         id: item.id,
         name: cleanName,
@@ -589,7 +594,7 @@
         salePrice: Number(promoPrice.toFixed(2)),
         promoLabel: item.promoLabel || matchedMeta.promoLabel || (promoQty > 1 ? `${promoQty} x ${money(promoPrice)}` : `1 x ${money(promoPrice)}`),
         badge: item.badge ?? matchedMeta.badge ?? "",
-        image: item.image || matchedMeta.image || FALLBACK_IMAGE,
+        image: finalImage,
         outOfStock: Boolean(item.outOfStock)
       };
     }
