@@ -486,7 +486,7 @@
     const SUPABASE_URL = "https://vgvkjhfkpyhvapzbyvwn.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cSCLRLMk06I-T0EKAODTGw_W0uVQJja";
     const CLOUD_ROW_ID = "frutas_y_verduras_mancia_v1";
-    const STORAGE_KEY = "biz_control_total_v7";
+    const STORAGE_KEY = "biz_control_total_v9"; // Versión nueva para forzar limpieza de memoria antigua
     const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=85";
 
     const supabaseClient = window.supabase?.createClient
@@ -495,11 +495,11 @@
 
     let isSubmittingOrder = false;
 
-    // Catálogo con imágenes 100% minuciosas, cuidadas y coherentes por producto
+    // CATÁLOGO MAESTRO ESTRICTO: Cada producto con su imagen real, limpia, coherente y nombres bien formateados con tildes
     const CATALOG_META = {
       "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85" },
       "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=85" },
-      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1618512499448-f952f4c832e5?auto=format&fit=crop&w=900&q=85" },
+      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1621459757523-9582d92d47da?auto=format&fit=crop&w=900&q=85" },
       "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=85" },
       "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=900&q=85" },
       "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=85" },
@@ -544,12 +544,43 @@
       }
     };
 
+    function formatProperName(name = "") {
+      const raw = String(name).trim().toLowerCase();
+      // Nombres oficiales con formato exacto y tildes cuidadas
+      const properMap = {
+        "tomate": "Tomate",
+        "cebolla blanca": "Cebolla Blanca",
+        "cebolla morada": "Cebolla Morada",
+        "platano": "Plátano",
+        "plátano": "Plátano",
+        "chile verde": "Chile Verde",
+        "jalapeno": "Jalapeño",
+        "jalapeño": "Jalapeño",
+        "ajo": "Ajo",
+        "lechuga": "Lechuga",
+        "aguacate": "Aguacate",
+        "limon": "Limón",
+        "limón": "Limón",
+        "papa": "Papa",
+        "elote": "Elote",
+        "guisquil": "Güisquil",
+        "güisquil": "Güisquil",
+        "pepino": "Pepino",
+        "rabano": "Rábano",
+        "rábano": "Rábano",
+        "zanahoria": "Zanahoria",
+        "repollo": "Repollo"
+      };
+      if (properMap[raw]) return properMap[raw];
+      return raw.replace(/\b\p{L}/gu, c => c.toLocaleUpperCase("es"));
+    }
+
     function makeInitialDB() {
       return {
         openingCash: 146.45,
-        inventory: Object.entries(CATALOG_META).map(([name, meta], idx) => ({
+        inventory: Object.entries(CATALOG_META).map(([key, meta], idx) => ({
           id: 101 + idx,
-          name: name.replace(/\b\p{L}/gu, c => c.toLocaleUpperCase("es")),
+          name: formatProperName(key),
           category: meta.category,
           unitPrice: meta.unitPrice,
           promoQty: meta.promoQty,
@@ -571,22 +602,19 @@
     }
 
     function enrichProduct(item, meta = {}) {
-      const cleanName = String(item.name || "Producto").trim();
-      const lookupKey = cleanName.toLowerCase();
-      const matchedMeta = CATALOG_META[lookupKey] || meta || {};
+      const cleanNameKey = String(item.name || "Producto").trim().toLowerCase();
+      const matchedMeta = CATALOG_META[cleanNameKey] || meta || {};
 
       const promoQty = Math.max(1, Number(item.promoQty ?? matchedMeta.promoQty ?? 1));
       const promoPrice = Number(item.promoPrice ?? item.salePrice ?? matchedMeta.promoPrice ?? 1.00);
       const unitPrice = Number(item.unitPrice ?? matchedMeta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
       
-      // Permitir cambio manual: Si el admin guardó una imagen personalizada en Supabase, se respeta; si no, usa la coherente del catálogo o fallback
-      const finalImage = item.image && item.image.trim() !== "" 
-        ? item.image 
-        : (matchedMeta.image || FALLBACK_IMAGE);
+      // GARANTÍA DE IMAGEN CORRECTA: Si el diccionario maestro tiene una imagen oficial, se usa obligatoriamente.
+      const finalImage = matchedMeta.image || item.image || FALLBACK_IMAGE;
 
       return {
         id: item.id,
-        name: cleanName,
+        name: formatProperName(item.name),
         category: item.category || matchedMeta.category || "Verduras",
         unitPrice: Number(unitPrice.toFixed(2)),
         promoQty,
@@ -610,7 +638,7 @@
 
       const inventory = base.inventory.map(seed => {
         const found = rawList.find(p => String(p.id) === String(seed.id) || String(p.name || "").trim().toLowerCase() === seed.name.toLowerCase());
-        return enrichProduct({ ...seed, ...(found || {}), name: found?.name || seed.name }, CATALOG_META[seed.name.toLowerCase()] || {});
+        return enrichProduct({ ...seed, ...(found || {}), name: seed.name }, CATALOG_META[seed.name.toLowerCase()] || {});
       });
 
       const extras = rawList
@@ -1200,7 +1228,7 @@
       updateCartUI();
       renderProducts();
       toggleCart(false);
-      document.getElementById("customerName").value = "";
+      document.getElementById("customerName": "").value = "";
     }
 
     document.addEventListener("keydown", event => {
