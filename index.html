@@ -469,6 +469,7 @@
 
         <button
           type="button"
+          id="sendOrderBtn"
           onclick="sendWhatsAppOrder()"
           class="w-full min-h-[50px] bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-base sm:text-lg py-3.5 px-5 rounded-2xl shadow-lg transition active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
         >
@@ -491,6 +492,8 @@
     const supabaseClient = window.supabase?.createClient
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
       : null;
+
+    let isSubmittingOrder = false;
 
     const CATALOG_META = {
       "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85" },
@@ -628,23 +631,7 @@
       } catch (e) {}
     }
 
-    async function syncStoreDBToCloud(db) {
-      if (!supabaseClient) return { ok: false };
-      try {
-        const { error } = await supabaseClient
-          .from("store_control")
-          .upsert({
-            id: CLOUD_ROW_ID,
-            data: db,
-            updated_at: new Date().toISOString()
-          });
-        return { ok: !error };
-      } catch {
-        return { ok: false };
-      }
-    }
-
-    async function fetchCloudStoreDB() {
+    async function fetchCloudCatalog() {
       if (!supabaseClient) return loadStoreDB();
       try {
         const { data, error } = await supabaseClient
@@ -674,7 +661,6 @@
       initManciaMap();
       updateOpenStatus();
 
-      // Verificar si ya hay una sesión activa de Supabase
       if (supabaseClient) {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) isLocalPosUnlocked = true;
@@ -687,7 +673,7 @@
           renderLocalPos();
         }
       }, 30000);
-      await fetchCloudStoreDB();
+      await fetchCloudCatalog();
       renderProducts();
       renderLocalPos();
     });
@@ -845,7 +831,7 @@
       if (!Number.isFinite(value) || value <= 0) return;
       const method = document.getElementById("localPosMethod").value || "Efectivo";
 
-      const db = await fetchCloudStoreDB();
+      const db = await fetchCloudCatalog();
       db.sales.unshift({
         id: crypto.randomUUID?.() || String(Date.now()),
         date: todaySV(),
@@ -857,12 +843,21 @@
 
       saveStoreDB(db);
       renderLocalPos();
-      const syncResult = await syncStoreDBToCloud(db);
+
+      if (supabaseClient) {
+        try {
+          await supabaseClient
+            .from("store_control")
+            .upsert({
+              id: CLOUD_ROW_ID,
+              data: db,
+              updated_at: new Date().toISOString()
+            });
+        } catch {}
+      }
 
       const feedback = document.getElementById("localPosFeedback");
-      feedback.textContent = syncResult.ok
-        ? `✓ Venta registrada: ${productName} • ${money(value)} (${method})`
-        : `✓ Guardado localmente: ${productName} • ${money(value)} (${method})`;
+      feedback.textContent = `✓ Venta registrada: ${productName} • ${money(value)} (${method})`;
       feedback.classList.remove("hidden");
     }
 
@@ -1150,10 +1145,8 @@
     }
 
     async function sendWhatsAppOrder() {
-      if (!cart.length) {
-        alert("Agrega al menos un producto a tu pedido.");
-        return;
-      }
+      if (!cart.length || isSubmittingOrder) return;
+      
       const name = document.getElementById("customerName").value.trim() || "Cliente";
       const pickup = document.getElementById("pickupTime").value;
       const payment = document.getElementById("paymentMethod").value;
@@ -1167,31 +1160,36 @@
       const message = `Hola *Frutas y Verduras Mancía*, quiero solicitar este pedido para retiro:\n\n*Nombre:* ${name}\n*Retiro:* ${pickup}\n*Pago:* ${payment}\n\n*Productos:*\n${lines}\n\n*Total estimado:* ${money(total)}`;
       const url = `https://wa.me/${WHATSAPP_ORDERS}?text=${encodeURIComponent(message)}`;
 
-      const db = await fetchCloudStoreDB();
-      db.orders.unshift({
-        id: crypto.randomUUID?.() || String(Date.now()),
-        createdAt: new Date().toISOString(),
-        date: todaySV(),
-        customer: name,
-        pickup,
-        payment,
-        items: cart.map(item => ({ ...item })),
-        estimatedTotal: Number(total.toFixed(2)),
-        status: "Pendiente"
-      });
-      saveStoreDB(db);
-      await syncStoreDBToCloud(db);
-
+      // Abrir WhatsApp inmediatamente dentro del toque del usuario (compatible con iPhone/Safari)
       const opened = window.open(url, "_blank", "noopener,noreferrer");
-      if (!opened) {
-        alert("Tu pedido quedó guardado como pendiente. Permite ventanas emergentes para abrir WhatsApp.");
-      }
+
+      isSubmittingOrder = true;
+      const btn = document.getElementById("sendOrderBtn");
+      if (btn) btn.disabled = true;
+
+      try {
+        if (supabaseClient) {
+          await supabaseClient.from("orders").insert({
+            id: crypto.randomUUID?.() || String(Date.now()),
+            date: todaySV(),
+            customer: name,
+            pickup,
+            payment,
+            items: cart.map(item => ({ ...item })),
+            estimated_total: Number(total.toFixed(2)),
+            status: "Pendiente"
+          });
+        }
+      } catch (e) {}
+
+      isSubmittingOrder = false;
+      if (btn) btn.disabled = false;
 
       cart = [];
       updateCartUI();
       renderProducts();
       toggleCart(false);
-      document.getElementById("customerName" ).value = "";
+      document.getElementById("customerName").value = "";
     }
 
     document.addEventListener("keydown", event => {
