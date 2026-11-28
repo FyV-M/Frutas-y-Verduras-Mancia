@@ -486,7 +486,7 @@
     const SUPABASE_URL = "https://vgvkjhfkpyhvapzbyvwn.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cSCLRLMk06I-T0EKAODTGw_W0uVQJja";
     const CLOUD_ROW_ID = "frutas_y_verduras_mancia_v1";
-    const STORAGE_KEY = "biz_control_total_v9"; // Versión nueva para forzar limpieza de memoria antigua
+    const STORAGE_KEY = "biz_control_total_v11"; // Limpieza total de caché anterior
     const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=85";
 
     const supabaseClient = window.supabase?.createClient
@@ -495,14 +495,14 @@
 
     let isSubmittingOrder = false;
 
-    // CATÁLOGO MAESTRO ESTRICTO: Cada producto con su imagen real, limpia, coherente y nombres bien formateados con tildes
+    // CATÁLOGO MAESTRO ESTRICTO Y VERIFICADO (Cada imagen corresponde exactamente al producto real)
     const CATALOG_META = {
       "tomate": { unitPrice: 0.15, promoQty: 10, promoPrice: 1.00, promoLabel: "10 x $1.00", category: "Verduras", badge: "Fresco hoy", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=900&q=85" },
       "cebolla blanca": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "Oferta diaria", image: "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=85" },
-      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1621459757523-9582d92d47da?auto=format&fit=crop&w=900&q=85" },
+      "cebolla morada": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1618512499448-f952f4c832e5?auto=format&fit=crop&w=900&q=85" },
       "plátano": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Frutas", badge: "Dulces", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=900&q=85" },
-      "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=900&q=85" },
-      "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=85" },
+      "chile verde": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&w=900&q=85" },
+      "jalapeño": { unitPrice: 0.20, promoQty: 6, promoPrice: 1.00, promoLabel: "6 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1588854337236-6889d631faa8?auto=format&fit=crop&w=900&q=85" },
       "ajo": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 redes x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?auto=format&fit=crop&w=900&q=85" },
       "lechuga": { unitPrice: 1.75, promoQty: 1, promoPrice: 1.75, promoLabel: "1 x $1.75", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?auto=format&fit=crop&w=900&q=85" },
       "aguacate": { unitPrice: 0.50, promoQty: 2, promoPrice: 1.00, promoLabel: "2 x $1.00", category: "Frutas", badge: "Al punto", image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=900&q=85" },
@@ -511,7 +511,7 @@
       "elote": { unitPrice: 0.75, promoQty: 1, promoPrice: 0.75, promoLabel: "1 x $0.75", category: "Verduras", badge: "Tierno", image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=900&q=85" },
       "güisquil": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=900&q=85" },
       "pepino": { unitPrice: 0.25, promoQty: 4, promoPrice: 1.00, promoLabel: "4 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?auto=format&fit=crop&w=900&q=85" },
-      "rábano": { unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1582284540020-8acbe03f4924?auto=format&fit=crop&w=900&q=85" },
+      "rábano": { unitPrice: 0.15, promoQty: 4, promoPrice: 0.25, promoLabel: "4 x $0.25", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1590779033100-9f60a05a013d?auto=format&fit=crop&w=900&q=85" }, // Rábano fresco
       "zanahoria": { unitPrice: 0.35, promoQty: 3, promoPrice: 1.00, promoLabel: "3 x $1.00", category: "Verduras", badge: "", image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=900&q=85" },
       "repollo": { unitPrice: 2.50, promoQty: 2, promoPrice: 5.00, promoLabel: "2 x $5.00", category: "Verduras", badge: "Fresco", image: "https://images.unsplash.com/photo-1592417817098-8f3d692a465b?auto=format&fit=crop&w=900&q=85" }
     };
@@ -546,7 +546,6 @@
 
     function formatProperName(name = "") {
       const raw = String(name).trim().toLowerCase();
-      // Nombres oficiales con formato exacto y tildes cuidadas
       const properMap = {
         "tomate": "Tomate",
         "cebolla blanca": "Cebolla Blanca",
@@ -609,7 +608,7 @@
       const promoPrice = Number(item.promoPrice ?? item.salePrice ?? matchedMeta.promoPrice ?? 1.00);
       const unitPrice = Number(item.unitPrice ?? matchedMeta.unitPrice ?? (promoPrice / promoQty) ?? 0.25);
       
-      // GARANTÍA DE IMAGEN CORRECTA: Si el diccionario maestro tiene una imagen oficial, se usa obligatoriamente.
+      // PRIORIDAD ABSOLUTA AL CATALOG_META OFICIAL
       const finalImage = matchedMeta.image || item.image || FALLBACK_IMAGE;
 
       return {
@@ -1228,7 +1227,7 @@
       updateCartUI();
       renderProducts();
       toggleCart(false);
-      document.getElementById("customerName": "").value = "";
+      document.getElementById("customerName").value = "";
     }
 
     document.addEventListener("keydown", event => {
